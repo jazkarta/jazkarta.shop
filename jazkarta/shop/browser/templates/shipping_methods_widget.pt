@@ -1,0 +1,22 @@
+<tal:b define="methods view/available_shipping_methods;
+	           value request/form/shipping_method|nothing;
+	           value python:methods[0]['id'] if (methods and not value) else value;">
+
+	<div tal:repeat="method methods">
+	  <label>
+	    <input name="shipping_method" type="radio" value="${method/id}"
+	           tal:attributes="checked python:'checked' if value == method['id'] else None" />
+	    $<tal:s replace="python:'{:.2f}'.format(method['price'])" /> - ${method/name}
+	  </label>
+	</div>
+
+	<dl class="portalMessage" tal:condition="not:methods">
+	  <dt>Info</dt>
+	  <dd>Please enter a shipping address so we can check what shipping methods are available.</dd>
+	</dl>
+
+	<div class="formControls" tal:condition="methods">
+	  <tal:b replace="structure view/actions/proceed/render" />
+	</div>
+
+</tal:b>

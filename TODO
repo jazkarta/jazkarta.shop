@@ -1,0 +1,12 @@
+- promo content type
+- buyable behavior / content types
+- UI
+  - order history
+
+- Tax helper should be turned into a utility.
+- So should shipping services.
+- Be sure to use navigation root url consistently instead of portal url
+- See @@@ comments
+- Add logging
+- Make sure js works for manage-shipping-methods
+- Use browser layer

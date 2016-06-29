@@ -1,0 +1,47 @@
+<html xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n">
+<body tal:define="cart view/old_cart;
+	              order cart/data">
+
+<p>${view/receipt_intro}</p>
+
+<table>
+	<tr>
+		<td tal:define="bill_to order/bill_to|nothing" tal:condition="bill_to" style="vertical-align: top; padding-right: 20px;">
+			<strong>Billed to:</strong><br />
+			${bill_to/first_name} ${bill_to/last_name}<br />
+			${bill_to/address}<br />
+			${bill_to/city}, ${bill_to/state} ${bill_to/zip}<br />
+			${bill_to/country}<br />
+			${bill_to/email}<br />
+			${bill_to/phone}
+		</td>
+		<td tal:define="ship_to order/ship_to|nothing" tal:condition="ship_to" style="vertical-align: top;">
+			<strong>Shipped to:</strong><br />
+			${ship_to/first_name} ${ship_to/last_name}<br />
+			${ship_to/street}<br />
+			${ship_to/city}, ${ship_to/state} ${ship_to/postal_code}<br />
+			${ship_to/country}
+		</td>
+	</tr>
+</table>
+
+<tal:block tal:replace="structure view/cart_template" />
+
+<br /><br />
+<div class="subtotal">
+  <strong>Your purchases total</strong>
+  <span tal:content="python:'${:,.2f}'.format(view.amount)"></span>
+</div>
+
+<tal:b condition="order/notes|nothing">
+  <br />
+  <strong>Notes/Questions:</strong>
+  <div tal:content="order/notes" />
+</tal:b>
+
+<p tal:replace="structure cart/thankyou_message" />
+
+</body>
+</html>

@@ -1,0 +1,57 @@
+<tal:block tal:define="dummy python:request.set('disable_border', True)"/><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="context/main_template/macros/master"
+      i18n:domain="plone">
+
+<body>
+
+<metal:main fill-slot="main">
+  <div data-pat-modal='{"actionOptions": {"displayInModal": false}}'>
+    <h1 class="documentFirstHeading">Shipping Methods</h1>
+
+    <a class="pat-modal green button" href="${context/absolute_url}/${view/__name__}/+">Add Shipping Method</a>
+    <table class="listing">
+      <tr>
+        <th>Name</th>
+        <th>Zones</th>
+        <th>Min Purchase</th>
+        <th>Calculation</th>
+        <th></th>
+      </tr>
+      <tr tal:repeat="(name, method) view/shipping_methods/items">
+        <td>${method/name}</td>
+        <td tal:content="python:', '.join(method['zones'])" />
+        <td tal:content="python:'${:.2f}'.format(method['min_purchase']) if method['min_purchase'] else ''" />
+        <td tal:content="python:view.format_calculation(method['calculation'])" tal:on-error="nothing" />
+        <td>
+          <a class="pat-modal" href="${context/absolute_url}/${view/__name__}/${name}">Edit</a>
+        </td>
+      </tr>
+    </table>
+
+    <script type="text/javascript">
+    jQuery(function($) {
+        var update = function() {
+            var calc = $('select[name="form.widgets.calculation"]').val();
+            if (calc == 'weight') {
+                $('#formfield-form-widgets-weight_table').show();
+            } else {
+                $('#formfield-form-widgets-weight_table').hide();
+            }
+        };
+        var initialize = function() {
+            dataGridField2Functions.init();
+            $('select[name="form.widgets.calculation"]').change(update);
+            update();
+        };
+        $(document).on('shown.modal.patterns', initialize);
+        $(document).on('afterDraw.modal.patterns', initialize);
+    });
+    </script>
+  </div>
+</metal:main>
+</body>
+</html>

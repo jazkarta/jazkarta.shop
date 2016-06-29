@@ -1,0 +1,39 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:gs="http://namespaces.zope.org/genericsetup"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    i18n_domain="jazkarta.shop">
+
+  <include package="collective.z3cform.datagridfield" />
+  <include package="z3c.currency" />
+
+  <gs:registerProfile
+      name="default"
+      title="jazkarta.shop"
+      directory="profiles/default"
+      description=""
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
+  <permission
+      id="jazkarta.shop.ManageShop"
+      title="jazkarta.shop: Manage shop">
+    <role name="Site Administrator" />
+    <role name="Manager" />
+  </permission>
+
+  <include package=".browser" />
+
+  <!-- Behavior -->
+  <plone:behavior
+    title="Jazkarta Shop Product"
+    description="Allows the content type to be purchased in the shop."
+    provides=".interfaces.IProduct"
+    />
+  <adapter factory=".purchasable.DefaultPurchaseHandler" />
+
+  <!-- Vocabulary factories -->
+  <utility name="jazkarta.shop.countries" component=".vocabs.get_country_vocab" />
+  <utility name="jazkarta.shop.product_categories" component=".vocabs.product_categories" />
+
+</configure>

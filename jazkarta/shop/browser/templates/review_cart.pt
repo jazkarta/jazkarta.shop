@@ -1,0 +1,132 @@
+<tal:block tal:define="dummy python:request.set('disable_border', True)"/><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="context/main_template/macros/master"
+      i18n:domain="plone">
+
+<head>
+  <metal:js fill-slot="javascript_head_slot">
+  <script type="text/javascript"
+          tal:content="string:var order_amount = ${view/cart/subtotal};">
+  </script>
+  <script type="text/javascript">
+    var format_currency = function(x) {
+      return x.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+    jQuery(function($) {
+        var refresh_cart = function() {
+            $.get(portal_url + '/shopping-cart', {}, function(data) {
+              $('#cartWrapper').replaceWith(data)
+              $('#cartWrapper').addClass('deactivated');
+            }, 'html');
+        }
+        var update_order_totals = function() {
+          var subtotal = parseFloat($('#total_order_amount').val());
+          order_amount = subtotal;
+          var new_order_total = subtotal;
+          subtotal = format_currency(subtotal);
+          var discount = parseFloat($('#total_order_discount').val());
+          new_order_total = new_order_total + discount;
+          $('#subtotal-amount').text(subtotal);
+          $('#discount-amount').text(format_currency(discount));
+          $('#total-amount').text(format_currency(new_order_total));
+          if ($('tr.item').length || new_order_total) {
+            $('#checkout-button').show();
+          } else {
+            $('#checkout-button').hide();          
+          }
+        }
+        var bind_cart_actions = function() {
+          $('.form_item_change').on('change', function() {
+              $.post(portal_url + '/shopping-cart-form',
+                {'change': $(this).attr('rel'),
+                 'quantity': $(this).val()}, function(data) {
+                $('#cartFormWrapper').replaceWith(data);
+                update_order_totals();
+                bind_cart_actions();
+                refresh_cart();
+              }, 'html');
+          });
+          $('.form_item_add, .item_add').unbind('click').click(function(e) {
+              e.stopPropagation();
+              $.post(portal_url + '/shopping-cart-form', {'add': $(this).attr('data-uid')}, function(data) {
+                $('#cartFormWrapper').replaceWith(data);
+                update_order_totals();
+                bind_cart_actions();
+                refresh_cart();
+              }, 'html');
+          });
+          $('.form_item_del').unbind('click').click(function() {
+              $.post(portal_url + '/shopping-cart-form', {'del': $(this).attr('rel')}, function(data) {
+                $('#cartFormWrapper').replaceWith(data);
+                update_order_totals();
+                bind_cart_actions();
+                refresh_cart();
+              }, 'html');
+          });
+          $('.form_item_remove').unbind('click').click(function() {
+              $.post(portal_url + '/shopping-cart-form', {'remove': $(this).attr('rel')}, function(data) {
+                $('#cartFormWrapper').replaceWith(data);
+                update_order_totals();
+                bind_cart_actions();
+                refresh_cart();
+              }, 'html');
+          });
+        };
+        bind_cart_actions();
+    });
+  </script>
+  </metal:js>
+</head>
+
+<body>
+
+<metal:main fill-slot="main">
+    <h1 class="documentFirstHeading">Your Shopping Cart</h1>
+
+    <tal:block tal:replace="structure view/cart_template" />
+    <div class="subtotal">
+      <strong>Your purchases subtotal</strong>
+      <span id="subtotal-amount" tal:content="python:'${:,.2f}'.format(view.cart.orig_subtotal)"></span>
+    </div>
+
+    <div id="promocodes">
+      <tal:block tal:define="view nocall:view/promo_form">
+        <tal:block metal:use-macro="context/@@ploneform-macros/titlelessform" />
+      </tal:block>
+      <div id="promos">
+        <div tal:repeat="promo view/promos">
+          <span tal:content="string:Promo: ${promo/id}"></span>
+          <span class="promo-amount" tal:content="string:(${promo/discount} off)"></span>
+          <a tal:condition="promo/can_remove" title="Remove this promo" href="${portal_url}/review-cart?remove_promo=${promo/id}" class="promo_remove"></a>
+        </div>
+      </div>
+      <div id="promo-total" tal:condition="view/cart/discount">
+        <strong>Total discount</strong>
+         $<span id="discount-amount" tal:content="python:'{:,.2f}'.format(view.cart.discount)"></span>
+      </div>
+    </div>
+
+    <form method="post" tal:attributes="action string:${context/portal_url}/review-cart">
+      <input name="submitted" type="hidden" value="1" />
+
+      <div id="order-total">
+        <p><strong>Your Total</strong>
+           $<span id="total-amount" tal:content="python:'{:,.2f}'.format(view.cart.subtotal)"></span></p>
+          <p>Note that any shipping charges or sales tax for physical items will be added later in the checkout process.</p>
+      </div>
+
+      <div class="form-buttons checkout-buttons">
+        <a class="button continue-exploring"
+           tal:define="came_from request/came_from|request/HTTP_REFERER|context/portal_url"
+           href="${came_from}">Continue Exploring</a>
+        <input id="checkout-button" type="submit" value="Proceed to Checkout" class="button yellow"
+               tal:attributes="style python:'display: none' if not view.cart else ''" />
+      </div>
+ 
+    </form>
+</metal:main>
+</body>
+</html>

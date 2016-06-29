@@ -1,0 +1,46 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="context/main_template/macros/master"
+      i18n:domain="plone">
+<body>
+
+<metal:main fill-slot="main">
+  <div tal:define="cart view/old_cart|nothing"
+       tal:condition="not:view/error">
+    <h1 class="documentFirstHeading">Thank You</h1>
+    <dl class="portalMessage success" tal:condition="cart/items">
+      <dt>Success</dt>
+      <dd>
+        <h2>Order Complete</h2>
+        <p>Thank you for your purchase.</p>
+      </dd>
+    </dl>
+    <br />
+    <tal:b condition="cart/items">
+      <tal:b replace="structure view/cart_template" />
+      <div class="subtotal">
+        <strong>Your purchases total</strong>
+        <span tal:content="python:'${:,.2f}'.format(view.amount)"></span>
+      </div>
+      <br />
+      <tal:b condition="cart/data/notes|nothing">
+        <h3>Notes/Questions:</h3>
+        <p tal:content="cart/data/notes" />
+      </tal:b>
+      <br />
+    </tal:b>
+    <p tal:replace="structure cart/thankyou_message" />
+  </div>
+  <dl class="portalMessage error" tal:condition="view/error">
+    <dt>Error</dt>
+    <dd>
+      <h2>There was a problem with your order</h2>
+      <p tal:content="view/error">Error</p>
+    </dd>
+  </dl>
+</metal:main>
+</body>
+</html>

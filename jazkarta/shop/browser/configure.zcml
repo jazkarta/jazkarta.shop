@@ -1,0 +1,92 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    i18n_domain="jazkarta.shop">
+
+  <browser:page
+    name="jazkarta-shop-settings"
+    for="plone.app.layout.navigation.interfaces.INavigationRoot"
+    class=".controlpanel.SettingsControlPanelView"
+    permission="jazkarta.shop.ManageShop"
+    />
+
+  <browser:page
+    name="jazkarta-shop-shipping-methods"
+    for="plone.app.layout.navigation.interfaces.INavigationRoot"
+    class=".shipping.ShippingMethodControlPanel"
+    template="templates/shipping_methods_controlpanel.pt"
+    permission="jazkarta.shop.ManageShop"
+    />
+
+  <browser:page
+    name="shopping-cart"
+    for="*"
+    class=".viewlets.CartView"
+    template="templates/cart.pt"
+    permission="zope.Public"
+    />
+
+  <browser:page
+    name="review-cart"
+    for="*"
+    class=".cart.ReviewCartForm"
+    template="templates/review_cart.pt"
+    permission="zope2.View"
+    />
+
+  <browser:page
+    name="update-cart"
+    for="plone.app.layout.navigation.interfaces.INavigationRoot"
+    class=".cart.UpdateCartView"
+    template="templates/checkout_cart.pt"
+    permission="zope2.View"
+    />
+
+  <browser:page
+    name="shipping"
+    for="plone.app.layout.navigation.interfaces.INavigationRoot"
+    class=".shipping.ShippingForm"
+    template="templates/shipping_form.pt"
+    permission="zope2.View"
+    />
+
+  <browser:page
+    name="checkout"
+    for="plone.app.layout.navigation.interfaces.INavigationRoot"
+    class=".checkout.CheckoutForm"
+    template="templates/checkout_form.pt"
+    permission="zope2.View"
+    />
+
+  <browser:viewlet
+    name="jazkarta.shop.stripe_js"
+    view="jazkarta.shop.interfaces.IStripeEnabledView"
+    manager="plone.app.layout.viewlets.interfaces.IHtmlHead"
+    class=".stripe.StripeJS"
+    permission="zope2.View"
+    />
+
+  <browser:viewlet
+    name="jazkarta.shop.cart"
+    for="*"
+    manager="plone.app.layout.viewlets.interfaces.IPortalHeader"
+    class=".viewlets.CartViewlet"
+    template="templates/cart.pt"
+    permission="zope.Public"
+    />
+
+  <browser:viewlet
+    name="jazkarta.shop.addtocart"
+    for="..interfaces.IProduct"
+    manager="plone.app.layout.viewlets.interfaces.IBelowContentTitle"
+    class=".viewlets.AddToCartViewlet"
+    template="templates/add_to_cart.pt"
+    permission="zope2.View"
+    />
+
+  <browser:resourceDirectory
+    name="jazkarta.shop"
+    directory="static"
+    />
+
+</configure>
