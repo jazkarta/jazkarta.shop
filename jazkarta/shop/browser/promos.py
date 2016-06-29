@@ -14,6 +14,7 @@ class IPromoCode(Interface):
 
     promo_code = schema.TextLine(
         title=u'Promo Code',
+        required=False,
     )
 
 
