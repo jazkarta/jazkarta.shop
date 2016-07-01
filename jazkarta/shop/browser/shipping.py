@@ -200,7 +200,7 @@ class ShippingForm(AutoExtensibleForm):
             self.update()
             return self.shipping_methods_template()
         else:
-            return super(SchemaForm, self).__call__()
+            return super(AutoExtensibleForm, self).__call__()
 
     def getContent(self):
         ship_to = self.cart.ship_to
