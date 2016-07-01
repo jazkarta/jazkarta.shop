@@ -16,6 +16,7 @@
       return x.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     };
     jQuery(function($) {
+        var portal_url = window.portal_url || $('body').data('portal-url');
         var refresh_cart = function() {
             $.get(portal_url + '/shopping-cart', {}, function(data) {
               $('#cartWrapper').replaceWith(data)
@@ -40,7 +41,7 @@
         }
         var bind_cart_actions = function() {
           $('.form_item_change').on('change', function() {
-              $.post(portal_url + '/shopping-cart-form',
+              $.post(portal_url + '/update-cart',
                 {'change': $(this).attr('rel'),
                  'quantity': $(this).val()}, function(data) {
                 $('#cartFormWrapper').replaceWith(data);
@@ -51,7 +52,7 @@
           });
           $('.form_item_add, .item_add').unbind('click').click(function(e) {
               e.stopPropagation();
-              $.post(portal_url + '/shopping-cart-form', {'add': $(this).attr('data-uid')}, function(data) {
+              $.post(portal_url + '/update-cart', {'add': $(this).attr('data-uid')}, function(data) {
                 $('#cartFormWrapper').replaceWith(data);
                 update_order_totals();
                 bind_cart_actions();
@@ -59,7 +60,7 @@
               }, 'html');
           });
           $('.form_item_del').unbind('click').click(function() {
-              $.post(portal_url + '/shopping-cart-form', {'del': $(this).attr('rel')}, function(data) {
+              $.post(portal_url + '/update-cart', {'del': $(this).attr('rel')}, function(data) {
                 $('#cartFormWrapper').replaceWith(data);
                 update_order_totals();
                 bind_cart_actions();
@@ -67,7 +68,7 @@
               }, 'html');
           });
           $('.form_item_remove').unbind('click').click(function() {
-              $.post(portal_url + '/shopping-cart-form', {'remove': $(this).attr('rel')}, function(data) {
+              $.post(portal_url + '/update-cart', {'remove': $(this).attr('rel')}, function(data) {
                 $('#cartFormWrapper').replaceWith(data);
                 update_order_totals();
                 bind_cart_actions();
