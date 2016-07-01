@@ -31,6 +31,12 @@ class PromoCodeForm(form.Form):
         if errors:
             return
 
+        # XXX since promo codes are not required, the field may now be empty
+        # this is away to bypass just a scenario where no promo code exists
+        # but the user has hit apply promo code button
+        if data['promo_code'] is None:
+            return
+
         promo = find_promo_by_code(data['promo_code'])
         if promo is None:
             raise ActionExecutionError(
