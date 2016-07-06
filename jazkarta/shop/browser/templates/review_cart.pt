@@ -109,7 +109,7 @@
         <div tal:repeat="promo view/promos">
           <span tal:content="string:Promo: ${promo/id}"></span>
           <span class="promo-amount" tal:content="string:(${promo/discount} off)"></span>
-          <a tal:condition="promo/can_remove" title="Remove this promo" href="${portal_url}/review-cart?remove_promo=${promo/id}" class="promo_remove"></a>
+          <a tal:condition="promo/can_remove" title="Remove this promo" href="${portal_state/navigation_root_url}/review-cart?remove_promo=${promo/id}" class="promo_remove"></a>
         </div>
       </div>
       <div id="promo-total" tal:condition="view/cart/discount">
@@ -118,7 +118,7 @@
       </div>
     </div>
 
-    <form method="post" tal:attributes="action string:${context/portal_url}/review-cart">
+    <form method="post" tal:attributes="action string:${portal_state/navigation_root_url}/review-cart">
       <input name="submitted" type="hidden" value="1" />
 
       <div id="order-total">
@@ -129,7 +129,7 @@
 
       <div class="form-buttons checkout-buttons">
         <a class="button continue-exploring"
-           tal:define="came_from request/came_from|request/HTTP_REFERER|context/portal_url"
+           tal:define="came_from request/came_from|request/HTTP_REFERER|portal_state/navigation_root_url"
            href="${came_from}">Continue Exploring</a>
         <input id="checkout-button" type="submit" value="Proceed to Checkout" class="button yellow"
                tal:attributes="style python:'display: none' if not view.cart else ''" />

@@ -11,7 +11,7 @@
       />
 
   <upgradeDepends
-      profile="jazkarta.shop"
+      profile="jazkarta.shop:default"
       source="1"
       destination="2"
       title="Install browser layer"

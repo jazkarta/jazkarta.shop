@@ -9,7 +9,7 @@
         appId="jazkarta.shop"
         category="Products"
         condition_expr=""
-        url_expr="string:${portal_url}/@@jazkarta-shop-settings"
+        url_expr="string:${object/@@plone_portal_state/navigation_root_url}/@@jazkarta-shop-settings"
         icon_expr=""
         visible="True"
         i18n:attributes="title">
@@ -22,7 +22,7 @@
         appId="jazkarta.shop"
         category="Products"
         condition_expr=""
-        url_expr="string:${portal_url}/@@jazkarta-shop-shipping-methods"
+        url_expr="string:${object/@@plone_portal_state/navigation_root_url}/@@jazkarta-shop-shipping-methods"
         icon_expr=""
         visible="True"
         i18n:attributes="title">

@@ -5,6 +5,5 @@
 
 - Tax helper should be turned into a utility.
 - So should shipping services.
-- Be sure to use navigation root url consistently instead of portal url
 - See @@@ comments
 - Add logging

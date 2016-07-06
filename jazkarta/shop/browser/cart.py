@@ -5,7 +5,7 @@ from zope.cachedescriptors.property import Lazy as lazy_property
 
 from ..interfaces import OutOfStock
 from ..cart import Cart
-from ..utils import get_site
+from ..utils import get_navigation_root_url
 from ..utils import get_user_fullname
 from ..utils import resolve_uid
 from .promos import PromoCodeForm
@@ -39,11 +39,11 @@ class ReviewCartForm(CartViewMixin, BrowserView):
             return
 
         if 'submitted' in self.request.form:
-            portal_url = get_site().absolute_url()
+            base_url = get_navigation_root_url(self.context)
             if self.cart.shippable:
-                return self.request.response.redirect(portal_url + '/shipping')
+                return self.request.response.redirect(base_url + '/shipping')
             else:
-                return self.request.response.redirect(portal_url + '/checkout')
+                return self.request.response.redirect(base_url + '/checkout')
 
         return self.index()
 
