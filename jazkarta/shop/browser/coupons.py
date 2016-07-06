@@ -32,9 +32,9 @@ class CouponCodeForm(form.Form):
         if errors:
             return
 
-        # Since coupon codes are not required, the field may now be empty
-        # this is away to bypass just a scenario where no coupon code exists
-        # but the user has hit apply promo code button
+        # Since coupon codes are not required, the field may now be empty.
+        # This is a way to bypass a scenario where no coupon code exists
+        # but the user has hit apply coupon code button
         if data['code'] is None:
             return
 
