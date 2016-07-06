@@ -8,5 +8,3 @@
 - Be sure to use navigation root url consistently instead of portal url
 - See @@@ comments
 - Add logging
-- Make sure js works for manage-shipping-methods
-- Use browser layer

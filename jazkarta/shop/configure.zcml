@@ -7,14 +7,6 @@
   <include package="collective.z3cform.datagridfield" />
   <include package="z3c.currency" />
 
-  <gs:registerProfile
-      name="default"
-      title="jazkarta.shop"
-      directory="profiles/default"
-      description=""
-      provides="Products.GenericSetup.interfaces.EXTENSION"
-      />
-
   <permission
       id="jazkarta.shop.ManageShop"
       title="jazkarta.shop: Manage shop">
@@ -22,6 +14,7 @@
     <role name="Manager" />
   </permission>
 
+  <include file="profile.zcml" />
   <include package=".browser" />
 
   <!-- Behavior -->
@@ -31,6 +24,12 @@
     provides=".interfaces.IProduct"
     />
   <adapter factory=".purchasable.DefaultPurchaseHandler" />
+
+  <!-- Handle storing form fields in a PersistentMapping -->
+  <adapter
+    factory="z3c.form.datamanager.DictionaryField"
+    provides="z3c.form.interfaces.IDataManager"
+    for="persistent.mapping.PersistentMapping .interfaces.IDictField" />
 
   <!-- Vocabulary factories -->
   <utility name="jazkarta.shop.countries" component=".vocabs.get_country_vocab" />

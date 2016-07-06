@@ -1,0 +1,22 @@
+<configure
+    xmlns="http://namespaces.zope.org/genericsetup"
+    i18n_domain="jazkarta.shop">
+
+  <registerProfile
+      name="default"
+      title="jazkarta.shop"
+      directory="profiles/default"
+      description=""
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
+  <upgradeDepends
+      profile="jazkarta.shop"
+      source="1"
+      destination="2"
+      title="Install browser layer"
+      description=""
+      import_steps="browserlayer"
+      />
+
+</configure>

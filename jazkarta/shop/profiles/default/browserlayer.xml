@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<layers>
+  <layer
+      name="jazkarta.shop"
+      interface="jazkarta.shop.interfaces.IBrowserLayer"
+      />
+</layers>

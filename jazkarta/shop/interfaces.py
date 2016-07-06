@@ -10,6 +10,7 @@ from zope.interface import alsoProvides
 from zope.interface import Interface
 from zope.interface import provider
 from zope import schema
+from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 from zope.schema.interfaces import IField
 from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
@@ -130,6 +131,10 @@ class ISettings(model.Schema):
     ups_account = schema.TextLine(title=u'UPS Account Number')
 
     usps_userid = schema.TextLine(title=u'USPS User Id')
+
+
+class IBrowserLayer(IDefaultBrowserLayer):
+    """Browser layer to mark the request when this product is activated."""
 
 
 class IDictField(IField):
