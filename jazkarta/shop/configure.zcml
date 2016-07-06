@@ -22,6 +22,14 @@
     <role name="Contributor" />
   </permission>
 
+  <permission
+      id="jazkarta.shop.AddCoupon"
+      title="jazkarta.shop: Add coupon">
+    <role name="Site Administrator" />
+    <role name="Manager" />
+    <role name="Contributor" />
+  </permission>
+
   <include file="profile.zcml" />
   <include package=".browser" />
 

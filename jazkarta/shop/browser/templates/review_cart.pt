@@ -101,18 +101,18 @@
       <span id="subtotal-amount" tal:content="python:'${:,.2f}'.format(view.cart.orig_subtotal)"></span>
     </div>
 
-    <div id="promocodes">
-      <tal:block tal:define="view nocall:view/promo_form">
+    <div class="coupons">
+      <tal:block tal:define="view nocall:view/coupon_form">
         <tal:block metal:use-macro="context/@@ploneform-macros/titlelessform" />
       </tal:block>
-      <div id="promos">
-        <div tal:repeat="promo view/promos">
-          <span tal:content="string:Promo: ${promo/id}"></span>
-          <span class="promo-amount" tal:content="string:(${promo/discount} off)"></span>
-          <a tal:condition="promo/can_remove" title="Remove this promo" href="${portal_state/navigation_root_url}/review-cart?remove_promo=${promo/id}" class="promo_remove"></a>
+      <div>
+        <div tal:repeat="coupon view/coupons">
+          <span tal:content="string:Promo: ${coupon/id}"></span>
+          <span class="coupon-amount" tal:content="string:(${coupon/discount} off)"></span>
+          <a tal:condition="coupon/can_remove" title="Remove this promo" href="${portal_state/navigation_root_url}/review-cart?remove_coupon=${coupon/id}" class="coupon_remove"></a>
         </div>
       </div>
-      <div id="promo-total" tal:condition="view/cart/discount">
+      <div class="coupons-total" tal:condition="view/cart/discount">
         <strong>Total discount</strong>
          $<span id="discount-amount" tal:content="python:'{:,.2f}'.format(view.cart.discount)"></span>
       </div>

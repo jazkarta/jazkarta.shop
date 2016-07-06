@@ -1,9 +1,10 @@
-- promo content type
-- UI
-  - order history
-
 - Tax helper should be turned into a utility.
 - So should shipping services.
 - Add logging.
+- UI for admins to view order history.
+- Fix promo code widgets.
 - Use shipping address as default billing address. (Or provide 'same as shipping' option.)
 - Icons for content types
+- Make sure products are searchable
+- Make sure coupons are not included in navigation or searchable (use private-only workflow?)
+- Add missing i18n

@@ -172,21 +172,21 @@ class CheckoutForm(BrowserView):
         if 'success' in charge_result and charge_result['success']:
 
             # Call `after_purchase` hook for each product
-            promos_used = set()
+            coupons_used = set()
             for index, item in enumerate(self.cart.items):
                 ob = resolve_uid(item.uid)
                 if ob is not None:
                     purchase_handler = IPurchaseHandler(ob)
                     purchase_handler.after_purchase(item._item)
 
-                # keep track of promos used
+                # keep track of coupons used
                 if item.is_discounted:
-                    promos_used.add(item.promo)
+                    coupons_used.add(item.coupon)
 
-            # store count of promo usage
-            for promo_uid in promos_used:
+            # store count of coupon usage
+            for coupon_uid in coupons_used:
                 storage.increment_shop_data(
-                    [userid, 'promos', promo_uid], 1)
+                    [userid, 'coupons', coupon_uid], 1)
 
         # Store historic record of order
         self.cart.store_order(userid)

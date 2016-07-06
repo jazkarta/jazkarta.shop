@@ -8,7 +8,7 @@ from ..cart import Cart
 from ..utils import get_navigation_root_url
 from ..utils import get_user_fullname
 from ..utils import resolve_uid
-from .promos import PromoCodeForm
+from .coupons import CouponCodeForm
 
 
 class CartViewMixin(object):
@@ -25,14 +25,14 @@ class CartViewMixin(object):
 
 
 class ReviewCartForm(CartViewMixin, BrowserView):
-    """A form to review the cart and enter promo codes."""
+    """A form to review the cart and enter coupon codes."""
 
     cart_template = ViewPageTemplateFile('templates/checkout_cart.pt')
     cart_is_editable = True
 
     def __call__(self):
-        self.promo_form = PromoCodeForm(self.context, self.request)
-        self.promo_form.update()
+        self.coupon_form = CouponCodeForm(self.context, self.request)
+        self.coupon_form.update()
 
         self.validate_cart()
         if self.error:
@@ -47,20 +47,20 @@ class ReviewCartForm(CartViewMixin, BrowserView):
 
         return self.index()
 
-    def promos(self):
+    def coupons(self):
         items = []
         for cart_item in self.cart.items:
             if not cart_item.is_discounted:
                 continue
-            promo = resolve_uid(cart_item.promo)
+            coupon = resolve_uid(cart_item.coupon)
             discount_amount = Decimal(
                 cart_item.price) - Decimal(cart_item.orig_price)
             items.append({
-                'description': promo.description,
-                'id': promo.title,
-                'discount': format_discount(promo),
+                'description': coupon.description,
+                'id': coupon.title,
+                'discount': format_discount(coupon),
                 'amount': discount_amount,
-                'can_remove': not promo.member_discount,
+                'can_remove': True,
             })
         return items
 
@@ -98,9 +98,9 @@ class UpdateCartView(CartViewMixin, BrowserView):
         return self.index()
 
 
-def format_discount(promo):
-    if promo.unit == '$':
-        discount = '$%s' % promo.amount
+def format_discount(coupon):
+    if coupon.unit == '$':
+        discount = '$%s' % coupon.amount
     else:
-        discount = '%s%%' % int(promo.amount)
+        discount = '%s%%' % int(coupon.amount)
     return discount

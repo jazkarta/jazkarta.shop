@@ -28,4 +28,13 @@
       import_steps="typeinfo"
       />
 
+  <upgradeDepends
+      profile="jazkarta.shop:default"
+      source="3"
+      destination="4"
+      title="Add Coupon content type"
+      description=""
+      import_steps="typeinfo"
+      />
+
 </configure>

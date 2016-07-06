@@ -12,6 +12,6 @@ class TestLineItem(unittest.TestCase):
         item = self._makeOne(
             price=Decimal('0.03'),
             discount_pct=Decimal('50.0'),
-            promo='FOO',
+            coupon='FOO',
         )
         self.assertEqual(item.price, Decimal('0.02'))

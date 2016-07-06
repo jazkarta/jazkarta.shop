@@ -82,7 +82,7 @@ class LineItem(object):
     def price(self):
         if 'price_override' in self._item:
             price = self._item['price_override']
-        elif 'promo' in self._item:
+        elif 'coupon' in self._item:
             price = self.discounted_price
         else:
             price = self.orig_price
@@ -112,24 +112,24 @@ class LineItem(object):
 
     @property
     def is_discounted(self):
-        return bool('promo' in self._item)
+        return bool('coupon' in self._item)
 
-    def apply_promo(self, promo):
-        self._item['promo'] = promo.UID()
-        self._item['promo_code'] = promo.title
-        if promo.unit == '%':
+    def apply_coupon(self, coupon):
+        self._item['coupon'] = coupon.UID()
+        self._item['coupon_code'] = coupon.title
+        if coupon.unit == '%':
             if 'discount_amt' in self._item:
                 del self._item['discount_amt']
-            self._item['discount_pct'] = promo.amount
+            self._item['discount_pct'] = coupon.amount
         else:  # absolute discount
             if 'discount_pct' in self._item:
                 del self._item['discount_pct']
-            self._item['discount_amt'] = promo.amount
+            self._item['discount_amt'] = coupon.amount
 
     def override_price(self, price):
         self._item['orig_price'] = price
         for field in (
-                'promo', 'promo_code', 'discount_amt', 'discount_pct'):
+                'coupon', 'coupon_code', 'discount_amt', 'discount_pct'):
             if field in self._item:
                 del self._item[field]
 
