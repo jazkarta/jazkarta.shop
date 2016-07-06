@@ -1,6 +1,7 @@
 from decimal import Decimal
 from persistent.mapping import PersistentMapping
 from plone.autoform.form import AutoExtensibleForm
+from plone.directives import form
 from Products.Five import BrowserView
 from z3c.form import button
 from z3c.form.form import Form
@@ -137,7 +138,7 @@ class ShippingMethodForm(AutoExtensibleForm, Form):
         del self.shipping_methods[self._name]
 
 
-class ShippingForm(AutoExtensibleForm):
+class ShippingForm(form.SchemaForm):
     schema = IShippingAddress
     shipping_methods_template = ViewPageTemplateFile(
         'templates/shipping_methods_widget.pt')
@@ -200,7 +201,7 @@ class ShippingForm(AutoExtensibleForm):
             self.update()
             return self.shipping_methods_template()
         else:
-            return super(AutoExtensibleForm, self).__call__()
+            return super(form.SchemaForm, self).__call__()
 
     def getContent(self):
         ship_to = self.cart.ship_to
