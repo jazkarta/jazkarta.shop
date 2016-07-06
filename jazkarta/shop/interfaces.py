@@ -1,21 +1,25 @@
 from collective.z3cform.datagridfield import DataGridFieldFactory
 from collective.z3cform.datagridfield import DictRow
 from decimal import Decimal
+from plone.app.vocabularies.catalog import CatalogSource
 from plone.autoform import directives as form
 from plone.autoform.interfaces import IFormFieldProvider
 from plone.supermodel import model
 from z3c.currency.field import Currency
 from z3c.form.browser.checkbox import CheckBoxWidget
+from zope.interface import alsoProvides
 from zope.interface import Interface
 from zope.interface import provider
 from zope import schema
+from zope.publisher.interfaces.browser import IDefaultBrowserLayer
+from zope.schema.interfaces import IField
 from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
 from jazkarta.shop import config
 
 
 @provider(IFormFieldProvider)
-class IProduct(Interface):
+class IProduct(model.Schema):
     """Marker for content that can be purchased."""
 
     product_category = schema.Choice(
@@ -40,7 +44,7 @@ class IProduct(Interface):
 
     taxable = schema.Bool(
         title=u'Taxable?',
-        description=u'Is this item subject to WA state sales tax?',
+        description=u'Mark the box if this product is subject to sales tax.',
         default=True,
     )
 
@@ -48,6 +52,13 @@ class IProduct(Interface):
         title=u'Weight (lbs)',
         description=u'Used to calculate shipping.',
         required=False,
+    )
+
+    model.fieldset(
+        'shop', label=u"Shop",
+        fields=(
+            'product_category', 'price', 'stock_level', 'taxable', 'weight',
+        ),
     )
 
 
@@ -62,6 +73,73 @@ class IPurchaseHandler(Interface):
 
     def after_purchase(item):
         """Perform actions after this product is purchased."""
+
+
+class ICoupon(model.Schema):
+
+    code = schema.TextLine(
+        title=u'Code',
+    )
+
+    categories = schema.Set(
+        title=u'Product Category',
+        description=u'If specified, this coupon will only apply to '
+                    u'products from the specified categories.',
+        value_type=schema.Choice(
+            vocabulary='jazkarta.shop.product_categories',
+        ),
+    )
+
+    scope = schema.Choice(
+        title=u'Discount applies to',
+        values=(
+            u'One item',
+            u'All items in cart',
+        ),
+    )
+
+    amount = Currency(
+        title=u'Discount Amount',
+    )
+
+    unit = schema.Choice(
+        title=u'Discount Unit',
+        values=(u'$', u'%'),
+    )
+
+    per_user_limit = schema.Int(
+        title=u'Use Limit Per User',
+        description=u'The number of times this coupon may be used '
+                    u'by an individual. Enter 0 for unlimited.',
+        default=1,
+    )
+
+    product = schema.Choice(
+        title=u'Specific Product',
+        description=u'Optionally specify one product to which this coupon '
+                    u'may be applied.',
+        source=CatalogSource(
+            object_provides='jazkarta.shop.interfaces.IProduct'),
+        required=False,
+    )
+
+    # excluded_products = schema.Set(
+    #     title=u'Excluded Products',
+    #     description=u'Products for which this coupon may not be used.',
+    #     value_type=schema.Choice(
+    #         source=CatalogSource(
+    #             object_provides='jazkarta.shop.interfaces.IProduct'),
+    #     ),
+    #     required=False,
+    # )
+
+    start = schema.Datetime(
+        title=u'Start Date',
+    )
+
+    end = schema.Datetime(
+        title=u'End Date',
+    )
 
 
 class ISettings(model.Schema):
@@ -130,6 +208,14 @@ class ISettings(model.Schema):
     usps_userid = schema.TextLine(title=u'USPS User Id')
 
 
+class IBrowserLayer(IDefaultBrowserLayer):
+    """Browser layer to mark the request when this product is activated."""
+
+
+class IDictField(IField):
+    """Marker for form fields that should use the dict data manager."""
+
+
 class IWeightPrice(model.Schema):
     min = schema.Float(
         title=u'Min Weight',
@@ -192,6 +278,12 @@ class IShippingMethod(model.Schema):
         value_type=DictRow(schema=IWeightPrice)
         )
     form.widget('weight_table', DataGridFieldFactory)
+
+
+# Make sure shipping method fields will be read/written
+# using the DictionaryField manager.
+for name, field in schema.getFields(IShippingMethod).items():
+    alsoProvides(field, IDictField)
 
 
 class IShippingAddress(model.Schema):

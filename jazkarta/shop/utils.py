@@ -8,8 +8,10 @@ from plone.registry.interfaces import IRegistry
 from Products.CMFCore.interfaces import ISiteRoot
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.interfaces.controlpanel import IMailSchema
+from Products.CMFPlone.patterns.utils import get_portal_url
 from zope.component import getUtility
 from zope.component.hooks import getSite
+from zope.globalrequest import getRequest
 from ZODB.POSException import ConflictError
 from jazkarta.shop import config
 from .interfaces import ISettings
@@ -27,6 +29,9 @@ def get_site():
     while not ISiteRoot.providedBy(possible_site):
         possible_site = aq_parent(possible_site)
     return possible_site
+
+
+get_navigation_root_url = get_portal_url
 
 
 def get_catalog():

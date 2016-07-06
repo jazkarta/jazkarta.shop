@@ -1,0 +1,40 @@
+<configure
+    xmlns="http://namespaces.zope.org/genericsetup"
+    i18n_domain="jazkarta.shop">
+
+  <registerProfile
+      name="default"
+      title="jazkarta.shop"
+      directory="profiles/default"
+      description="A flexible web-based shop."
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
+  <upgradeDepends
+      profile="jazkarta.shop:default"
+      source="1"
+      destination="2"
+      title="Install browser layer"
+      description=""
+      import_steps="browserlayer"
+      />
+
+  <upgradeDepends
+      profile="jazkarta.shop:default"
+      source="2"
+      destination="3"
+      title="Add Product content type"
+      description=""
+      import_steps="typeinfo"
+      />
+
+  <upgradeDepends
+      profile="jazkarta.shop:default"
+      source="3"
+      destination="4"
+      title="Add Coupon content type"
+      description=""
+      import_steps="typeinfo"
+      />
+
+</configure>

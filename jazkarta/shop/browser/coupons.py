@@ -10,20 +10,21 @@ from ..utils import get_catalog
 from ..utils import get_current_userid
 
 
-class IPromoCode(Interface):
+class ICouponCode(Interface):
 
-    promo_code = schema.TextLine(
+    code = schema.TextLine(
         title=u'Promo Code',
         required=False,
     )
 
 
-class PromoCodeForm(form.Form):
+class CouponCodeForm(form.Form):
     label = u'Discounts'
     description = u'Do you have a promo code?'
+    fields = field.Fields(ICouponCode)
     ignoreContext = True
+    # Make sure the input is cleared after a coupon is applied.
     ignoreRequest = True
-    fields = field.Fields(IPromoCode)
 
     @button.buttonAndHandler(u'Apply')
     def handleApply(self, action):
@@ -31,14 +32,14 @@ class PromoCodeForm(form.Form):
         if errors:
             return
 
-        # XXX since promo codes are not required, the field may now be empty
-        # this is away to bypass just a scenario where no promo code exists
+        # Since coupon codes are not required, the field may now be empty
+        # this is away to bypass just a scenario where no coupon code exists
         # but the user has hit apply promo code button
-        if data['promo_code'] is None:
+        if data['code'] is None:
             return
 
-        promo = find_promo_by_code(data['promo_code'])
-        if promo is None:
+        coupon = find_coupon_by_code(data['code'])
+        if coupon is None:
             raise ActionExecutionError(
                 Invalid(u'The promo code you entered is not valid.'))
             return
@@ -49,14 +50,14 @@ class PromoCodeForm(form.Form):
         most_expensive_item = None
         for cart_item in cart.items:
             # make sure product category matches
-            if (cart_item.category not in promo.category and
-                    'Any' not in promo.category):
+            if (coupon.categories and
+                    cart_item.category not in coupon.categories):
                 continue
             # make sure specific product matches
-            if (promo.excluded_products and
-                    cart_item.uid in promo.excluded_products):
-                continue
-            if promo.product and cart_item.uid != promo.product:
+            # if (coupon.excluded_products and
+            #         cart_item.uid in coupon.excluded_products):
+            #     continue
+            if coupon.product and cart_item.uid != coupon.product:
                 continue
 
             eligible_items.append(cart_item)
@@ -69,53 +70,48 @@ class PromoCodeForm(form.Form):
                 Invalid(u'The promo code you entered is not valid for any '
                         u'items in your cart.'))
 
-        if promo.scope == 'Single Item':
-            most_expensive_item.apply_promo(promo)
+        if coupon.scope == 'One item':
+            most_expensive_item.apply_coupon(coupon)
         else:  # All Items
             for item in eligible_items:
-                item.apply_promo(promo)
+                item.apply_coupon(coupon)
 
         cart.save()
 
 
-def find_promo_by_code(code):
-    """Find promos based on a code entered by the user.
+def find_coupon_by_code(code):
+    """Find coupons based on a code entered by the user.
 
-    Skips promos that are not active for the current date
-    or that are limited to a different user.
+    Skips coupons that are not active for the current date.
 
-    Returns None if multiple promos are found.
+    Returns None if multiple coupons are found.
     """
     userid = get_current_userid()
     code = code.lower()
-    promos = []
+    coupons = []
     for b in get_catalog().unrestrictedSearchResults(
-            portal_type='jazkarta.cart.promo'):
-        promo = b._unrestrictedGetObject()
+            portal_type='jazkarta.cart.coupon'):
+        coupon = b._unrestrictedGetObject()
 
-        # skip promo if it's not the right code
-        if promo.title.lower() != code:
+        # skip if it's not the right code
+        if coupon.code.lower() != code:
             continue
 
-        # skip promo if it's not currently active
-        if promo.start and promo.start > datetime.now():
+        # skip if it's not currently active
+        if coupon.start and coupon.start > datetime.now():
             continue
-        if promo.end and promo.end < datetime.now():
-            continue
-
-        # user limit
-        if promo.user and promo.user != userid:
+        if coupon.end and coupon.end < datetime.now():
             continue
 
         # limit on number of uses per user
-        if promo.limit and userid is not None:
+        if coupon.per_user_limit and userid is not None:
             code_use = storage.get_shop_data(
-                [userid, 'promos', promo.UID()], default=0)
-            if code_use >= promo.limit:
+                [userid, 'coupons', coupon.UID()], default=0)
+            if code_use >= coupon.per_user_limit:
                 continue
 
-        promos.append(promo)
+        coupons.append(coupon)
 
-    if len(promos) > 1 or len(promos) == 0:
+    if len(coupons) > 1 or len(coupons) == 0:
         return None
-    return promos[0]
+    return coupons[0]

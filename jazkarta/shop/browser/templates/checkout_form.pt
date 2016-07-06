@@ -84,7 +84,7 @@
       <span tal:content="python:'${:,.2f}'.format(view.amount)"></span>
     </div>
 
-    <form method="post" tal:attributes="action string:${context/portal_url}/checkout" id="checkout-form" class="checkout-form">
+    <form method="post" tal:attributes="action string:${portal_state/navigation_root_url}/checkout" id="checkout-form" class="checkout-form">
       <input type="hidden" name="amount" tal:attributes="value view/amount" />
       <input type="hidden" name="submitted" value="1"/>
 

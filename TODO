@@ -1,12 +1,10 @@
-- promo content type
-- buyable behavior / content types
-- UI
-  - order history
-
 - Tax helper should be turned into a utility.
 - So should shipping services.
-- Be sure to use navigation root url consistently instead of portal url
-- See @@@ comments
-- Add logging
-- Make sure js works for manage-shipping-methods
-- Use browser layer
+- Add logging.
+- UI for admins to view order history.
+- Fix promo code widgets.
+- Use shipping address as default billing address. (Or provide 'same as shipping' option.)
+- Icons for content types
+- Make sure products are searchable
+- Make sure coupons are not included in navigation or searchable (use private-only workflow?)
+- Add missing i18n
