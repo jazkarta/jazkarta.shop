@@ -14,6 +14,14 @@
     <role name="Manager" />
   </permission>
 
+  <permission
+      id="jazkarta.shop.AddProduct"
+      title="jazkarta.shop: Add product">
+    <role name="Site Administrator" />
+    <role name="Manager" />
+    <role name="Contributor" />
+  </permission>
+
   <include file="profile.zcml" />
   <include package=".browser" />
 

@@ -66,7 +66,7 @@ class CheckoutForm(BrowserView):
         return range(year, year + 11)
 
     def prepopulate_billing_info(self):
-        # @@@ Do we want to store contact info?
+        # Do we want to store contact info?
         # If so we can prefill the form by putting values
         # in the request here.
         pass

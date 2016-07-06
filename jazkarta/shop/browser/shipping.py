@@ -206,7 +206,7 @@ class ShippingForm(AutoExtensibleForm):
         ship_to = self.cart.ship_to
         userid = get_current_userid()
         if not ship_to and userid is not None:
-            # @@@ This is where we could prefill the current user's address
+            # This is where we could prefill the current user's address
             # ship_to = extract_shipping_address(userid)
             pass
         return ship_to
@@ -244,7 +244,7 @@ class ShippingForm(AutoExtensibleForm):
         order['ship_method'] = method['name']
         order['ship_charge'] = Decimal(charge).quantize(Decimal('0.01'))
 
-        # @@@ This is where we could save the shipping address
+        # This is where we could save the shipping address
         # for use in future orders.
 
         # Calculate tax rate and update order.
