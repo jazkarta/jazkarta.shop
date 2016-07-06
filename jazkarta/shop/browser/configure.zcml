@@ -89,4 +89,9 @@
     directory="static"
     />
 
+  <adapter
+    factory="z3c.form.datamanager.DictionaryField"
+    provides="z3c.form.interfaces.IDataManager"
+    for="persistent.mapping.PersistentMapping ..interfaces.IDictField" />
+
 </configure>

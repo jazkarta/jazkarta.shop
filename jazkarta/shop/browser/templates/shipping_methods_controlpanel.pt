@@ -9,10 +9,10 @@
 <body>
 
 <metal:main fill-slot="main">
-  <div data-pat-modal='{"actionOptions": {"displayInModal": false}}'>
+  <div data-pat-plone-modal='{"actionOptions": {"displayInModal": false}}'>
     <h1 class="documentFirstHeading">Shipping Methods</h1>
 
-    <a class="pat-modal green button" href="${context/absolute_url}/${view/__name__}/+">Add Shipping Method</a>
+    <a class="pat-plone-modal green button" href="${context/absolute_url}/${view/__name__}/+"><button>Add Shipping Method</button></a>
     <table class="listing">
       <tr>
         <th>Name</th>
@@ -27,7 +27,7 @@
         <td tal:content="python:'${:.2f}'.format(method['min_purchase']) if method['min_purchase'] else ''" />
         <td tal:content="python:view.format_calculation(method['calculation'])" tal:on-error="nothing" />
         <td>
-          <a class="pat-modal" href="${context/absolute_url}/${view/__name__}/${name}">Edit</a>
+          <a class="pat-plone-modal" href="${context/absolute_url}/${view/__name__}/${name}">Edit</a>
         </td>
       </tr>
     </table>
@@ -35,7 +35,7 @@
     <script type="text/javascript">
     jQuery(function($) {
         var update = function() {
-            var calc = $('select[name="form.widgets.calculation"]').val();
+            var calc = $('select[name="form.widgets.calculation:list"]').val();
             if (calc == 'weight') {
                 $('#formfield-form-widgets-weight_table').show();
             } else {
@@ -47,8 +47,7 @@
             $('select[name="form.widgets.calculation"]').change(update);
             update();
         };
-        $(document).on('shown.modal.patterns', initialize);
-        $(document).on('afterDraw.modal.patterns', initialize);
+        $(document).on('after-render.plone-modal.patterns', initialize);
     });
     </script>
   </div>

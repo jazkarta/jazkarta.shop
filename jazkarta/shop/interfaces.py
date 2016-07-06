@@ -6,9 +6,11 @@ from plone.autoform.interfaces import IFormFieldProvider
 from plone.supermodel import model
 from z3c.currency.field import Currency
 from z3c.form.browser.checkbox import CheckBoxWidget
+from zope.interface import alsoProvides
 from zope.interface import Interface
 from zope.interface import provider
 from zope import schema
+from zope.schema.interfaces import IField
 from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
 from jazkarta.shop import config
@@ -130,6 +132,10 @@ class ISettings(model.Schema):
     usps_userid = schema.TextLine(title=u'USPS User Id')
 
 
+class IDictField(IField):
+    """Marker for form fields that should use the dict data manager."""
+
+
 class IWeightPrice(model.Schema):
     min = schema.Float(
         title=u'Min Weight',
@@ -192,6 +198,12 @@ class IShippingMethod(model.Schema):
         value_type=DictRow(schema=IWeightPrice)
         )
     form.widget('weight_table', DataGridFieldFactory)
+
+
+# Make sure shipping method fields will be read/written
+# using the DictionaryField manager.
+for name, field in schema.getFields(IShippingMethod).items():
+    alsoProvides(field, IDictField)
 
 
 class IShippingAddress(model.Schema):
