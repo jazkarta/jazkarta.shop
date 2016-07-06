@@ -43,7 +43,7 @@ class IProduct(Interface):
 
     taxable = schema.Bool(
         title=u'Taxable?',
-        description=u'Is this item subject to WA state sales tax?',
+        description=u'Is this item subject to sales tax?',
         default=True,
     )
 
@@ -51,6 +51,13 @@ class IProduct(Interface):
         title=u'Weight (lbs)',
         description=u'Used to calculate shipping.',
         required=False,
+    )
+
+    model.fieldset(
+        'shop', label=u"Shop",
+        fields=(
+            'product_category', 'price', 'stock_level', 'taxable', 'weight',
+        ),
     )
 
 
