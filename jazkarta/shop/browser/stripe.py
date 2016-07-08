@@ -5,7 +5,7 @@ from ..utils import get_setting
 
 
 STRIPE_JS_HTML = """
-    <script type="text/javascript" src="https://js.stripe.com/v1/"></script>
+    <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
     <script type="text/javascript">
         (function ($) {
             $(document).ready(function() {
