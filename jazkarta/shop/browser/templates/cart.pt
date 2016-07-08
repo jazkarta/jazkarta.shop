@@ -23,7 +23,7 @@
           <span class="jaz-shop-total" tal:content="python: '${:,.2f}'.format(item.subtotal)" />
         </div>
       </div>
-      <a href="${context/portal_url}/review-cart"><button>Checkout</button></a>
+      <a href="${context/@@plone_portal_state/navigation_root_url}/review-cart"><button>Checkout</button></a>
     </tal:block>
   </div>
 </div>
