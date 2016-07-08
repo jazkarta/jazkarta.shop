@@ -15,3 +15,53 @@
 .collapse[aria-expanded="true"] {
 	display: block;
 }
+
+@media (min-width: 800px) {
+	.jaz-shop-half-form {
+		width: 45%;
+		margin-right: 5%;
+		float: left;
+	}
+	.jaz-shop-half-form + * {
+		clear: left;
+	}
+	.jaz-shop-half-form + .jaz-shop-half-form {
+		clear: none;
+	}
+}
+
+input[type="text"].jaz-shop-quantity {
+	display: inline;
+	width: 2em;
+	height: auto;
+	padding: 0;
+	text-align: center;
+}
+
+input[type="text"].jaz-shop-coupon {
+	display: inline;
+	width: auto;
+}
+
+.jaz-shop-buttons {
+	text-align: center;
+	margin: 2em auto;
+}
+
+.jaz-shop-checkout-form input[type="text"] {
+	display: inline;
+}
+.jaz-shop-checkout-form input[type="text"][size] {
+	width: auto;
+}
+.jaz-shop-checkout-form .fieldset-contact-info label {
+	width: 100px;
+	float: left;
+}
+.jaz-shop-checkout-form .input {
+	overflow: hidden;
+}
+.jaz-shop-checkout-form .fieldset-payment-info select {
+	display: inline;
+	width: 30%;
+}

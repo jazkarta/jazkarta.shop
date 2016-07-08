@@ -97,7 +97,6 @@
   <browser:resourceDirectory
     name="jazkarta.shop"
     directory="static"
-    layer="..interfaces.IBrowserLayer"
     />
 
 </configure>

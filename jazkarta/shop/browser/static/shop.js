@@ -1,6 +1,6 @@
 require(['jquery', 'mockup-utils'], function($, utils) {
 
-	var portal_url = $('body').data('portal-url');
+	var portal_url = $('body').attr('data-portal-url');
     $(document).on('click', '.jaz-shop-add', function(e) {
         e.preventDefault();
         var uid = $(this).attr('data-uid');

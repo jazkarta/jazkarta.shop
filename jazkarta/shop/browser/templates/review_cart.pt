@@ -41,7 +41,7 @@
           }
         }
         var bind_cart_actions = function() {
-          $('.form_item_change').on('change', function() {
+          $('.jaz-shop-quantity').on('change', function() {
               $.post(portal_url + '/update-cart',
                 {'change': $(this).attr('rel'),
                  'quantity': $(this).val(),
@@ -52,7 +52,7 @@
                 refresh_cart();
               }, 'html');
           });
-          $('.form_item_add, .item_add').unbind('click').click(function(e) {
+          $('.jaz-shop-incr').unbind('click').click(function(e) {
               e.stopPropagation();
               $.post(portal_url + '/update-cart',
                 {'add': $(this).attr('data-uid'),
@@ -63,7 +63,7 @@
                 refresh_cart();
               }, 'html');
           });
-          $('.form_item_del').unbind('click').click(function() {
+          $('.jaz-shop-decr').unbind('click').click(function() {
               $.post(portal_url + '/update-cart',
                 {'del': $(this).attr('rel'),
                  _authenticator: _authenticator}, function(data) {
@@ -73,7 +73,7 @@
                 refresh_cart();
               }, 'html');
           });
-          $('.form_item_remove').unbind('click').click(function() {
+          $('.jaz-shop-remove').unbind('click').click(function() {
               $.post(portal_url + '/update-cart',
                 {'remove': $(this).attr('rel'),
                  _authenticator: _authenticator}, function(data) {
@@ -96,38 +96,47 @@
     <h1 class="documentFirstHeading">Your Shopping Cart</h1>
 
     <tal:block tal:replace="structure view/cart_template" />
-    <div class="subtotal">
-      <strong>Your purchases subtotal</strong>
-      <span id="subtotal-amount" tal:content="python:'${:,.2f}'.format(view.cart.orig_subtotal)"></span>
-    </div>
+    <p class="subtotal">
+      <big>
+        Your purchases subtotal:
+        <strong id="subtotal-amount" tal:content="python:'${:,.2f}'.format(view.cart.orig_subtotal)"></strong>
+      </big>
+    </p>
 
-    <div class="coupons">
-      <tal:block tal:define="view nocall:view/coupon_form">
-        <tal:block metal:use-macro="context/@@ploneform-macros/titlelessform" />
-      </tal:block>
-      <div>
-        <div tal:repeat="coupon view/coupons">
-          <span tal:content="string:Promo: ${coupon/id}"></span>
-          <span class="coupon-amount" tal:content="string:(${coupon/discount} off)"></span>
-          <a tal:condition="coupon/can_remove" title="Remove this promo" href="${portal_state/navigation_root_url}/review-cart?remove_coupon=${coupon/id}" class="coupon_remove"></a>
+    <form class="jaz-shop-half-form"
+          method="post" action="${portal_state/navigation_root_url}/review-cart">
+        <label>Promo Code</label>
+        <p>
+          <input class="jaz-shop-coupon" type="text" value="${request/form/coupon|nothing}" />
+          <input class="jaz-shop-apply-coupon" type="submit" value="Apply" />
+        </p>
+        <div>
+          <div tal:repeat="coupon view/coupons">
+            <span tal:content="string:Promo: ${coupon/id}"></span>
+            <span class="coupon-amount" tal:content="string:(${coupon/discount} off)"></span>
+            <a tal:condition="coupon/can_remove" title="Remove this promo" href="${portal_state/navigation_root_url}/review-cart?remove_coupon=${coupon/id}" class="coupon_remove"></a>
+          </div>
         </div>
-      </div>
-      <div class="coupons-total" tal:condition="view/cart/discount">
-        <strong>Total discount</strong>
-         $<span id="discount-amount" tal:content="python:'{:,.2f}'.format(view.cart.discount)"></span>
-      </div>
-    </div>
+        <div class="coupons-total" tal:condition="view/cart/discount">
+          <strong>Total discount</strong>
+           $<span id="discount-amount" tal:content="python:'{:,.2f}'.format(view.cart.discount)"></span>
+        </div>
+    </form>
 
-    <form method="post" tal:attributes="action string:${portal_state/navigation_root_url}/review-cart">
+    <form method="post" action="${portal_state/navigation_root_url}/review-cart">
       <input name="submitted" type="hidden" value="1" />
 
       <div id="order-total">
-        <p><strong>Your Total</strong>
-           $<span id="total-amount" tal:content="python:'{:,.2f}'.format(view.cart.subtotal)"></span></p>
-          <p>Note that any shipping charges or sales tax for physical items will be added later in the checkout process.</p>
+        <p>
+          <big>
+            Your total:
+            <strong>$<span id="total-amount" tal:content="python:'{:,.2f}'.format(view.cart.subtotal)"></span></strong>
+          </big>
+        </p>
+        <p>Note that any shipping charges or sales tax for physical items will be added later in the checkout process.</p>
       </div>
 
-      <div class="form-buttons checkout-buttons">
+      <div class="jaz-shop-buttons">
         <a class="continue-exploring"
            tal:define="came_from request/came_from|request/HTTP_REFERER|portal_state/navigation_root_url;
                        came_from python:came_from if not came_from.endswith('/review-cart') else portal_state.navigation_root_url"

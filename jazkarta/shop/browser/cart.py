@@ -33,6 +33,8 @@ class ReviewCartForm(CartViewMixin, BrowserView):
     def __call__(self):
         self.coupon_form = CouponCodeForm(self.context, self.request)
         self.coupon_form.update()
+        if self.coupon_form.errors:
+            return
 
         self.validate_cart()
         if self.error:

@@ -42,13 +42,13 @@
         <span tal:replace="item/quantity">Quantity</span>
       </td>
       <td tal:condition="can_edit">
-        <a href="javascript:;" class="form_item_remove"
+        <a href="javascript:;" class="jaz-shop-decr"
            tal:condition="can_edit"
            tal:attributes="rel item/cart_id">-</a>
-        <input type="text" class="form_item_change"
+        <input type="text" class="jaz-shop-quantity"
                tal:attributes="value item/quantity;
                                rel item/cart_id" />
-        <a href="javascript:;" class="form_item_add"
+        <a href="javascript:;" class="jaz-shop-incr"
            tal:condition="can_edit"
            tal:attributes="data-uid item/uid">+</a>
         <div class="error"
@@ -63,7 +63,7 @@
                 tal:content="python:'${:,.2f}'.format(item.subtotal)">Price</span>
       </td>
       <td tal:condition="can_edit">
-        <a href="javascript:;" class="form_item_del" tal:attributes="rel item/cart_id">&#9447;</a>
+        <a href="javascript:;" class="jaz-shop-remove" tal:attributes="rel item/cart_id">&#9447;</a>
       </td>
       <td tal:condition="can_refund">
         $<input type="text" size="4"

@@ -1,47 +1,27 @@
 from datetime import datetime
-from z3c.form import button, form, field
-from z3c.form.interfaces import ActionExecutionError
-from zope.interface import Interface
-from zope.interface import Invalid
-from zope import schema
 from jazkarta.shop import storage
+from Products.Five import BrowserView
 from ..cart import Cart
 from ..utils import get_catalog
 from ..utils import get_current_userid
 
 
-class ICouponCode(Interface):
+class CouponCodeForm(BrowserView):
+    label = u'Coupons'
 
-    code = schema.TextLine(
-        title=u'Promo Code',
-        required=False,
-    )
+    def update(self):
+        self.errors = []
 
-
-class CouponCodeForm(form.Form):
-    label = u'Discounts'
-    description = u'Do you have a promo code?'
-    fields = field.Fields(ICouponCode)
-    ignoreContext = True
-    # Make sure the input is cleared after a coupon is applied.
-    ignoreRequest = True
-
-    @button.buttonAndHandler(u'Apply')
-    def handleApply(self, action):
-        data, errors = self.extractData()
-        if errors:
-            return
-
+        code = self.request.form.get('coupon')
         # Since coupon codes are not required, the field may now be empty.
         # This is a way to bypass a scenario where no coupon code exists
         # but the user has hit apply coupon code button
-        if data['code'] is None:
+        if not code:
             return
 
-        coupon = find_coupon_by_code(data['code'])
+        coupon = find_coupon_by_code(code)
         if coupon is None:
-            raise ActionExecutionError(
-                Invalid(u'The promo code you entered is not valid.'))
+            self.errors.append('The promo code you entered is not valid.')
             return
 
         # find eligible cart items
@@ -66,9 +46,11 @@ class CouponCodeForm(form.Form):
                 most_expensive_item = cart_item
 
         if not eligible_items:
-            raise ActionExecutionError(
-                Invalid(u'The promo code you entered is not valid for any '
-                        u'items in your cart.'))
+            self.errors.append(
+                'The promo code you entered is not valid for any '
+                'items in your cart.'
+            )
+            return
 
         if coupon.scope == 'One item':
             most_expensive_item.apply_coupon(coupon)
@@ -77,6 +59,9 @@ class CouponCodeForm(form.Form):
                 item.apply_coupon(coupon)
 
         cart.save()
+
+        # Clear coupon from request
+        del self.request.form['coupon']
 
 
 def find_coupon_by_code(code):
