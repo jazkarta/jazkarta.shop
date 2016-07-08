@@ -54,12 +54,20 @@ input[type="text"].jaz-shop-coupon {
 .jaz-shop-checkout-form input[type="text"][size] {
 	width: auto;
 }
-.jaz-shop-checkout-form .fieldset-contact-info label {
-	width: 100px;
+.jaz-shop-checkout-form .fieldset-contact-info label,
+.jaz-shop-shipping-address label {
+	width: 120px;
 	float: left;
 }
-.jaz-shop-checkout-form .input {
-	overflow: hidden;
+.jaz-shop-checkout-form .fieldset-contact-info input[type="text"],
+.jaz-shop-checkout-form .fieldset-contact-info input[type="email"],
+.jaz-shop-checkout-form .fieldset-contact-info select,
+.template-shipping input[type="text"],
+.template-shipping select {
+	width: calc(100% - 120px);
+}
+.template-shipping .select2-input {
+	width: 100% !important;
 }
 .jaz-shop-checkout-form .fieldset-payment-info select {
 	display: inline;

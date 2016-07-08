@@ -51,7 +51,6 @@
     name="shipping"
     for="plone.app.layout.navigation.interfaces.INavigationRoot"
     class=".shipping.ShippingForm"
-    template="templates/shipping_form.pt"
     permission="zope2.View"
     layer="..interfaces.IBrowserLayer"
     />

@@ -10,12 +10,11 @@
 	  </label>
 	</div>
 
-	<dl class="portalMessage" tal:condition="not:methods">
-	  <dt>Info</dt>
-	  <dd>Please enter a shipping address so we can check what shipping methods are available.</dd>
-	</dl>
+	<div class="portalMessage warning" tal:condition="not:methods">
+	  Please enter a shipping address so we can check what shipping methods are available.
+	</div>
 
-	<div class="formControls" tal:condition="methods">
+	<div class="jaz-shop-buttons" tal:condition="methods">
 	  <tal:b replace="structure view/actions/proceed/render" />
 	</div>
 

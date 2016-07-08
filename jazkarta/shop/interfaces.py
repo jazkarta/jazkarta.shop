@@ -2,6 +2,7 @@ from collective.z3cform.datagridfield import DataGridFieldFactory
 from collective.z3cform.datagridfield import DictRow
 from decimal import Decimal
 from plone.app.vocabularies.catalog import CatalogSource
+from plone.app.z3cform.widget import SelectWidget
 from plone.autoform import directives as form
 from plone.autoform.interfaces import IFormFieldProvider
 from plone.supermodel import model
@@ -280,12 +281,6 @@ class IShippingMethod(model.Schema):
     form.widget('weight_table', DataGridFieldFactory)
 
 
-# Make sure shipping method fields will be read/written
-# using the DictionaryField manager.
-for name, field in schema.getFields(IShippingMethod).items():
-    alsoProvides(field, IDictField)
-
-
 class IShippingAddress(model.Schema):
 
     first_name = schema.TextLine(
@@ -304,6 +299,7 @@ class IShippingAddress(model.Schema):
         title=u'Country',
         vocabulary='jazkarta.shop.countries',
     )
+    form.widget('country', SelectWidget)
     state = schema.TextLine(
         title=u'State/Province',
     )
@@ -311,6 +307,13 @@ class IShippingAddress(model.Schema):
         title=u'ZIP',
         required=False,
     )
+
+
+# Make sure PersistentMapping fields will be read/written
+# using the DictionaryField manager.
+for s in (IShippingMethod, IShippingAddress):
+    for name, field in schema.getFields(s).items():
+        alsoProvides(field, IDictField)
 
 
 class IStripeEnabledView(Interface):

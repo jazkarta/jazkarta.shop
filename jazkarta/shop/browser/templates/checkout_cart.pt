@@ -74,7 +74,7 @@
   </tal:items>
   <tal:shipping condition="cart/shipping">
     <tr>
-      <td>Shipping - ${cart/order/ship_method}</td>
+      <td>Shipping - ${cart/data/ship_method}</td>
       <td></td>
       <td></td>
       <td tal:content="python:'${:,.2f}'.format(cart.shipping)" />
@@ -87,7 +87,7 @@
   </tal:shipping>
   <tal:tax define="tax cart/tax|nothing" condition="tax">
     <tr>
-      <td>WA State Tax</td>
+      <td>Tax</td>
       <td></td>
       <td></td>
       <td tal:content="python:'${:,.2f}'.format(tax)">TAX</td>

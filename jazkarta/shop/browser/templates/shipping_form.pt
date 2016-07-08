@@ -14,8 +14,8 @@
     <tal:form metal:use-macro="context/@@ploneform-macros/titlelessform">
       <tal:fields metal:fill-slot="fields">
 
-        <div class="form-left">
-          <fieldset>
+        <div class="jaz-shop-half-form">
+          <fieldset class="jaz-shop-shipping-address">
             <legend>Shipping Address</legend>
             <tal:block tal:replace="structure view/widgets/first_name/@@ploneform-render-widget" />
             <tal:block tal:replace="structure view/widgets/last_name/@@ploneform-render-widget" />
@@ -97,7 +97,7 @@
           </fieldset>
 
         </div>
-        <div class="form-left">
+        <div class="jaz-shop-half-form">
           <fieldset>
             <legend>Shipping Method</legend>
             <div id="shipping-method" tal:content="structure view/shipping_methods_template" />

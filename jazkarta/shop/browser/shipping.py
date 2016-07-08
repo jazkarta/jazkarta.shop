@@ -1,7 +1,6 @@
 from decimal import Decimal
 from persistent.mapping import PersistentMapping
 from plone.autoform.form import AutoExtensibleForm
-from plone.directives import form
 from Products.Five import BrowserView
 from z3c.form import button
 from z3c.form.form import Form
@@ -138,8 +137,9 @@ class ShippingMethodForm(AutoExtensibleForm, Form):
         del self.shipping_methods[self._name]
 
 
-class ShippingForm(form.SchemaForm):
+class ShippingForm(AutoExtensibleForm, Form):
     schema = IShippingAddress
+    template = ViewPageTemplateFile('templates/shipping_form.pt')
     shipping_methods_template = ViewPageTemplateFile(
         'templates/shipping_methods_widget.pt')
 
@@ -157,7 +157,7 @@ class ShippingForm(form.SchemaForm):
             return []
 
         zones = set()
-        country = self.widgets['country'].value[0]
+        country = self.widgets['country'].value
         state = self.widgets['state'].value
         if country == 'United States':
             if state == 'AK':
@@ -201,7 +201,7 @@ class ShippingForm(form.SchemaForm):
             self.update()
             return self.shipping_methods_template()
         else:
-            return super(form.SchemaForm, self).__call__()
+            return super(AutoExtensibleForm, self).__call__()
 
     def getContent(self):
         ship_to = self.cart.ship_to

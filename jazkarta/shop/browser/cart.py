@@ -81,12 +81,12 @@ class UpdateCartView(CartViewMixin, BrowserView):
                 cart_id = self.request.form['change']
                 self.cart[cart_id].quantity = int(self.request.form['quantity'])
 
-            if 'del' in self.request.form:
-                cart_id = self.request.form['del']
-                self.cart[cart_id].quantity = 0
-
             if 'remove' in self.request.form:
                 cart_id = self.request.form['remove']
+                self.cart[cart_id].quantity = 0
+
+            if 'del' in self.request.form:
+                cart_id = self.request.form['del']
                 self.cart[cart_id].quantity -= 1
         except OutOfStock:
             self.cart_warnings = {

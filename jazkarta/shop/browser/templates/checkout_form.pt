@@ -101,62 +101,44 @@
           <div class="field-inputs">
             <div class="field subfield-first-name">
               <label>First name</label>
-              <div class="input">
-                <input type="text" name="first_name" required="required" tal:attributes="value python: view.request.form.get('first_name', None)" />
-              </div>
+              <input type="text" name="first_name" required="required" tal:attributes="value python: view.request.form.get('first_name', None)" />
             </div>
             <div class="field subfield-last-name">
               <label>Last name</label>
-              <div class="input">
-                <input type="text" name="last_name" required="required" tal:attributes="value python: view.request.form.get('last_name', None)" />
-              </div>
+              <input type="text" name="last_name" required="required" tal:attributes="value python: view.request.form.get('last_name', None)" />
             </div>
             <div class="field subfield-address">
               <label>Address</label>
-              <div class="input">
-                <input type="text" name="address" required="required" tal:attributes="value python: view.request.form.get('address', None)" />
-              </div>
+              <input type="text" name="address" required="required" tal:attributes="value python: view.request.form.get('address', None)" />
             </div>
             <div class="field subfield-city">
               <label>City</label>
-              <div class="input">
-                <input type="text" name="city" required="required" tal:attributes="value python: view.request.form.get('city', None)" />
-              </div>
+              <input type="text" name="city" required="required" tal:attributes="value python: view.request.form.get('city', None)" />
             </div>
             <div class="field subfield-state">
               <label>State</label>
-              <div class="input">
-                <input type="text" name="state" required="required" tal:attributes="value python: view.request.form.get('state', None)"/>
-              </div>
+              <input type="text" name="state" required="required" tal:attributes="value python: view.request.form.get('state', None)"/>
             </div>
             <div class="field subfield-zip">
               <label>Postal code</label>
-              <div class="input">
-                <input type="text" name="zip" required="required" tal:attributes="value python: view.request.form.get('zip', None)" />
-              </div>
+              <input type="text" name="zip" required="required" tal:attributes="value python: view.request.form.get('zip', None)" />
             </div>
             <div class="field subfield-country"
                  tal:define="value request/country|string:United States">
               <label>Country</label>
-              <div class="input">
-                <select name="country" required="required">
-                  <option tal:repeat="country view/countries" 
-                          tal:content="country"
-                          tal:attributes="value country; selected python:'selected' if country == value else None">United States</option>
-                </select>
-              </div>
+              <select name="country" required="required">
+                <option tal:repeat="country view/countries" 
+                        tal:content="country"
+                        tal:attributes="value country; selected python:'selected' if country == value else None">United States</option>
+              </select>
             </div>
             <div class="field subfield-email">
               <label>Email</label>
-              <div class="input">
-                <input type="email" name="email" required="required" tal:attributes="value python:request.form.get('email', '')" />
-              </div>
+              <input type="email" name="email" required="required" tal:attributes="value python:request.form.get('email', '')" />
             </div>
             <div class="field subfield-phone">
               <label>Phone</label>
-              <div class="input">
-                <input type="text" name="phone" tal:attributes="value python:request.form.get('phone', '')"/>
-              </div>
+              <input type="text" name="phone" tal:attributes="value python:request.form.get('phone', '')"/>
             </div>
           </div>
         </div>
