@@ -11,6 +11,7 @@
 	</div>
 
 	<div class="portalMessage warning" tal:condition="not:methods">
+	  <strong>No shipping available.</strong>
 	  Please enter a shipping address so we can check what shipping methods are available.
 	</div>
 

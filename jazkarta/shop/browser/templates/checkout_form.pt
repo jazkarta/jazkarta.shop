@@ -126,7 +126,7 @@
             <div class="field subfield-country"
                  tal:define="value request/country|string:United States">
               <label>Country</label>
-              <select name="country" required="required">
+              <select name="country" required="required" class="pat-select2">
                 <option tal:repeat="country view/countries" 
                         tal:content="country"
                         tal:attributes="value country; selected python:'selected' if country == value else None">United States</option>

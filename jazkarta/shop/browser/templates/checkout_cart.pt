@@ -7,11 +7,11 @@
 <input type="hidden" name="total_order_discount" id="total_order_discount"
        tal:condition="can_edit" tal:attributes="value view/cart/discount" />
 
-<dl class="portalMessage error"
-    tal:condition="view/error|nothing">
-  <dt>Error</dt>
-  <dd>${view/error}</dd>
-</dl>
+<div class="portalMessage error"
+     tal:condition="view/error|nothing">
+  <strong>Error</strong>
+  ${view/error}
+</div>
 
 <table class="listing cart-listing">
   <tr>
