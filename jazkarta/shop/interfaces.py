@@ -202,7 +202,10 @@ class ISettings(model.Schema):
     )
 
     ups_username = schema.TextLine(title=u'ups.com Username')
-    ups_password = schema.Password(title=u'ups.com Password')
+    ups_password = schema.Password(
+        title=u'ups.com Password',
+        required=False,
+        )
     ups_api_key = schema.TextLine(title=u'UPS API Key')
     ups_account = schema.TextLine(title=u'UPS Account Number')
 
