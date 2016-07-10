@@ -13,7 +13,8 @@
  
       if (response.error) {
         // Show the errors on the form
-        $form.find('.checkout-errors').show().text(response.error.message);
+        $form.find('.checkout-error-wrapper').show();
+        $form.find('.checkout-error').text(response.error.message);
         $form.find('input[type="submit"]').prop('disabled', false);
       } else {
         // token contains id, last4, and card type
@@ -90,9 +91,11 @@
       <input type="hidden" name="amount" tal:attributes="value view/amount" />
       <input type="hidden" name="submitted" value="1"/>
 
-      <div class="checkout-errors error"
-           tal:content="view/error"
-           tal:attributes="style python:'display: none;;' if not view.error else ''" />
+      <div class="portalMessage error checkout-error-wrapper"
+           tal:attributes="style python:'display: none;;' if not view.error else ''">
+        <strong>Error</strong>
+        <span class="checkout-error">${view/error}</span>
+      </div>
 
       <fieldset class="fieldset-contact-info jaz-shop-half-form">
         <legend><span class="step">1.</span> Billing Address</legend>
@@ -218,9 +221,16 @@
 
       </fieldset>
 
-      <div class="jaz-shop-half-form jaz-shop-buttons">
-        <input type="submit" value="Complete Purchase" class="allowMultiSubmit context"
-               tal:attributes="disabled python:'disabled' if (not view.cart.items and not view.cart.amount) else None" />
+      <div class="jaz-shop-half-form">
+        <div class="portalMessage error checkout-error-wrapper"
+             tal:attributes="style python:'display: none;;' if not view.error else ''">
+          <strong>Error</strong>
+          <span class="checkout-error">${view/error}</span>
+        </div>
+        <div class="jaz-shop-buttons">
+          <input type="submit" value="Complete Purchase" class="allowMultiSubmit context"
+                 tal:attributes="disabled python:'disabled' if (not view.cart.items and not view.cart.amount) else None" />
+        </div>
       </div>
  
     </form>
