@@ -248,9 +248,5 @@ class ShippingForm(AutoExtensibleForm, Form):
         # This is where we could save the shipping address
         # for use in future orders.
 
-        # Calculate tax rate and update order.
-        # Asking the cart for the tax rate will update rate and period on order
-        cart.tax_rate
-
         return self.request.response.redirect(
             self.context.absolute_url() + '/checkout')

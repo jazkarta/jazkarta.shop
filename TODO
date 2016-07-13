@@ -1,5 +1,3 @@
-- Tax helper should be turned into a utility.
-- So should shipping services.
 - Add logging.
 - UI for admins to view order history.
 - Fix promo code widgets.

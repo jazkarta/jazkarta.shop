@@ -37,4 +37,13 @@
       import_steps="typeinfo"
       />
 
+  <upgradeDepends
+      profile="jazkarta.shop:default"
+      source="4"
+      destination="5"
+      title="Add tax handlers setting"
+      description=""
+      import_steps="plone.app.registry"
+      />
+
 </configure>

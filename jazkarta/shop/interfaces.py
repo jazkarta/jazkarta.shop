@@ -9,6 +9,7 @@ from plone.supermodel import model
 from z3c.currency.field import Currency
 from z3c.form.browser.checkbox import CheckBoxWidget
 from zope.interface import alsoProvides
+from zope.interface import Attribute
 from zope.interface import Interface
 from zope.interface import provider
 from zope import schema
@@ -74,6 +75,15 @@ class IPurchaseHandler(Interface):
 
     def after_purchase(item):
         """Perform actions after this product is purchased."""
+
+
+class ITaxHandler(Interface):
+
+    label = Attribute("""Name shown in UI""")
+
+    def get_tax_rates(cart):
+        """Return a label -> rate mapping of tax rates in effect for this cart.
+        """
 
 
 class ICoupon(model.Schema):
@@ -211,6 +221,14 @@ class ISettings(model.Schema):
 
     usps_userid = schema.TextLine(title=u'USPS User Id')
 
+    tax_handlers = schema.List(
+        title=u'Calculate Tax Using',
+        value_type=schema.Choice(
+            vocabulary='jazkarta.shop.tax_handlers',
+        ),
+        default=[],
+    )
+
 
 class IBrowserLayer(IDefaultBrowserLayer):
     """Browser layer to mark the request when this product is activated."""
@@ -326,12 +344,12 @@ class IStripeEnabledView(Interface):
 # Exceptions
 
 class PaymentProcessingException(Exception):
-    """Exception indicating a problem with payment processing."""
+    """A problem with payment processing."""
 
 
 class OutOfStock(Exception):
-    """Exception indicating that a cart item is out of stock."""
+    """A cart item is out of stock."""
 
 
 class TaxRateException(Exception):
-    """Exception indicating failure to calculate tax rate."""
+    """Failure to calculate tax rate."""
