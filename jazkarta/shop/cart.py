@@ -3,12 +3,14 @@ from cPickle import dumps, loads
 from datetime import datetime
 from decimal import Decimal
 from persistent.mapping import PersistentMapping
+from zope.component import queryUtility
 import copy
 
+from jazkarta.shop import logger
 from jazkarta.shop import storage
 from .interfaces import IPurchaseHandler
+from .interfaces import ITaxHandler
 from .interfaces import OutOfStock
-from .tax import Tax
 from .utils import get_current_userid
 from .utils import get_setting
 from .utils import get_site
@@ -96,14 +98,6 @@ class LineItem(object):
     def subtotal(self):
         return Decimal(self.price * self.quantity)
 
-    @property
-    def tax(self):
-        tax = Decimal(0)
-        if self._item.get('taxable', False):
-            # this is a point at which the TaxRateException might be thrown
-            tax = (self.subtotal * self.cart.tax_rate).quantize(Decimal('0.01'))
-        return tax
-
     def __getattr__(self, name):
         try:
             return self._item[name]
@@ -181,7 +175,6 @@ class Cart(object):
         self._items = data['items']
         self.data = data
         self.request = request
-        self._tax_calculator = Tax(self)
 
     def clone(self):
         return Cart(
@@ -244,33 +237,39 @@ class Cart(object):
                 discount += item_discount
         return discount
 
+    def calculate_taxes(self):
+        rates = OrderedDict()
+        for name in get_setting('tax_handlers'):
+            tax_handler = queryUtility(ITaxHandler, name=name)
+            if tax_handler is None:
+                logger.warning(
+                    'Tax handler enabled but not found: {}'.format(name))
+                continue
+
+            rates.update(tax_handler.get_tax_rates(self))
+
+        taxable_subtotal = sum(
+            item.subtotal for item in self.items if item.taxable)
+        taxable_subtotal += self.shipping
+
+        taxes = []
+        for label, rate in rates.items():
+            # Calculate tax, rounded to nearest cent
+            tax = (taxable_subtotal * rate).quantize(Decimal('0.01'))
+            taxes.append({
+                'label': label,
+                'tax': tax,
+            })
+
+        self.data['taxes'] = taxes
+
     @property
-    def tax(self):
-        if 'tax_override' in self.data:
-            return self.data['tax_override']
-
-        # this is a point at which the TaxRateException might be thrown
-        items_tax = sum(item.tax for item in self.items)
-        shipping_tax = Decimal(0)
-
-        tax_rate = self.tax_rate
-        shipping = self.shipping
-        if tax_rate and shipping:
-            shipping_tax = (shipping * tax_rate).quantize(Decimal('0.01'))
-
-        return items_tax + shipping_tax
+    def taxes(self):
+        return self.data.get('taxes', [])
 
     @property
-    def tax_rate(self):
-        """Returns the tax rate appropriate for the order's ship_to address.
-
-        If the rate is required and cannot be calculated, this method will
-        raise jazkarta.shop.interfaces.TaxRateException
-        """
-        if not self.ship_to:
-            return Decimal(0)
-
-        return self._tax_calculator.rate
+    def tax_subtotal(self):
+        return sum(item['tax'] for item in self.taxes)
 
     @property
     def amount(self):
@@ -278,7 +277,7 @@ class Cart(object):
 
         Includes optional donation, shipping and tax.
         """
-        return self.subtotal + self.tax + self.shipping
+        return self.subtotal + self.tax_subtotal + self.shipping
 
     def add_product(self, product_uid, userid=None, **kw):
         """Add a product to the cart by UID.

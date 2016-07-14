@@ -50,5 +50,9 @@
   <!-- Vocabulary factories -->
   <utility name="jazkarta.shop.countries" component=".vocabs.get_country_vocab" />
   <utility name="jazkarta.shop.product_categories" component=".vocabs.product_categories" />
+  <utility name="jazkarta.shop.tax_handlers" component=".vocabs.get_tax_handler_vocab" />
+
+  <!-- Tax handlers -->
+  <utility name="jazkarta.shop.tax.wa_state.WAStateTaxHandler" factory=".tax.wa_state.WAStateTaxHandler" />
 
 </configure>

@@ -85,17 +85,12 @@
       </td>
     </tr>
   </tal:shipping>
-  <tal:tax define="tax cart/tax|nothing" condition="tax">
+  <tal:tax tal:repeat="tax_item cart/taxes">
     <tr>
-      <td>Tax</td>
+      <td>${tax_item/label}</td>
       <td></td>
       <td></td>
-      <td tal:content="python:'${:,.2f}'.format(tax)">TAX</td>
-      <td tal:condition="can_refund">
-        $<input type="text" size="4"
-                name="item_tax"
-                value="${python:request.form.get('item_tax', tax)}" />
-      </td>
+      <td tal:content="python:'${:,.2f}'.format(tax_item['tax'])">TAX</td>
     </tr>
   </tal:tax>
 </table>

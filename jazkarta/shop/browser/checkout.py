@@ -1,5 +1,6 @@
 from datetime import date
 from persistent.mapping import PersistentMapping
+from plone.protect.utils import safeWrite
 from premailer import Premailer
 from Products.Five import BrowserView
 from ZODB.POSException import ConflictError
@@ -49,6 +50,9 @@ class CheckoutForm(BrowserView):
     def update(self):
         self.error = None
         self.prepopulate_billing_info()
+        self.cart.calculate_taxes()
+        # Make sure writing tax to cart doesn't trigger CSRF warning
+        safeWrite(self.cart.data)
 
     def render(self):
         if 'submitted' in self.request.form and not self.error:
