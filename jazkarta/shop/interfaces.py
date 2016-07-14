@@ -262,7 +262,12 @@ class IWeightPrice(model.Schema):
 
 CALCULATION_METHODS = SimpleVocabulary([
     SimpleTerm(value='weight', token='weight', title=u'By weight'),
-    SimpleTerm(value='usps', token='usps', title=u'USPS Priority Mail'),
+    SimpleTerm(
+        value='usps:USPS Priority Mail', token='usps_prioritymail', 
+        title=u'USPS Priority Mail'),
+    SimpleTerm(
+        value='usps:USPS Media Mail', token='usps_mediamail',
+        title=u'USPS Media Mail'),
     SimpleTerm(
         value='ups:UPS Next Day', token='ups_nextday', title=u'UPS Next Day'),
     SimpleTerm(value='ups:UPS 2nd Day', token='ups_2day', title=u'UPS 2nd Day'),

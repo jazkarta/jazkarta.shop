@@ -8,7 +8,7 @@ ENDPOINT = 'http://production.shippingapis.com/ShippingAPI.dll'
 DOMESTIC_REQUEST = """<RateV4Request USERID="%(userid)s">
   <Revision>2</Revision>
   <Package ID="0">
-    <Service>PRIORITY</Service>
+    <Service>%(service)s</Service>
     <ZipOrigination>%(origin_zip)s</ZipOrigination>
     <ZipDestination>%(destination_zip)s</ZipDestination>
     <Pounds>%(pounds)s</Pounds>
@@ -69,12 +69,15 @@ def expand_weight(weight):
     return pounds, ounces
 
 
-def calculate_domestic_usps_rate(weight, destination_zip):
+def calculate_domestic_usps_rate(weight, service_type, destination_zip):
     pounds, ounces = expand_weight(weight)
+    usps_services = {'USPS Priority Mail' : 'PRIORITY',
+                     'USPS Media Mail' : 'MEDIA'}
     params = {
         'destination_zip': destination_zip,
         'pounds': pounds,
         'ounces': ounces,
+        'service': usps_services[service_type],
     }
     res = call_usps_api('RateV4', DOMESTIC_REQUEST, params)
     rate = res.find('.//Postage/Rate').text
@@ -94,8 +97,8 @@ def calculate_international_usps_rate(weight, country):
     return Decimal(rate)
 
 
-def calculate_usps_rate(weight, country, zip):
+def calculate_usps_rate(weight, service_type, country, zip):
     if country == 'United States':
-        return calculate_domestic_usps_rate(weight, zip)
+        return calculate_domestic_usps_rate(weight, service_type, zip)
     else:
         return calculate_international_usps_rate(weight, country)

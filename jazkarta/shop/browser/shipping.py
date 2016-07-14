@@ -42,9 +42,10 @@ def calculate_shipping(cart, method, addr):
                     return subtotal * row['rate'] / Decimal(100)
                 else:
                     return row['rate']
-        elif method['calculation'] == 'usps':
+        elif method['calculation'].startswith('usps'):
+            service = method['calculation'].split(':')[-1]
             return calculate_usps_rate(
-                weight, addr['country'], addr['postal_code'])
+                weight, service, addr['country'], addr['postal_code'])
         elif method['calculation'].startswith('ups'):
             service = method['calculation'].split(':')[-1]
             request = getRequest()
