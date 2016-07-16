@@ -71,4 +71,5 @@ def fetch_rate(street, city, postal_code):
         )
         raise TaxRateException(msg)
 
-    return Decimal(result.attrib['rate'])
+    rate = result.attrib['rate'] or '0'
+    return Decimal(rate)
