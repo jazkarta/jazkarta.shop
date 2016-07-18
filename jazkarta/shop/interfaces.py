@@ -219,7 +219,7 @@ class ISettings(model.Schema):
     ups_api_key = schema.TextLine(title=u'UPS API Key')
     ups_account = schema.TextLine(title=u'UPS Account Number')
 
-    usps_userid = schema.TextLine(title=u'USPS User Id')
+    usps_userid = schema.TextLine(title=u'USPS WebTools API User Id')
 
     tax_handlers = schema.List(
         title=u'Calculate Tax Using',
@@ -229,6 +229,10 @@ class ISettings(model.Schema):
         default=[],
     )
 
+    taxjar_smartcalcs_api_key = schema.TextLine(
+        title=u'TaxJar SmartCalcs API Token',
+        required=False,
+        )
 
 class IBrowserLayer(IDefaultBrowserLayer):
     """Browser layer to mark the request when this product is activated."""

@@ -46,4 +46,13 @@
       import_steps="plone.app.registry"
       />
 
+  <upgradeDepends
+      profile="jazkarta.shop:default"
+      source="5"
+      destination="6"
+      title="Add taxjar api key to shop settings"
+      description=""
+      import_steps="plone.app.registry"
+      />
+
 </configure>
