@@ -29,7 +29,7 @@ class SDStateTaxHandler(object):
 
     """
 
-    label = u'South Dakota State Tax Handler (TaxJar SmartCalcs)'
+    label = u'South Dakota State Tax Handler (TaxJar)'
 
     def get_tax_rates(self, cart):
         ship_to = cart.ship_to
