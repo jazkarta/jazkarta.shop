@@ -359,7 +359,8 @@ class Cart(object):
         return Decimal(self.data.get('ship_charge', 0))
 
     def store_order(self, userid):
+        data = copy.deepcopy(self.data)
+        now = datetime.now()
+        storage.set_shop_data(['orders', now], data)
         if userid is not None:
-            data = copy.deepcopy(self.data)
-            now = datetime.now()
             storage.set_shop_data([userid, 'orders', now], data)
