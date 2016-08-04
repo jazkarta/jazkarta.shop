@@ -7,34 +7,39 @@
       i18n:domain="plone">
 <body>
 
-<metal:main fill-slot="main">
-  <div tal:define="cart view/old_cart|nothing"
-       tal:condition="not:view/error">
-    <h1 class="documentFirstHeading">Thank You</h1>
-    <div class="portalMessage info" tal:condition="cart/items">
-      <strong>Order Complete</strong>
-      <p>Thank you for your purchase.</p>
-    </div>
-    <br />
-    <tal:b condition="cart/items">
-      <tal:b replace="structure view/cart_template" />
-      <div class="subtotal">
-        <strong>Your purchases total</strong>
-        <span tal:content="python:'${:,.2f}'.format(view.amount)"></span>
+<metal:title fill-slot="content-title">
+  <h1 class="documentFirstHeading"
+      tal:condition="not:view/error">Thank You</h1>
+</metal:title>
+
+<metal:core fill-slot="content-core">
+  <tal:cart tal:define="cart view/old_cart|nothing">
+    <tal:no-error tal:condition="not:view/error">
+      <div class="portalMessage info" tal:condition="cart/items">
+        <strong>Order Complete</strong>
+        <p>Thank you for your purchase.</p>
       </div>
       <br />
-      <tal:b condition="cart/data/notes|nothing">
-        <h3>Notes/Questions:</h3>
-        <p tal:content="cart/data/notes" />
+      <tal:b condition="cart/items">
+        <tal:b replace="structure view/cart_template" />
+        <div class="subtotal">
+          <strong>Your purchases total</strong>
+          <span tal:content="python:'${:,.2f}'.format(view.amount)"></span>
+        </div>
+        <br />
+        <tal:b condition="cart/data/notes|nothing">
+          <h3>Notes/Questions:</h3>
+          <p tal:content="cart/data/notes" />
+        </tal:b>
+        <br />
       </tal:b>
-      <br />
-    </tal:b>
-    <p tal:replace="structure cart/thankyou_message" />
-  </div>
-  <div class="portalMessage error" tal:condition="view/error">
-    <strong>There was a problem with your order</strong>
-    <p tal:content="view/error">Error</p>
-  </div>
-</metal:main>
+      <p tal:replace="structure cart/thankyou_message" />
+    </tal:no-error>
+    <div class="portalMessage error" tal:condition="view/error">
+      <strong>There was a problem with your order</strong>
+      <p tal:content="view/error">Error</p>
+    </div>
+  </tal:cart>
+</metal:core>
 </body>
 </html>
