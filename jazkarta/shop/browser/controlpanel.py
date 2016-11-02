@@ -6,7 +6,6 @@ from plone.app.registry.browser.controlpanel import ControlPanelFormWrapper
 from plone.batching import Batch
 from plone.z3cform import layout
 from z3c.form import form
-from zope.interface import Interface
 from ..interfaces import ISettings
 from ..utils import resolve_uid
 from .. import storage
@@ -60,9 +59,10 @@ def _fetch_orders(part, key=()):
             data['items'] = item_str + '</ul>'
             address = data['ship_to']
             data['ship_to'] = '<p>{} {}</p><p>{}</p><p>{}, {} {} {}</p>'.format(
-                address['first_name'], address['last_name'], address['street'],
-                address['city'], address['state'], address['postal_code'],
-                address['country']
+                address.get('first_name'), address.get('last_name'),
+                address.get('street'), address.get('city'),
+                address.get('state'), address.get('postal_code'),
+                address.get('country')
             )
             yield data
 
