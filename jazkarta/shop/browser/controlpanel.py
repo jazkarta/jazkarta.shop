@@ -37,16 +37,16 @@ def _fetch_orders(part, key=()):
             if len(key) == 3:
                 data['userid'] = key[0]
             data['date'] = key[-1]
-            line_items = [LineItem(None, k, v) for k, v in data['items'].items()]
-            taxes = Decimal(sum(item['tax'] for item in data.get('taxes', ())))
-            data['total'] = (Decimal(sum(i.subtotal for i in line_items)) +
-                             taxes + Decimal(data.get('ship_charges', 0)))
-            items = ''
-            for i in data.line_items:
-                items += '<p><a href="{}">{}</a> x {} @ {}</p>'.format(
-                    i.href, i.uid, i.quantity, i.price
-                )
-            data['items'] = items
+            # line_items = [LineItem(None, k, v) for k, v in data['items'].items()]
+            # taxes = Decimal(sum(item['tax'] for item in data.get('taxes', ())))
+            # data['total'] = (Decimal(sum(i.subtotal for i in line_items)) +
+            #                  taxes + Decimal(data.get('ship_charges', 0)))
+            # items = ''
+            # for i in data.line_items:
+            #     items += '<p><a href="{}">{}</a> x {} @ {}</p>'.format(
+            #         i.href, i.uid, i.quantity, i.price
+            #     )
+            # data['items'] = items
             yield data
 
 
