@@ -36,7 +36,7 @@ def _fetch_orders(part, key=()):
             if len(key) == 3:
                 data['userid'] = key[0]
             data['date'] = key[-1]
-            line_items = [LineItem(None, None, i) for i in data['items']]
+            line_items = [LineItem(None, k, v) for k, v in data['items'].items()]
             data['total'] = (sum(i.subtotal for i in line_items) +
                              data.get('taxes') + data.get('ship_charges'))
             items = ''
