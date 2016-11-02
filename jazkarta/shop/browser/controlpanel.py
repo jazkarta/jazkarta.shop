@@ -5,7 +5,8 @@ from plone.app.registry.browser.controlpanel import RegistryEditForm
 from plone.app.registry.browser.controlpanel import ControlPanelFormWrapper
 from plone.batching import Batch
 from plone.z3cform import layout
-from Products.Five.browser import BrowserView
+from z3c.form import form
+from zope.interface import Interface
 from ..interfaces import ISettings
 from ..utils import resolve_uid
 from .. import storage
@@ -54,7 +55,7 @@ def _fetch_orders(part, key=()):
                     href = title = i.get('href', '')
 
                 items += '<li><a href="{}">{}</a> x {} @ {}</li>'.format(
-                    href, title, i.get('quantity'), i.get('price')
+                    href, title, i.get('quantity', 1), i.get('price', 0.0)
                 )
             data['items'] = items + '</ul>'
             address = data['ship_to']
@@ -66,19 +67,20 @@ def _fetch_orders(part, key=()):
             yield data
 
 
-class OrderControlPanelView(BrowserView):
+class OrderControlPanelForm(form.Form):
     id = "JazkartaShopOrders"
     label = _(u"Jazkarta Shop Orders")
-    description = ""
-    form_name = _(u"Jazkarta Shop Orders")
-    control_panel_view = "jazkarta-shop-orders"
+
+
+class OrderControlPanelView(ControlPanelFormWrapper):
+    label = _(u"Jazkarta Shop Orders")
+    form = OrderControlPanelForm
     orders = ()
     keys = ORDER_KEYS
 
-    def __init__(self, context, request):
-        self.context = context
-        self.request = request
+    def update(self):
         orders = list(_fetch_orders(storage.get_storage()))
         orders.sort(key=lambda o: o.get('date_sort', ''), reverse=True)
-        start = int(request.get('b_start', 0))
+        start = int(self.request.get('b_start', 0))
         self.batch = Batch(orders, size=50, start=start)
+        super(OrderControlPanelView, self).update()
