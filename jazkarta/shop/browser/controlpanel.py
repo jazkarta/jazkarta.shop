@@ -1,5 +1,6 @@
 import copy
 from BTrees.OOBTree import OOBTree
+from decimal import Decimal
 from plone.app.registry.browser.controlpanel import RegistryEditForm
 from plone.app.registry.browser.controlpanel import ControlPanelFormWrapper
 from plone.batching import Batch
@@ -37,8 +38,9 @@ def _fetch_orders(part, key=()):
                 data['userid'] = key[0]
             data['date'] = key[-1]
             line_items = [LineItem(None, k, v) for k, v in data['items'].items()]
-            data['total'] = (sum(i.subtotal for i in line_items) +
-                             data.get('taxes') + data.get('ship_charges'))
+            taxes = Decimal(sum(item['tax'] for item in data.get('taxes', ())))
+            data['total'] = (Decimal(sum(i.subtotal for i in line_items)) +
+                             taxes + Decimal(data.get('ship_charges', 0)))
             items = ''
             for i in data.line_items:
                 items += '<p><a href="{}">{}</a> x {} @ {}</p>'.format(
