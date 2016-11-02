@@ -7,7 +7,7 @@ from plone.batching import Batch
 from plone.z3cform import layout
 from Products.Five.browser import BrowserView
 from ..interfaces import ISettings
-from ..cart import LineItem
+from ..utils import resolve_uid
 from .. import storage
 from .. import _
 
@@ -36,17 +36,33 @@ def _fetch_orders(part, key=()):
             data = copy.deepcopy(part)
             if len(key) == 3:
                 data['userid'] = key[0]
-            data['date'] = key[-1].isoformat() if hasattr(key[-1], 'isoformat') else ''
-            # line_items = [LineItem(None, k, v) for k, v in data['items'].items()]
-            # taxes = Decimal(sum(item['tax'] for item in data.get('taxes', ())))
-            # data['total'] = (Decimal(sum(i.subtotal for i in line_items)) +
-            #                  taxes + Decimal(data.get('ship_charges', 0)))
-            # items = ''
-            # for i in data.line_items:
-            #     items += '<p><a href="{}">{}</a> x {} @ {}</p>'.format(
-            #         i.href, i.uid, i.quantity, i.price
-            #     )
-            # data['items'] = items
+            raw_date = key[-1]
+            data['date'] = raw_date.strftime('%Y-%m-%d %I:%M %p')
+            items = data['items'].values()
+            data['date_sort'] = raw_date.isoformat() if hasattr(raw_date, 'isoformat') else ''
+            taxes = sum(item.get('tax', 0) for item in data.get('taxes', ()))
+            data['total'] = (sum((i.get('price', 0) * i.get('quantity', 1)) for i in items) +
+                             taxes + Decimal(data.get('ship_charges', 0)))
+            items = '<ul>'
+            for i in items:
+                uid = i.get('uid', None)
+                if uid:
+                    product = resolve_uid(uid)
+                    title = product.Title()
+                    href = product.absolute_url()
+                else:
+                    href = title = i.get('href', '')
+
+                items += '<li><a href="{}">{}</a> x {} @ {}</li>'.format(
+                    href, title, i.get('quantity'), i.get('price')
+                )
+            data['items'] = items + '</ul>'
+            address = data['ship_to']
+            data['ship_to'] = '<p>{} {}</p><p>{}</p><p>{}, {} {} {}</p>'.format(
+                address['first_name'], address['last_name'], address['street'],
+                address['city'], address['state'], address['postal_code'],
+                address['country']
+            )
             yield data
 
 
@@ -63,6 +79,6 @@ class OrderControlPanelView(BrowserView):
         self.context = context
         self.request = request
         orders = list(_fetch_orders(storage.get_storage()))
-        orders.sort(key=lambda o: o.get('date', ''), reverse=True)
+        orders.sort(key=lambda o: o.get('date_sort', ''), reverse=True)
         start = int(request.get('b_start', 0))
         self.batch = Batch(orders, size=50, start=start)
