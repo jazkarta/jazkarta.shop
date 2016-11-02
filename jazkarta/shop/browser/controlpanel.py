@@ -36,7 +36,7 @@ def _fetch_orders(part, key=()):
             data = copy.deepcopy(part)
             if len(key) == 3:
                 data['userid'] = key[0]
-            data['date'] = key[-1]
+            data['date'] = key[-1].isoformat() if hasattr(key[-1], 'isoformat') else ''
             # line_items = [LineItem(None, k, v) for k, v in data['items'].items()]
             # taxes = Decimal(sum(item['tax'] for item in data.get('taxes', ())))
             # data['total'] = (Decimal(sum(i.subtotal for i in line_items)) +
@@ -63,6 +63,6 @@ class OrderControlPanelView(BrowserView):
         self.context = context
         self.request = request
         orders = list(_fetch_orders(storage.get_storage()))
-        orders.sort(key=lambda o: o.get('date'), reverse=True)
+        orders.sort(key=lambda o: o.get('date', ''), reverse=True)
         start = int(request.get('b_start', 0))
         self.batch = Batch(orders, size=50, start=start)
