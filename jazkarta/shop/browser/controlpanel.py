@@ -40,9 +40,9 @@ def _fetch_orders(part, key=()):
             data['date'] = raw_date.strftime('%Y-%m-%d %I:%M %p')
             items = data['items'].values()
             data['date_sort'] = raw_date.isoformat() if hasattr(raw_date, 'isoformat') else ''
-            taxes = sum(item.get('tax', 0) for item in data.get('taxes', ()))
+            data['taxes'] = sum(item.get('tax', 0) for item in data.get('taxes', ()))
             data['total'] = (sum((i.get('price', 0) * i.get('quantity', 1)) for i in items) +
-                             taxes + Decimal(data.get('ship_charges', 0)))
+                             data['taxes'] + Decimal(data.get('ship_charges', 0)))
             items = '<ul>'
             for i in items:
                 uid = i.get('uid', None)
