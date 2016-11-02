@@ -37,7 +37,7 @@ def _fetch_orders(part, key=()):
             if len(key) == 3:
                 data['userid'] = key[0]
             raw_date = key[-1]
-            data['date'] = raw_date.strftime('%Y-%m-%d %I:%M %p')
+            data['date'] = raw_date.strftime('%Y-%m-%d %I:%M %p') if hasattr(raw_date, 'strftime') else raw_date
             items = data['items'].values()
             data['date_sort'] = raw_date.isoformat() if hasattr(raw_date, 'isoformat') else ''
             data['taxes'] = sum(item.get('tax', 0) for item in data.get('taxes', ()))
