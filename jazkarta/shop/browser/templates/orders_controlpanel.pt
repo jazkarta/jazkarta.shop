@@ -24,7 +24,7 @@
       <tbody>
           <tr tal:repeat="entry batch">
             <tal:value repeat="key view/keys">
-                <td>${python:entry.get(key, '')}</td>
+                <td tal:content="structure python:entry.get(key, '')">Value</td>
             </tal:value>
             <!-- td>
                 <select name="${entry/userid|string:}:${entry/date/isoformat}" tal:attributes="value entry.get('order_status', 'New')">

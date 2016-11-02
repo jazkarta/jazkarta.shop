@@ -1,5 +1,6 @@
 import copy
 from BTrees.OOBTree import OOBTree
+from cgi import escape
 from decimal import Decimal
 from plone.app.registry.browser.controlpanel import RegistryEditForm
 from plone.app.registry.browser.controlpanel import ControlPanelFormWrapper
@@ -53,16 +54,19 @@ def _fetch_orders(part, key=()):
                 else:
                     href = title = i.get('href', '')
 
-                item_str += '<li><a href="{}">{}</a> x {} @ {}</li>'.format(
+                item_str += '<li><a href="{}">{}</a> x {} @ ${}</li>'.format(
                     href, title, i.get('quantity', 1), i.get('price', 0.0)
                 )
             data['items'] = item_str + '</ul>'
             address = data.get('ship_to', {})
             data['ship_to'] = '<p>{} {}</p><p>{}</p><p>{}, {} {} {}</p>'.format(
-                address.get('first_name'), address.get('last_name'),
-                address.get('street'), address.get('city'),
-                address.get('state'), address.get('postal_code'),
-                address.get('country')
+                escape(address.get('first_name', '')),
+                escape(address.get('last_name', '')),
+                escape(address.get('street', '')),
+                escape(address.get('city', '')),
+                escape(address.get('state', '')),
+                escape(address.get('postal_code', '')),
+                escape(address.get('country', '')),
             )
             yield data
 
