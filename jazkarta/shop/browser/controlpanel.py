@@ -44,7 +44,7 @@ def _fetch_orders(part, key=()):
             items = ''
             for i in data.line_items:
                 items += '<p><a href="{}">{}</a> x {} @ {}</p>'.format(
-                    i.href, i.product.Title(), i.quantity, i.price
+                    i.href, i.uid, i.quantity, i.price
                 )
             data['items'] = items
             yield data
