@@ -42,8 +42,8 @@ def _fetch_orders(part, key=()):
             items = data.get('items', {}).values()
             data['date_sort'] = raw_date.isoformat() if hasattr(raw_date, 'isoformat') else ''
             data['taxes'] = sum(item.get('tax', 0) for item in data.get('taxes', ()))
-            data['total'] = (sum((i.get('price', 0) * i.get('quantity', 1)) for i in items) +
-                             data['taxes'] + Decimal(data.get('ship_charges', 0)))
+            data['total'] = (sum((i.get('price', 0.0) * i.get('quantity', 1)) for i in items) +
+                             data['taxes'] + data.get('ship_charge', 0))
             item_str = '<ul>'
             for i in items:
                 uid = i.get('uid', None)
@@ -59,7 +59,7 @@ def _fetch_orders(part, key=()):
                 )
             data['items'] = item_str + '</ul>'
             address = data.get('ship_to', {})
-            data['ship_to'] = '<p>{} {}</p><p>{}</p><p>{}, {} {} {}</p>'.format(
+            data['ship_to'] = '<p>{} {}</p><p>{}</p><p>{}, {} {}</p><p>{}</p>'.format(
                 escape(address.get('first_name', '')),
                 escape(address.get('last_name', '')),
                 escape(address.get('street', '')),
