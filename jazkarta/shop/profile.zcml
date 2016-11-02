@@ -55,4 +55,13 @@
       import_steps="plone.app.registry"
       />
 
+  <upgradeDepends
+      profile="jazkarta.shop:default"
+      source="6"
+      destination="7"
+      title="Add order controlpanel"
+      description=""
+      import_steps="controlpanel"
+      />
+
 </configure>

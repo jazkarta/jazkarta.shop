@@ -21,6 +21,15 @@
     />
 
   <browser:page
+    name="jazkarta-shop-orders"
+    for="plone.app.layout.navigation.interfaces.INavigationRoot"
+    class=".controlpanel.OrderControlPanelView"
+    template="templates/orders_controlpanel.pt"
+    permission="jazkarta.shop.ManageShop"
+    layer="..interfaces.IBrowserLayer"
+    />
+
+  <browser:page
     name="shopping-cart"
     for="*"
     class=".viewlets.CartView"

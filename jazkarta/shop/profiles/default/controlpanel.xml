@@ -29,4 +29,17 @@
         <permission>jazkarta.shop: Manage shop</permission>
     </configlet>
 
+    <configlet
+        title="Jazkarta Shop Orders"
+        action_id="jazkarta.shop.orders"
+        appId="jazkarta.shop"
+        category="Products"
+        condition_expr=""
+        url_expr="string:${object/@@plone_portal_state/navigation_root_url}/@@jazkarta-shop-orders"
+        icon_expr=""
+        visible="True"
+        i18n:attributes="title">
+        <permission>jazkarta.shop: Manage shop</permission>
+    </configlet>
+
 </object>

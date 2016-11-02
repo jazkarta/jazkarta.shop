@@ -1,0 +1,44 @@
+<tal:block tal:define="dummy python:request.set('disable_border', True)"/><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="context/main_template/macros/master"
+      i18n:domain="plone">
+
+<body>
+
+<metal:main fill-slot="main">
+  <div tal:define="batch view/batch">
+    <h1 class="documentFirstHeading">Shop Orders</h1>
+
+    <table class="listing">
+      <thead>
+        <tr>
+            <tal:heading tal:repeat="key view/keys">
+                <th tal:content="python:key.replace('_', ' ').title()">Heading</th>
+            </tal:heading>
+            <!-- th>Order Status</th -->
+        </tr>
+      </thead>
+      <tbody>
+          <tr tal:repeat="entry batch">
+            <tal:value repeat="key view/keys">
+                <td>${python:entry.get(key, '')}</td>
+            </tal:value>
+            <!-- td>
+                <select name="${entry/userid|string:}:${entry/date/isoformat}" tal:attributes="value entry.get('order_status', 'New')">
+                    <option>New</option>
+                    <option>Shipped</option>
+                    <option>Returned</option>
+                </select>
+            </td -->
+          </tr>
+      </tbody>
+    </table>
+    <tal:batchnavigation define="batchnavigation nocall:context/@@batchnavigation"
+                         replace="structure python:batchnavigation(batch)" />
+  </div>
+</metal:main>
+</body>
+</html>
