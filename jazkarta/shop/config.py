@@ -1,5 +1,10 @@
 import os
 
+# note: if the JAZKARTA_SHOP_PRODUCTION exists in the environment 
+# the system considers itself to be in PRODUCTION mode, setting 
+# JAZKARTA_SHOP_PRODUCTION=False does not mean that one is now in DEVELOPMENT 
+# mode, one is still in PRODUCTION - instead unset the JAZKARTA_SHOP_PRODUCTION
+# variable to return to DEVELOPMENT mode
 IN_PRODUCTION = os.environ.get('JAZKARTA_SHOP_PRODUCTION', False)
 
 STORAGE_KEY = '_jaz_shop'
