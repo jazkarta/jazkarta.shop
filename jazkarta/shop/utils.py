@@ -121,13 +121,20 @@ def send_mail(subject, message, mfrom=None, mto=None):
     mfrom = email.utils.formataddr((realname, mail_settings.email_from_address))
     # Send to portal email address if no recipient was specified,
     # or if we're on a test site
-    if mto is None or not config.IN_PRODUCTION:
-        mto = mfrom
-
     mailhost = site.MailHost
-    mailhost.send(
-        msg, subject=subject, mfrom=mfrom, mto=mto,
-        immediate=False, charset='utf-8')
+    if mto is None or not config.IN_PRODUCTION:
+        mailhost.send(
+            msg, subject=subject, mfrom=mfrom, mto=mfrom,
+            immediate=False, charset='utf-8')
+    else:
+        # send a copy to customer
+        mailhost.send(
+            msg, subject=subject, mfrom=mfrom, mto=mto,
+            immediate=False, charset='utf-8')
+        # send a copy to the site owner
+        mailhost.send(
+            msg, subject=subject, mfrom=mfrom, mto=mfrom,
+                immediate=False, charset='utf-8')
 
 
 def run_in_transaction(retries=5, retry_callback=None):
