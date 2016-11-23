@@ -76,6 +76,9 @@ class IPurchaseHandler(Interface):
     def after_purchase(item):
         """Perform actions after this product is purchased."""
 
+    def get_obj_href(uid):
+        """ Provide a hook by which the link to an item can be customized. """
+
 
 class ITaxHandler(Interface):
 

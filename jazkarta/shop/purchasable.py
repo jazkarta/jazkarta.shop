@@ -3,7 +3,7 @@ from zope.component import adapter
 from zope.interface import implementer
 from .interfaces import IProduct
 from .interfaces import IPurchaseHandler
-from .utils import get_setting
+from .utils import get_setting, resolve_uid
 
 
 @implementer(IPurchaseHandler)
@@ -34,3 +34,8 @@ class DefaultPurchaseHandler(object):
     def after_purchase(self, item):
         # Override this in a more specific adapter
         pass
+
+    def get_obj_href(self, uid):
+        obj = resolve_uid(uid)
+        if obj is not None:
+            return obj.absolute_url()
