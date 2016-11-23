@@ -49,7 +49,7 @@ def _fetch_orders(part, key=()):
                 uid = i.get('uid', None)
                 if uid:
                     product = resolve_uid(uid)
-                    title = product.Title()
+                    title = i['name']
                     href = product.absolute_url()
                 else:
                     href = title = i.get('href', '')
