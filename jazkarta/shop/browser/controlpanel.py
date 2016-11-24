@@ -27,7 +27,7 @@ ORDER_KEYS = ('userid', 'date', 'items', 'ship_to', 'taxes', 'ship_charge', 'tot
 def _fetch_orders(part, key=()):
     if isinstance(part, OOBTree):
         for k in part.keys():
-            if k in ['coupon', 'shipping_methods']:
+            if k in ['cart', 'coupon', 'shipping_methods']:
                 continue
             key = key + (k,)
             for data in _fetch_orders(part[k], key):
