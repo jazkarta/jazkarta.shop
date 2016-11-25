@@ -358,6 +358,23 @@ class Cart(object):
     def shipping(self):
         return Decimal(self.data.get('ship_charge', 0))
 
+    @property
+    def stripe_shipping_summary(self):
+        ship_to = self.data.get('ship_to')
+        if ship_to:
+            res = """%(first_name)s %(last_name)s
+%(street)s
+%(city)s, %(state)s %(postal_code)s
+%(country)s
+""" % ship_to
+            import pdb; pdb.set_trace()
+            return res + '[{}]'.format(self.data.get('ship_method'))
+
+    @property
+    def summary(self):
+        items = [item.name for item in self.items]
+        return u', '.join(items)
+
     def store_order(self, userid):
         data = copy.deepcopy(self.data)
         now = datetime.now()

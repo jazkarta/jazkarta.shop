@@ -35,14 +35,24 @@ def process_refund(charge_id, refund_amount):
     })
 
 
-def process_interactive_payment(amount, card_token):
+def process_interactive_payment(cart, card_token, contact_info):
     # Calculate total
-    amount = stripe_amount(amount)
+    amount = stripe_amount(cart.amount)
     assert amount > 0
+
+    metadata = {
+        'email': contact_info['email'],
+        'phone': contact_info['phone'],
+    }
+    shipping = cart.stripe_shipping_summary
+    if shipping:
+        metadata['ship_to'] = shipping
 
     # Process the charge using Stripe
     return call_stripe('post', '/v1/charges', {
         'amount': int(amount),
         'currency': 'usd',
         'card': card_token,
+        'description': cart.summary,
+        'metadata': metadata,
     })

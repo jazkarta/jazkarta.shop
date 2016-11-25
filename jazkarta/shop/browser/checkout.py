@@ -117,7 +117,7 @@ class CheckoutForm(BrowserView):
 
             try:
                 charge_result = process_interactive_payment(
-                    self.cart.amount, card_token)
+                    self.cart, card_token, contact_info)
                 charge_result['success'] = True
             except PaymentProcessingException as e:
                 charge_result = {
