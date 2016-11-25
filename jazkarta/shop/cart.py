@@ -367,7 +367,6 @@ class Cart(object):
 %(city)s, %(state)s %(postal_code)s
 %(country)s
 """ % ship_to
-            import pdb; pdb.set_trace()
             return res + '[{}]'.format(self.data.get('ship_method'))
 
     @property
