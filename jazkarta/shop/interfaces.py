@@ -160,22 +160,50 @@ class ISettings(model.Schema):
 
     stripe_api_key_dev = schema.TextLine(
         title=u'Stripe Secret Key (Development)',
+        required=False,
     )
 
     stripe_pub_key_dev = schema.TextLine(
         title=u'Stripe Publishable Key (Development)',
+        required=False,
     )
 
     stripe_api_key_production = schema.TextLine(
         title=u'Stripe Secret Key (Production)',
         description=u"This key will be used when the JAZKARTA_SHOP_ENV "
-                    u"environment variable equals 'production'."
+                    u"environment variable equals 'production'.",
+        required=False,
     )
 
     stripe_pub_key_production = schema.TextLine(
         title=u'Stripe Publishable Key (Production)',
         description=u"This key will be used when the JAZKARTA_SHOP_ENV "
-                    u"environment variable equals 'production'."
+                    u"environment variable equals 'production'.",
+        required=False,
+    )
+
+    authorizenet_api_login_id_dev = schema.TextLine(
+        title=u'Authorize.Net API Login ID (Sandbox account)',
+        required=False,
+    )
+
+    authorizenet_transaction_key_dev = schema.TextLine(
+        title=u'Authorize.Net Transaction Key (Sandbox account)',
+        required=False,
+    )
+
+    authorizenet_api_login_id_production = schema.TextLine(
+        title=u'Authorize.Net API Login ID (Production)',
+        description=u"This key will be used when the JAZKARTA_SHOP_ENV "
+                    u"environment variable equals 'production'.",
+        required=False,
+    )
+
+    authorizenet_transaction_key_production = schema.TextLine(
+        title=u'Authorize.Net Transaction Key (Production)',
+        description=u"This key will be used when the JAZKARTA_SHOP_ENV "
+                    u"environment variable equals 'production'.",
+        required=False,
     )
 
     receipt_subject = schema.TextLine(

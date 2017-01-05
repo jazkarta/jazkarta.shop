@@ -64,4 +64,13 @@
       import_steps="controlpanel"
       />
 
+  <upgradeDepends
+      profile="jazkarta.shop:default"
+      source="7"
+      destination="8"
+      title="Add authorize.net keys to shop settings"
+      description=""
+      import_steps="plone.app.registry"
+      />
+
 </configure>
