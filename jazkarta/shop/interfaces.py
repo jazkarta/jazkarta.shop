@@ -158,6 +158,16 @@ class ICoupon(model.Schema):
 
 class ISettings(model.Schema):
 
+    payment_processors = schema.List(
+        title=u'Payment Processor',
+        description=u"Important - Make sure that the relevant API keys to the "
+                    u"selected payment processor are completed below.",
+        value_type=schema.Choice(
+            vocabulary='jazkarta.shop.payment_processors',
+        ),
+        default=[],
+    )
+
     stripe_api_key_dev = schema.TextLine(
         title=u'Stripe Secret Key (Development)',
         required=False,

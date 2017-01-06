@@ -28,6 +28,11 @@ def get_tax_handler_vocab(context):
 directlyProvides(get_tax_handler_vocab, IVocabularyFactory)
 
 
+def get_payment_processor_vocab(context):
+    return SimpleVocabulary.fromValues(config.PAYMENT_PROCESSORS)
+directlyProvides(get_payment_processor_vocab, IVocabularyFactory)
+
+
 def vocab_from_setting(setting):
     """Sets up a vocabulary based on a setting."""
 
