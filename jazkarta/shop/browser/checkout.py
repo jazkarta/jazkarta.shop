@@ -24,13 +24,37 @@ from ..validators import is_email
 from ..vocabs import country_names
 
 
-@implementer(IStripeEnabledView)
 class CheckoutForm(BrowserView):
+
+    def __call__(self):
+        payment_processor = get_setting('payment_processors')
+        if payment_processor != []:
+            p_p = payment_processor[0]
+            if p_p == 'Authorize.Net SIM':
+                return CheckoutFormAuthorizeNetSIM(self.context, self.request)();
+            elif p_p == 'Stripe':
+                return CheckoutFormStripe(self.context, self.request)();
+        else:
+            raise Exception(
+                    'No payment processor has been specified.')
+
+
+class CheckoutFormAuthorizeNetSIM(BrowserView):
+    """ Renders a checkout form with button to submit to Authorize.Net SIM """
+    # XXX placeholder for actual code to come
+
+    def __call__(self):
+        return "Authorize.net SIM view coming soon"
+
+
+@implementer(IStripeEnabledView)
+class CheckoutFormStripe(BrowserView):
     """ Renders a checkout form set up to submit through Stripe """
 
     cart_template = ViewPageTemplateFile('templates/checkout_cart.pt')
     thankyou_template = ViewPageTemplateFile('templates/checkout_thankyou.pt')
     receipt_email = ViewPageTemplateFile('templates/receipt_email.pt')
+    index = ViewPageTemplateFile('templates/checkout_form.pt')
 
     @lazy_property
     def cart(self):

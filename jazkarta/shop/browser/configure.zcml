@@ -68,7 +68,22 @@
     name="checkout"
     for="plone.app.layout.navigation.interfaces.INavigationRoot"
     class=".checkout.CheckoutForm"
-    template="templates/checkout_form.pt"
+    permission="zope2.View"
+    layer="..interfaces.IBrowserLayer"
+    />
+
+  <browser:page
+    name="checkout_authorizenet_sim"
+    for="plone.app.layout.navigation.interfaces.INavigationRoot"
+    class=".checkout.CheckoutFormAuthorizeNetSIM"
+    permission="zope2.View"
+    layer="..interfaces.IBrowserLayer"
+    />
+
+  <browser:page
+    name="checkout_stripe"
+    for="plone.app.layout.navigation.interfaces.INavigationRoot"
+    class=".checkout.CheckoutFormStripe"
     permission="zope2.View"
     layer="..interfaces.IBrowserLayer"
     />
