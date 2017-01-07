@@ -31,6 +31,7 @@ setup(
         'python-ups',
         'requests',
         'z3c.currency',
+        'authorizenet',
     ],
     extras_require={
         'test': [
