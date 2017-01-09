@@ -33,9 +33,9 @@ class CheckoutForm(BrowserView):
         if payment_processor != []:
             p_p = payment_processor[0]
             if p_p == 'Authorize.Net SIM':
-                return CheckoutFormAuthorizeNetSIM(self.context, self.request)();
+                return CheckoutFormAuthorizeNetSIM(self.context, self.request)()
             elif p_p == 'Stripe':
-                return CheckoutFormStripe(self.context, self.request)();
+                return CheckoutFormStripe(self.context, self.request)()
         else:
             raise Exception(
                     'No payment processor has been specified.')
@@ -43,6 +43,10 @@ class CheckoutForm(BrowserView):
 
 class CheckoutFormAuthorizeNetSIM(BrowserView):
     """ Renders a checkout form with button to submit to Authorize.Net SIM """
+
+    cart_template = ViewPageTemplateFile('templates/checkout_cart.pt')
+    index = ViewPageTemplateFile('templates/checkout_form_authorize_net_sim.pt')
+    post_url = 'https://accept.authorize.net/payment/payment'
 
     @lazy_property
     def cart(self):
@@ -52,7 +56,7 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
     def amount(self):
         return self.cart.amount
 
-    def __call__(self):
+    def token(self):
 
         merchantAuth = apicontractsv1.merchantAuthenticationType()
         merchantAuth.name = get_setting('authorizenet_api_login_id_dev')
@@ -77,29 +81,37 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
         paymentPageRequest = apicontractsv1.getHostedPaymentPageRequest()
         paymentPageRequest.merchantAuthentication = merchantAuth
         paymentPageRequest.transactionRequest = transactionrequest
-        paymentPageRequest.hostedProfileSettings = settings
+        paymentPageRequest.hostedPaymentSettings = settings
 
         paymentPageController = getHostedPaymentPageController(paymentPageRequest)
         paymentPageController.execute()
         paymentPageResponse = paymentPageController.getresponse()
 
         if paymentPageResponse is not None:
-	        if paymentPageResponse.messages.resultCode == apicontractsv1.messageTypeEnum.Ok:
+            ok = apicontractsv1.messageTypeEnum.Ok
+            if paymentPageResponse.messages.resultCode == ok:
 		        print('Successfully got hosted payment page!')
 
 		        print('Token : %s' % paymentPageResponse.token)
 
 		        if paymentPageResponse.messages:
-			        print('Message Code : %s' % paymentPageResponse.messages.message[0]['code'].text)
-			        print('Message Text : %s' % paymentPageResponse.messages.message[0]['text'].text)
-	        else:
-		        if paymentPageResponse.messages:
-			        print('Failed to get batch statistics.\nCode:%s \nText:%s' % (paymentPageResponse.messages.message[0]['code'].text,paymentPageResponse.messages.message[0]['text'].text))
+			        print('Message Code : %s' % \
+                    paymentPageResponse.messages.message[0]['code'].text)
+			        print('Message Text : %s' % \
+                    paymentPageResponse.messages.message[0]['text'].text)
+            else:
+                if paymentPageResponse.messages:
+                    print('Failed to get batch statistics.\nCode:%s \nText:%s'%\
+                    (paymentPageResponse.messages.message[0]['code'].text,
+                     paymentPageResponse.messages.message[0]['text'].text))
 
-        import pdb; pdb.set_trace()
-        return paymentPageResponse
+        return paymentPageResponse.token
 
-        return "Authorize.net SIM view coming soon"
+    def __call__(self):
+        return self.render()
+
+    def render(self):
+        return self.index()
 
 
 @implementer(IStripeEnabledView)
