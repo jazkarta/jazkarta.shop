@@ -78,10 +78,15 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
         setting3.settingName = settingNameEnum.hostedPaymentReturnOptions
         setting3.settingValue = '{"showReceipt" : true, "url":"https://www.reddit.com", "urlText": "Continue", "cancelUrl": "https://www.reddit.com", "cancelUrlText": "Cancel."}'
 
+        setting4 = apicontractsv1.settingType()
+        setting4.settingName = settingNameEnum.hostedPaymentBillingAddressOptions
+        setting4.settingValue = '{"show": true, "required":true}'
+
         settings = apicontractsv1.ArrayOfSetting()
         settings.setting.append(setting1)
         settings.setting.append(setting2)
         settings.setting.append(setting3)
+        settings.setting.append(setting4)
         
         transactionrequest = apicontractsv1.transactionRequestType()
         transactionrequest.transactionType = "authCaptureTransaction"
