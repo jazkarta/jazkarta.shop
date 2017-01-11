@@ -46,7 +46,8 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
 
     cart_template = ViewPageTemplateFile('templates/checkout_cart.pt')
     index = ViewPageTemplateFile('templates/checkout_form_authorize_net_sim.pt')
-    post_url = 'https://accept.authorize.net/payment/payment'
+#    post_url = 'https://accept.authorize.net/payment/payment'
+    post_url = 'https://test.authorize.net/payment/payment'
 
     @lazy_property
     def cart(self):
@@ -58,21 +59,64 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
 
     def token(self):
 
+        # NB XXX add check for production site here
         merchantAuth = apicontractsv1.merchantAuthenticationType()
         merchantAuth.name = get_setting('authorizenet_api_login_id_dev')
         merchantAuth.transactionKey = get_setting('authorizenet_transaction_key_dev')
         
+        settingNameEnum = apicontractsv1.settingNameEnum
+
         setting1 = apicontractsv1.settingType()
-        setting1.settingName = apicontractsv1.settingNameEnum.hostedPaymentButtonOptions
-        setting1.settingValue = "{\"text\": \"Pay\"}"
+        setting1.settingName = settingNameEnum.hostedPaymentButtonOptions
+        setting1.settingValue = '{"text": "Pay"}'
 
         setting2 = apicontractsv1.settingType()
-        setting2.settingName = apicontractsv1.settingNameEnum.hostedPaymentOrderOptions
-        setting2.settingValue = "{\"show\": false}"
-        
+        setting2.settingName = settingNameEnum.hostedPaymentOrderOptions
+        setting2.settingValue = '{"show": false}'
+
+        setting3 = apicontractsv1.settingType()
+        setting3.settingName = settingNameEnum.hostedPaymentReturnOptions
+        setting3.settingValue = '{"showReceipt" : true, "url":"https://www.reddit.com", "urlText": "Continue", "cancelUrl": "https://www.reddit.com", "cancelUrlText": "This request was cancelled."}'
+
+        setting4 = apicontractsv1.settingType()
+        setting4.settingName = settingNameEnum.hostedPaymentOrderOptions
+        setting4.settingValue = '{"show": true, "merchantName":"BOOK SELLERS INC."}'
+
+        setting5 = apicontractsv1.settingType()
+        setting5.settingName = settingNameEnum.hostedPaymentStyleOptions
+        setting5.settingValue = '{"bgColor": "red"}'
+
+        setting6 = apicontractsv1.settingType()
+        setting6.settingName = settingNameEnum.hostedPaymentSecurityOptions
+        setting6.settingValue = '{"captcha": true}'
+
+        setting7 = apicontractsv1.settingType()
+        setting7.settingName = settingNameEnum.hostedPaymentBillingAddressOptions
+        setting7.settingValue = '{"show": true, "required":true}'
+
+        setting8 = apicontractsv1.settingType()
+        setting8.settingName = settingNameEnum.hostedPaymentShippingAddressOptions
+        setting8.settingValue = '{"show": true, "required":true}'
+
+        setting9 = apicontractsv1.settingType()
+        setting9.settingName = settingNameEnum.hostedPaymentBillingAddressOptions
+        setting9.settingValue = '{"show": true, "required":true}'
+
+        setting10 = apicontractsv1.settingType()
+        setting10.settingName = settingNameEnum.hostedPaymentCustomerOptions
+        setting10.settingValue = '{"showEmail": true, "requiredEmail":false}'
+
         settings = apicontractsv1.ArrayOfSetting()
         settings.setting.append(setting1)
         settings.setting.append(setting2)
+        settings.setting.append(setting3)
+#        settings.setting.append(setting4)
+        settings.setting.append(setting5)
+#        settings.setting.append(setting6)
+        settings.setting.append(setting7)
+        settings.setting.append(setting8)
+   #     settings.setting.append(setting9)
+        settings.setting.append(setting10)
         
         transactionrequest = apicontractsv1.transactionRequestType()
         transactionrequest.transactionType = "authCaptureTransaction"
@@ -84,7 +128,7 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
         paymentPageRequest.hostedPaymentSettings = settings
 
         paymentPageController = getHostedPaymentPageController(paymentPageRequest)
-        paymentPageController.execute()
+        paymentPageController.execute() # Makes a http-post call. 
         paymentPageResponse = paymentPageController.getresponse()
 
         if paymentPageResponse is not None:
