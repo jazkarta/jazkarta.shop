@@ -78,35 +78,10 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
         setting3.settingName = settingNameEnum.hostedPaymentReturnOptions
         setting3.settingValue = '{"showReceipt" : true, "url":"https://www.reddit.com", "urlText": "Continue", "cancelUrl": "https://www.reddit.com", "cancelUrlText": "Cancel."}'
 
-        setting4 = apicontractsv1.settingType()
-        setting4.settingName = settingNameEnum.hostedPaymentStyleOptions
-        setting4.settingValue = '{"bgColor": "red"}'
-
-        setting5 = apicontractsv1.settingType()
-        setting5.settingName = settingNameEnum.hostedPaymentSecurityOptions
-        setting5.settingValue = '{"captcha": true}'
-
-        setting6 = apicontractsv1.settingType()
-        setting6.settingName = settingNameEnum.hostedPaymentBillingAddressOptions
-        setting6.settingValue = '{"show": true, "required":true}'
-
-        setting7 = apicontractsv1.settingType()
-        setting7.settingName = settingNameEnum.hostedPaymentShippingAddressOptions
-        setting7.settingValue = '{"show": true, "required":true}'
-
-        setting8 = apicontractsv1.settingType()
-        setting8.settingName = settingNameEnum.hostedPaymentCustomerOptions
-        setting8.settingValue = '{"showEmail": true, "requiredEmail":false}'
-
         settings = apicontractsv1.ArrayOfSetting()
         settings.setting.append(setting1)
         settings.setting.append(setting2)
         settings.setting.append(setting3)
-        settings.setting.append(setting4)
-        settings.setting.append(setting5)
-        settings.setting.append(setting6)
-        settings.setting.append(setting7)
-        settings.setting.append(setting8)
         
         transactionrequest = apicontractsv1.transactionRequestType()
         transactionrequest.transactionType = "authCaptureTransaction"
