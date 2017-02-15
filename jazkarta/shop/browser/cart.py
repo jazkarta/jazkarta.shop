@@ -41,7 +41,7 @@ class ReviewCartForm(CartViewMixin, BrowserView):
             return
 
         if 'submitted' in self.request.form:
-            base_url = get_navigation_root_url(self.context)
+            base_url = get_navigation_root_url
             if self.cart.shippable:
                 return self.request.response.redirect(base_url + '/shipping')
             else:
