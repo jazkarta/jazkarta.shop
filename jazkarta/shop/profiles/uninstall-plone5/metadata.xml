@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<metadata>
-  <version>1</version>
-  <dependencies>
-    <dependency>profile-jazkarta.shop:uninstall-base</dependency>
-  </dependencies>
-</metadata>
