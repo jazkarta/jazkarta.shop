@@ -4,10 +4,10 @@ from Acquisition import aq_parent
 from email.Header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from plone import api
 from plone.registry.interfaces import IRegistry
 from Products.CMFCore.interfaces import ISiteRoot
 from Products.CMFCore.utils import getToolByName
-from Products.CMFPlone.interfaces.controlpanel import IMailSchema
 from zope.component import getUtility
 from zope.component.hooks import getSite
 from zope.globalrequest import getRequest
@@ -16,6 +16,10 @@ from jazkarta.shop import config
 from .interfaces import ISettings
 import email
 import transaction
+
+PLONE_VERSION = api.env.plone_version()
+if PLONE_VERSION[0] == '5':
+    from Products.CMFPlone.interfaces.controlpanel import IMailSchema
 
 
 def get_site():
@@ -110,11 +114,19 @@ def send_mail(subject, message, mfrom=None, mto=None):
         msg['Reply-To'] = Header(mfrom, 'utf-8')
 
     registry = getUtility(IRegistry)
-    mail_settings = registry.forInterface(IMailSchema, prefix='plone')
 
-    if not realname:
-        realname = mail_settings.email_from_name
-    mfrom = email.utils.formataddr((realname, mail_settings.email_from_address))
+    if PLONE_VERSION[0] == '5':
+        mail_settings = registry.forInterface(IMailSchema, prefix='plone')
+
+        if not realname:
+            realname = mail_settings.email_from_name
+        mfrom = email.utils.formataddr((realname, mail_settings.email_from_address))
+
+    else:
+        # XXX Replace with P4 way of obtaining these values
+        realname = "REALNAME PLACEHOLDER"
+        mfrom = "MAIL@PLACEHOLDER.NET"   
+
     # Send to portal email address if no recipient was specified,
     # or if we're on a test site
     mailhost = site.MailHost
