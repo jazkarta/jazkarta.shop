@@ -2,10 +2,10 @@ from decimal import Decimal
 from Products.Five import BrowserView
 from zope.browserpage import ViewPageTemplateFile
 from zope.cachedescriptors.property import Lazy as lazy_property
+from zope.component.hooks import getSite
 
 from ..interfaces import OutOfStock
 from ..cart import Cart
-from ..utils import get_navigation_root_url
 from ..utils import get_user_fullname
 from ..utils import resolve_uid
 from .coupons import CouponCodeForm
@@ -41,7 +41,7 @@ class ReviewCartForm(CartViewMixin, BrowserView):
             return
 
         if 'submitted' in self.request.form:
-            base_url = get_navigation_root_url
+            base_url = getSite().absolute_url()
             if self.cart.shippable:
                 return self.request.response.redirect(base_url + '/shipping')
             else:

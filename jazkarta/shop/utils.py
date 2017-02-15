@@ -30,9 +30,6 @@ def get_site():
     return possible_site
 
 
-get_navigation_root_url = getSite().absolute_url()
-
-
 def get_catalog():
     return getToolByName(get_site(), 'portal_catalog')
 
