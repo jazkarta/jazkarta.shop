@@ -33,6 +33,9 @@ def get_site():
         possible_site = aq_parent(possible_site)
     return possible_site
 
+def get_navigation_root_url():
+    return getSite().absolute_url()
+
 
 def get_catalog():
     return getToolByName(get_site(), 'portal_catalog')
