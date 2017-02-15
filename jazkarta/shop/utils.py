@@ -8,7 +8,6 @@ from plone.registry.interfaces import IRegistry
 from Products.CMFCore.interfaces import ISiteRoot
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.interfaces.controlpanel import IMailSchema
-from Products.CMFPlone.patterns.utils import get_portal_url
 from zope.component import getUtility
 from zope.component.hooks import getSite
 from zope.globalrequest import getRequest
@@ -31,7 +30,7 @@ def get_site():
     return possible_site
 
 
-get_navigation_root_url = get_portal_url
+get_navigation_root_url = getSite().absolute_url()
 
 
 def get_catalog():
