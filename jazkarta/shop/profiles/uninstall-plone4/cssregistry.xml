@@ -2,9 +2,7 @@
 <object name="portal_css">
 
   <stylesheet remove="true"
-    id="++resource++example.p4p5/chart.css"
-    applyPrefix="1"
-    media=""
-    insert-before="ploneCustom.css"/>
+              id="++resource++jazkarta.shop/shop.css"
+              />
 
 </object>

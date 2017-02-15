@@ -2,6 +2,6 @@
 <metadata>
   <version>1</version>
   <dependencies>
-    <dependency>profile-example.p4p5:uninstall-base</dependency>
+    <dependency>profile-jazkarta.shop:uninstall-base</dependency>
   </dependencies>
 </metadata>
