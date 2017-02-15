@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<metadata>
+  <version>1</version>
+  <dependencies>
+    <dependency>profile-jazkarta.shop:install-base</dependency>
+  </dependencies>
+</metadata>
