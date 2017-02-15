@@ -2,6 +2,6 @@
 <metadata>
   <version>7</version>
   <dependencies>
-    <dependency>profile-jazkarta.shop:install-base</dependency>
+  	<dependency>profile-collective.z3cform.datagridfield:default</dependency>
   </dependencies>
 </metadata>
