@@ -22,6 +22,7 @@ from ..interfaces import IShippingMethod
 from ..ship_ups import calculate_ups_rates
 from ..ship_usps import calculate_usps_rate
 from ..utils import get_current_userid
+from ..utils import PLONE_VERSION
 
 
 def calculate_shipping(cart, method, addr):
@@ -91,6 +92,12 @@ class ShippingMethodControlPanel(BrowserView):
             return DefaultPublishTraverse(self, request).publishTraverse(
                 request, name)
         return ShippingMethodForm(self.context, request, name)
+
+    def using_plone5(self):
+        import pdb; pdb.set_trace()
+        if PLONE_VERSION[0] == 5:
+            return True
+        return False
 
 
 class ShippingMethodForm(AutoExtensibleForm, Form):

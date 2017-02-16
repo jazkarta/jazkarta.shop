@@ -4,6 +4,7 @@ from Acquisition import aq_parent
 from email.Header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from plone import api
 from plone.registry.interfaces import IRegistry
 from Products.CMFCore.interfaces import ISiteRoot
 from Products.CMFCore.utils import getToolByName
@@ -15,6 +16,8 @@ from jazkarta.shop import config
 from .interfaces import ISettings
 import email
 import transaction
+
+PLONE_VERSION = api.env.plone_version()
 
 try:
     from Products.CMFPlone.interfaces.controlpanel import IMailSchema
