@@ -1,10 +1,9 @@
-function Plone4PrepOverlay() {
+jQuery(function($){
+
     $('a.p4-modal').prepOverlay({
         subtype: 'ajax',
         filter: '#content>*',
-        formselector: '#form',
         noform: 'reload',
         redirect: location.href,
-        closeselector: '[name=form.buttons.Cancel]'
         });
-}
+});
