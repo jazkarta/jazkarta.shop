@@ -2,7 +2,6 @@ from collective.z3cform.datagridfield import DataGridFieldFactory
 from collective.z3cform.datagridfield import DictRow
 from decimal import Decimal
 from plone.app.vocabularies.catalog import CatalogSource
-from plone.app.z3cform.widget import SelectWidget
 from plone.autoform import directives as form
 from plone.autoform.interfaces import IFormFieldProvider
 from plone.supermodel import model
@@ -18,6 +17,13 @@ from zope.schema.interfaces import IField
 from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
 from jazkarta.shop import config
+
+try:
+    from plone.app.z3cform.widget import SelectWidget
+    SELECT_WIDGET_PRESENT = True
+except ImportError:
+    # Plone4
+    SELECT_WIDGET_PRESENT = False
 
 
 @provider(IFormFieldProvider)
@@ -332,10 +338,13 @@ class IShippingAddress(model.Schema):
         title=u'Country',
         vocabulary='jazkarta.shop.countries',
     )
-    form.widget('country', SelectWidget)
+    if SELECT_WIDGET_PRESENT:
+        form.widget('country', SelectWidget)
+
     state = schema.TextLine(
         title=u'State/Province',
     )
+
     postal_code = schema.TextLine(
         title=u'ZIP',
         required=False,
