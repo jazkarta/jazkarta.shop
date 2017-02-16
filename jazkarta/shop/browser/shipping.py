@@ -94,8 +94,7 @@ class ShippingMethodControlPanel(BrowserView):
         return ShippingMethodForm(self.context, request, name)
 
     def using_plone5(self):
-        import pdb; pdb.set_trace()
-        if PLONE_VERSION[0] == 5:
+        if PLONE_VERSION[0] == '5':
             return True
         return False
 
