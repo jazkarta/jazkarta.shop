@@ -21,13 +21,13 @@
         <th>Calculation</th>
         <th></th>
       </tr>
-      <tr tal:repeat="(name, method) view/shipping_methods/items">
+      <tr tal:repeat="method view/shipping_methods">
         <td>${method/name}</td>
         <td tal:content="python:', '.join(method['zones'])" />
         <td tal:content="python:'${:.2f}'.format(method['min_purchase']) if method['min_purchase'] else ''" />
         <td tal:content="python:view.format_calculation(method['calculation'])" tal:on-error="nothing" />
         <td>
-          <a class="pat-plone-modal" href="${context/absolute_url}/${view/__name__}/${name}">Edit</a>
+          <a class="pat-plone-modal" href="${context/absolute_url}/${view/__name__}/${method/key}">Edit</a>
         </td>
       </tr>
     </table>
