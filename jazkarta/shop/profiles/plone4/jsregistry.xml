@@ -8,7 +8,7 @@
                 cookable="True"
                 enabled="True"
                 expression=""
-                id="++resource++jazkarta.shop/shop.js"
+                id="++resource++jazkarta.shop/p4_shop.js"
                 inline="False"/>
 
     <javascript authenticated="False"

@@ -31,8 +31,10 @@ setup(
         'python-ups',
         'requests',
         'z3c.currency',
-        'plone.protect>=3.0.9', # Plone 4.3.11 ships with 2.0.3. Version 3.0.9+
-                                # required for plone.protect.utils.safeWrite
+        'plone.protect>=3.0.19', # Plone 4.3.11 ships with 2.0.3. Version 3.0.9+
+                                 # required for plone.protect.utils.safeWrite
+                                 # Version 3.0.19 required for inclusion of
+                                 # protect.js from plone4.csrffixes
         'plone.api',
     ],
     extras_require={
