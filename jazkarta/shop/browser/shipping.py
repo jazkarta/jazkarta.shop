@@ -68,8 +68,17 @@ def calculate_shipping(cart, method, addr):
         return
 
 
+class P5Mixin():
+    """ utility method to distinguish between Plone 4 and 5 """
+
+    def using_plone5(self):
+        if PLONE_VERSION[0] == '5':
+            return True
+        return False
+
+
 @implementer(IPublishTraverse)
-class ShippingMethodControlPanel(BrowserView):
+class ShippingMethodControlPanel(BrowserView, P5Mixin):
 
     @lazy_property
     def shipping_methods(self):
@@ -92,11 +101,6 @@ class ShippingMethodControlPanel(BrowserView):
             return DefaultPublishTraverse(self, request).publishTraverse(
                 request, name)
         return ShippingMethodForm(self.context, request, name)
-
-    def using_plone5(self):
-        if PLONE_VERSION[0] == '5':
-            return True
-        return False
 
 
 class ShippingMethodForm(AutoExtensibleForm, Form):
@@ -153,7 +157,7 @@ class ShippingMethodForm(AutoExtensibleForm, Form):
         del self.shipping_methods[self._name]
 
 
-class ShippingForm(AutoExtensibleForm, Form):
+class ShippingForm(AutoExtensibleForm, Form, P5Mixin):
     schema = IShippingAddress
     template = ViewPageTemplateFile('templates/shipping_form.pt')
     shipping_methods_template = ViewPageTemplateFile(

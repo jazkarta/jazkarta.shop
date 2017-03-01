@@ -109,58 +109,118 @@
       <tal:actions metal:fill-slot="actions" />
     </tal:form>
 
-    <script>
-    jQuery(function($) {
-      var $form = $('#form');
-      var $street = $('input[name="form.widgets.street"]');
-      var $city = $('input[name="form.widgets.city"]');
-      var $state_text = $('input[name="form.widgets.state"]');
-      var $state_select = $('#state-select');
-      var $prov_select = $('#province-select');
-      var $zip = $('input[name="form.widgets.postal_code"]');
-      var $country = $('select[name="form.widgets.country"]');
+    <tal:using_p5 tal:condition="view/using_plone5">
+        <script>
+        jQuery(function($) {
+          var $form = $('#form');
+          var $street = $('input[name="form.widgets.street"]');
+          var $city = $('input[name="form.widgets.street"]');
+          var $state_text = $('input[name="form.widgets.state"]');
+          var $state_select = $('#state-select');
+          var $prov_select = $('#province-select');
+          var $zip = $('input[name="form.widgets.street"]');
+          var $country = $('select[name="form.widgets.country"]');
 
-      var update_states = function() {
-        var $state_select2 = $('#s2id_state-select');
-        var $prov_select2 = $('#s2id_province-select');
-        if ($country.val() == 'United States') {
-          $state_text.attr('name', null).hide();
-          $prov_select.attr('name', null)
-          $prov_select2.hide();
-          $state_select.attr('name', 'form.widgets.state');
-          $state_select.val($state_text.val()).trigger('change');
-          $state_select2.show();
-        } else if ($country.val() == 'Canada') {
-          $state_text.attr('name', null).hide();
-          $state_select.attr('name', null);
-          $state_select2.hide();
-          $prov_select.attr('name', 'form.widgets.state');
-          $prov_select.val($state_text.val()).trigger('change');
-          $prov_select2.show();
-        } else {
-          $state_select.attr('name', null).hide();
-          $state_select2.hide();
-          $prov_select.attr('name', null).hide();
-          $prov_select2.hide();
-          if ($state_text.is(':hidden')) {
-            $state_text.val('');
-          }
-          $state_text.attr('name', 'form.widgets.state').show();
-        }        
-      };
-      var update_form = function() {
-        var $state = $('[name="form.widgets.state"]');
-        if ($country.val() && $state.val() && $zip.val() && $city.val() && $street.val()) {
-          $('#shipping-method').load(location.href, $form.serialize() + '&update=1');
-        }
-      };
+          var update_states = function() {
+            var $state_select2 = $('#s2id_state-select');
+            var $prov_select2 = $('#s2id_province-select');
+            if ($country.val() == 'United States') {
+              $state_text.attr('name', null).hide();
+              $prov_select.attr('name', null)
+              $prov_select2.hide();
+              $state_select.attr('name', 'form.widgets.state');
+              $state_select.val($state_text.val()).trigger('change');
+              $state_select2.show();
+            } else if ($country.val() == 'Canada') {
+              $state_text.attr('name', null).hide();
+              $state_select.attr('name', null);
+              $state_select2.hide();
+              $prov_select.attr('name', 'form.widgets.state');
+              $prov_select.val($state_text.val()).trigger('change');
+              $prov_select2.show();
+            } else {
+              $state_select.attr('name', null).hide();
+              $state_select2.hide();
+              $prov_select.attr('name', null).hide();
+              $prov_select2.hide();
+              if ($state_text.is(':hidden')) {
+                $state_text.val('');
+              }
+              $state_text.attr('name', 'form.widgets.state').show();
+            }        
+          };
+          var update_form = function() {
+            var $state = $('[name="form.widgets.state"]');
+            if ($country.val() && $state.val() && $zip.val() && $city.val() && $street.val()) {
+              $('#shipping-method').load(location.href, $form.serialize() + '&update=1');
+            }
+          };
 
-      $country.change(update_states);
-      $('select,input', $form).change(update_form);
-      setTimeout(function() { update_states(); }, 5);
-      update_form();
-    });
-    </script>
+          $country.change(update_states);
+          $('select,input', $form).change(update_form);
+          setTimeout(function() { update_states(); }, 5);
+          update_form();
+        });
+        </script>
+    </tal:using_p5>
+    <tal:using_p4 tal:condition="not:view/using_plone5">
+        <!-- Plone4 does not make use of select2 widget, use standard select dropdowns instead -->
+        <script>
+        jQuery(function($) {
+          var $form = $('#form');
+          var $street = $('input[name="form.widgets.street"]');
+          var $city = $('input[name="form.widgets.city"]');
+          var $state_text = $('input[name="form.widgets.state"]');
+          var $state_select = $('#state-select');
+          var $prov_select = $('#province-select');
+          var $zip = $('input[name="form.widgets.postal_code"]');
+          var $country = $('select[name="form.widgets.country:list"]'); // P4 specific
+
+          var update_states = function() {
+            if ($country.val() == 'United States') {
+                console.log("US");
+              $state_text.attr('name', null).hide();
+              $prov_select.attr('name', null)
+              $prov_select.hide();
+              $state_select.attr('name', 'form.widgets.state');
+              $state_select.val($state_text.val()).trigger('change');
+              $state_select.show();
+            } else if ($country.val() == 'Canada') {
+                console.log("CANADA");
+              $state_text.attr('name', null).hide();
+              $state_select.attr('name', null);
+              $state_select.hide();
+              $prov_select.attr('name', 'form.widgets.state');
+              $prov_select.val($state_text.val()).trigger('change');
+              $prov_select.show();
+            } else {
+                console.log("OTHER");
+              $state_select.attr('name', null).hide();
+              $state_select.hide();
+              $prov_select.attr('name', null).hide();
+              $prov_select.hide();
+              if ($state_text.is(':hidden')) {
+                $state_text.val('');
+              }
+              $state_text.attr('name', 'form.widgets.state').show();
+            }        
+          };
+          var update_form = function() {
+            var $state = $('[name="form.widgets.state"]');
+            if ($country.val() && $state.val() && $zip.val() && $city.val() && $street.val()) {
+              $('#shipping-method').load(location.href, $form.serialize() + '&update=1');
+            }
+          };
+
+          $country.change(update_states);
+          $('select,input', $form).change(update_form);
+          setTimeout(function() { update_states(); }, 5);
+          update_form();
+        });
+        </script>
+
+    </tal:using_p4>
+
 </metal:main>
 </body>
 </html>
