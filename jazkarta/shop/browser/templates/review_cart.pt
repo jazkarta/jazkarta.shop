@@ -107,14 +107,16 @@
           method="post" action="${portal_state/navigation_root_url}/review-cart">
         <label>Promo Code</label>
         <p>
-          <input class="jaz-shop-coupon" type="text" value="${request/form/coupon|nothing}" />
+          <input class="jaz-shop-coupon" type="text" tal:attributes="value string:${request/form/coupon|nothing}" />
           <input class="jaz-shop-apply-coupon" type="submit" value="Apply" />
         </p>
         <div>
           <div tal:repeat="coupon view/coupons">
             <span tal:content="string:Promo: ${coupon/id}"></span>
             <span class="coupon-amount" tal:content="string:(${coupon/discount} off)"></span>
-            <a tal:condition="coupon/can_remove" title="Remove this promo" href="${portal_state/navigation_root_url}/review-cart?remove_coupon=${coupon/id}" class="coupon_remove"></a>
+            <a tal:condition="coupon/can_remove" title="Remove this promo" 
+               tal:attributes="href string:${portal_state/navigation_root_url}/review-cart?remove_coupon=${coupon/id}" 
+               class="coupon_remove"></a>
           </div>
         </div>
         <div class="coupons-total" tal:condition="view/cart/discount">
@@ -140,7 +142,9 @@
         <a class="continue-exploring"
            tal:define="came_from request/came_from|request/HTTP_REFERER|portal_state/navigation_root_url;
                        came_from python:came_from if not came_from.endswith('/review-cart') else portal_state.navigation_root_url"
-           href="${came_from}"><button type="button">Continue Exploring</button></a>
+           tal:attributes="href string:${came_from}">
+           <button type="button">Continue Exploring</button>
+        </a>
         <input type="submit" value="Proceed to Checkout" class="context"
                tal:attributes="style python:'display: none' if not view.cart else ''" />
       </div>
