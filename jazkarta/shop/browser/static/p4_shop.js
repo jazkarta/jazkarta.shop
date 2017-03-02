@@ -12,4 +12,10 @@ jQuery(function($){
         }, 'html');
     });
 
+    $(document).on('click', '.jaz-shop-cart-trigger', function(e) {
+        // Plone5 uses data-attributes which Plone4 does not recognize
+        // add manual event handler to toggle the cart contents
+        $('.jaz-shop-cart').toggle();
+    });
+
 });
