@@ -104,7 +104,7 @@
     </p>
 
     <form class="jaz-shop-half-form"
-          method="post" action="${portal_state/navigation_root_url}/review-cart">
+          method="post" tal:attributes="action string:${portal_state/navigation_root_url}/review-cart">
         <label>Promo Code</label>
         <p>
           <input class="jaz-shop-coupon" type="text" tal:attributes="value string:${request/form/coupon|nothing}" />
@@ -125,7 +125,7 @@
         </div>
     </form>
 
-    <form method="post" action="${portal_state/navigation_root_url}/review-cart">
+    <form method="post" tal:attributes="action string:${portal_state/navigation_root_url}/review-cart">
       <input name="submitted" type="hidden" value="1" />
 
       <div id="order-total">
