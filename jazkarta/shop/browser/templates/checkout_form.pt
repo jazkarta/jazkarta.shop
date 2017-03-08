@@ -94,7 +94,7 @@
       <div class="portalMessage error checkout-error-wrapper"
            tal:attributes="style python:'display: none;;' if not view.error else ''">
         <strong>Error</strong>
-        <span class="checkout-error">${view/error}</span>
+        <span class="checkout-error" tal:content="string:${view/error}"></span>
       </div>
 
       <fieldset class="fieldset-contact-info jaz-shop-half-form">
@@ -200,7 +200,7 @@
               <select class="card-expiration-year" required="required" data-stripe="exp-year">
                 <option value="">- Year -</option>
                 <option tal:repeat="year view/years"
-                        value="${year}">${year}</option>
+                        tal:attributes="value string:${year}" tal:content="string:${year}"></option>
               </select>
             </div>
           </div>
@@ -225,7 +225,7 @@
         <div class="portalMessage error checkout-error-wrapper"
              tal:attributes="style python:'display: none;;' if not view.error else ''">
           <strong>Error</strong>
-          <span class="checkout-error">${view/error}</span>
+          <span class="checkout-error" tal:content="string:${view/error}"></span>
         </div>
         <div class="jaz-shop-buttons">
           <input type="submit" value="Complete Purchase" class="allowMultiSubmit context"
