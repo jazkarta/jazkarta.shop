@@ -128,7 +128,7 @@ def send_mail(subject, message, mfrom=None, mto=None):
             realname = mail_settings.email_from_name
         mfrom = email.utils.formataddr((realname, mail_settings.email_from_address))
     else:
-        portal = self.portal_state().portal()
+        portal = getSite()
         if not realname:
             realname = portal.getProperty('email_from_name')
         mfrom = email.utils.formataddr((realname, portal.getProperty('email_from_address')))
