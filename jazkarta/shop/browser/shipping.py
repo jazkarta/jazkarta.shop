@@ -179,7 +179,7 @@ class ShippingForm(AutoExtensibleForm, Form, P5Mixin):
         zones = set()
         country = self.widgets['country'].value
         state = self.widgets['state'].value
-        if country == 'United States':
+        if 'United States' in country:
             if state == 'AK':
                 zones.add('Alaska')
             elif state == 'HI':
@@ -192,7 +192,7 @@ class ShippingForm(AutoExtensibleForm, Form, P5Mixin):
                 zones.add('Midwest')
             elif state in config.EAST:
                 zones.add('East')
-        elif country == 'Canada':
+        elif 'Canada' in country:
             zones.add('Canada')
         else:
             zones.add('International')
