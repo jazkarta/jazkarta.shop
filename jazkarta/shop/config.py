@@ -20,7 +20,7 @@ SHIPPING_ZONES = [
     u'West',
 ]
 WEST = {
-    'AZ', 'CA', 'CO', 'ID', 'MT', 'NV', 'NM', 'OR', 'UT', 'WY'
+    'AZ', 'CA', 'CO', 'ID', 'MT', 'NV', 'NM', 'OR', 'UT', 'WY', 'WA'
 }
 MIDWEST = {
     'AL', 'AR', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'MI', 'MN', 'MS',

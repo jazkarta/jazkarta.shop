@@ -158,8 +158,9 @@ class ShippingForm(AutoExtensibleForm, Form):
             return []
 
         zones = set()
-        country = self.widgets['country'].value
-        state = self.widgets['state'].value
+
+        country = recipient_address['country']
+        state = recipient_address['state']
         if country == 'United States':
             if state == 'AK':
                 zones.add('Alaska')

@@ -113,11 +113,11 @@
     jQuery(function($) {
       var $form = $('#form');
       var $street = $('input[name="form.widgets.street"]');
-      var $city = $('input[name="form.widgets.street"]');
+      var $city = $('input[name="form.widgets.city"]');
       var $state_text = $('input[name="form.widgets.state"]');
       var $state_select = $('#state-select');
       var $prov_select = $('#province-select');
-      var $zip = $('input[name="form.widgets.street"]');
+      var $zip = $('input[name="form.widgets.postal_code"]');
       var $country = $('select[name="form.widgets.country"]');
 
       var update_states = function() {
