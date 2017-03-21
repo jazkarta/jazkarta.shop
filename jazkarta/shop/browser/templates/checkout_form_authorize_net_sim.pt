@@ -33,7 +33,7 @@
         <input type="hidden" name="x_amount" tal:attributes="value string:${view/amount}">
 
         <div class="jaz-shop-buttons">
-          <input type="submit" value="Complete Purchase with Authorize.Net SIMP" class="allowMultiSubmit context"
+          <input type="submit" value="Complete Purchase with Authorize.Net" class="allowMultiSubmit context"
                  tal:attributes="disabled python:'disabled' if (not view.cart.items and not view.cart.amount) else None" />
         </div>
  

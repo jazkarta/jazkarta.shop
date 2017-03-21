@@ -1,6 +1,10 @@
+import hmac
+import time
+import random
 from authorizenet import apicontractsv1
 from authorizenet.apicontrollers import *
 from datetime import date
+from hashlib import md5
 from persistent.mapping import PersistentMapping
 from plone.protect.utils import safeWrite
 from premailer import Premailer
@@ -75,6 +79,7 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
     def render(self):
         return self.index()
 
+    @lazy_property
     def x_fp_hash(self):
         """
         x_fp_hash Required.
@@ -88,8 +93,15 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
         Currency code, if submitted (x_currency_code)
         Field values are concatenated and separated by a caret (^).
         """
-        return 
 
+        values = (str(self.x_login), self.x_fp_sequence,
+             self.x_fp_timestamp, str(self.amount))
+        source = "^".join(values)
+        hashed_values = hmac.new(source, '', md5)
+        hashed_values.update(source) ## add content
+        return hashed_values.hexdigest()
+
+    @lazy_property
     def x_fp_sequence(self):
         """
         x_fp_sequence Required
@@ -98,8 +110,9 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
         Notes: The sequence number can be a merchant-assigned value, such as an 
         invoice number or any randomly generated number.
         """
-        return 
+        return str(int(random.random() * 100000000000))
 
+    @lazy_property
     def x_fp_timestamp(self):
         """
         x_fp_timestamp Required
@@ -110,8 +123,7 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
         (sometimes referred to as GMT). Using a local time zone timestamp causes 
         fingerprint authentication to fail.
         """
-        return 
-
+        return str(int(time.time()))
 
 
 @implementer(IStripeEnabledView)
