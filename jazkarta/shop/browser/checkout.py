@@ -73,6 +73,13 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
         return get_setting('authorizenet_api_login_id_dev')
         # return get_setting('authorizenet_api_login_id_production')    
 
+    @lazy_property
+    def transaction_key(self):
+        # NB XXX add check for production site here
+        return get_setting('authorizenet_transaction_key_dev')
+        # return get_setting('authorizenet_transaction_key_production')
+
+
     def __call__(self):
         return self.render()
 
@@ -93,11 +100,10 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
         Currency code, if submitted (x_currency_code)
         Field values are concatenated and separated by a caret (^).
         """
-
         values = (str(self.x_login), self.x_fp_sequence,
              self.x_fp_timestamp, str(self.amount))
         source = "^".join(values)
-        hashed_values = hmac.new(source, '', md5)
+        hashed_values = hmac.new(str(self.transaction_key), '', md5)
         hashed_values.update(source) ## add content
         return hashed_values.hexdigest()
 
