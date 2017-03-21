@@ -32,6 +32,11 @@
         <input type="hidden" name="x_method" value="CC">
         <input type="hidden" name="x_amount" tal:attributes="value string:${view/amount}">
         <input type="hidden" name="x_relay_response" value="TRUE">
+        <input type="hidden" name="x_relay_url" tal:attributes="value string:${view/x_relay_url}">
+
+        <!-- other optional parameters -->
+        <!-- x_cancel_url_text
+             x_cancel_url -->
 
         <div class="jaz-shop-buttons">
           <input type="submit" value="Complete Purchase with Authorize.Net" class="allowMultiSubmit context"

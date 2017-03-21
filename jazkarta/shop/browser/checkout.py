@@ -106,7 +106,7 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
 
         Also as per:
         https://support.authorize.net/authkb/index?page=content&id=A569
-        trainig ^ is required
+        trailing ^ is required!!
         APIl0gin1D^Sequence123^1457632735^19.99^
         """
         values = (str(self.x_login), self.x_fp_sequence,
@@ -144,6 +144,12 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
         """
         return str(int(time.time()))
 
+    @lazy_property
+    def x_relay_url(self):
+        # XXX set to 
+
+        # debugging
+        return "http://developer.authorize.net/bin/developer/paramdump"
 
 @implementer(IStripeEnabledView)
 class CheckoutFormStripe(BrowserView):
