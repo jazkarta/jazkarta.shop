@@ -46,8 +46,8 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
 
     cart_template = ViewPageTemplateFile('templates/checkout_cart.pt')
     index = ViewPageTemplateFile('templates/checkout_form_authorize_net_sim.pt')
-#    post_url = 'https://accept.authorize.net/payment/payment'
-    post_url = 'https://test.authorize.net/payment/payment'
+    post_url_test = 'https://test.authorize.net/gateway/transact.dll'    
+    post_url_production = 'https://secure.authorize.net/gateway/transact.dll'
 
     @lazy_property
     def cart(self):
@@ -56,76 +56,62 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
     @lazy_property
     def amount(self):
         return self.cart.amount
-
-    def token(self):
-
+    
+    @lazy_property
+    def post_url(self):
         # NB XXX add check for production site here
-        merchantAuth = apicontractsv1.merchantAuthenticationType()
-        merchantAuth.name = get_setting('authorizenet_api_login_id_dev')
-        merchantAuth.transactionKey = get_setting('authorizenet_transaction_key_dev')
-        
-        settingNameEnum = apicontractsv1.settingNameEnum
+        return self.post_url_test
+        # return self.post_url_production
 
-        setting1 = apicontractsv1.settingType()
-        setting1.settingName = settingNameEnum.hostedPaymentButtonOptions
-        setting1.settingValue = '{"text": "Pay"}'
-
-        setting2 = apicontractsv1.settingType()
-        setting2.settingName = settingNameEnum.hostedPaymentOrderOptions
-        setting2.settingValue = '{"show": true, "merchantName":"BOOK SELLERS INC."}'
-
-        setting3 = apicontractsv1.settingType()
-        setting3.settingName = settingNameEnum.hostedPaymentReturnOptions
-        setting3.settingValue = '{"showReceipt" : true, "url":"https://www.reddit.com", "urlText": "Continue", "cancelUrl": "https://www.reddit.com", "cancelUrlText": "Cancel."}'
-
-        setting4 = apicontractsv1.settingType()
-        setting4.settingName = settingNameEnum.hostedPaymentBillingAddressOptions
-        setting4.settingValue = '{"show": true, "required":true}'
-
-        settings = apicontractsv1.ArrayOfSetting()
-        settings.setting.append(setting1)
-        settings.setting.append(setting2)
-        settings.setting.append(setting3)
-        settings.setting.append(setting4)
-        
-        transactionrequest = apicontractsv1.transactionRequestType()
-        transactionrequest.transactionType = "authCaptureTransaction"
-        transactionrequest.amount = self.amount
-
-        paymentPageRequest = apicontractsv1.getHostedPaymentPageRequest()
-        paymentPageRequest.merchantAuthentication = merchantAuth
-        paymentPageRequest.transactionRequest = transactionrequest
-        paymentPageRequest.hostedPaymentSettings = settings
-
-        paymentPageController = getHostedPaymentPageController(paymentPageRequest)
-        paymentPageController.execute() # Makes a http-post call. 
-        paymentPageResponse = paymentPageController.getresponse()
-
-        if paymentPageResponse is not None:
-            ok = apicontractsv1.messageTypeEnum.Ok
-            if paymentPageResponse.messages.resultCode == ok:
-		        print('Successfully got hosted payment page!')
-
-		        print('Token : %s' % paymentPageResponse.token)
-
-		        if paymentPageResponse.messages:
-			        print('Message Code : %s' % \
-                    paymentPageResponse.messages.message[0]['code'].text)
-			        print('Message Text : %s' % \
-                    paymentPageResponse.messages.message[0]['text'].text)
-            else:
-                if paymentPageResponse.messages:
-                    print('Failed to get batch statistics.\nCode:%s \nText:%s'%\
-                    (paymentPageResponse.messages.message[0]['code'].text,
-                     paymentPageResponse.messages.message[0]['text'].text))
-
-        return paymentPageResponse.token
+    @lazy_property
+    def x_login(self):
+        # NB XXX add check for production site here
+        return get_setting('authorizenet_api_login_id_dev')
+        # return get_setting('authorizenet_api_login_id_production')    
 
     def __call__(self):
         return self.render()
 
     def render(self):
         return self.index()
+
+    def x_fp_hash(self):
+        """
+        x_fp_hash Required.
+        Value: The unique transaction fingerprint.
+        Notes: The fingerprint is generated using the HMAC-MD5 hashing algorithm 
+        on the following field values:
+        API login ID (x_login)
+        The sequence number of the transaction (x_fp_sequence)
+        The timestamp of the sequence number creation (x_fp_timestamp)
+        Amount (x_amount)
+        Currency code, if submitted (x_currency_code)
+        Field values are concatenated and separated by a caret (^).
+        """
+        return 
+
+    def x_fp_sequence(self):
+        """
+        x_fp_sequence Required
+        Value: The merchant-assigned sequence number for the transaction.
+        Format: Numeric.
+        Notes: The sequence number can be a merchant-assigned value, such as an 
+        invoice number or any randomly generated number.
+        """
+        return 
+
+    def x_fp_timestamp(self):
+        """
+        x_fp_timestamp Required
+        Value: The timestamp at the time of fingerprint generation.
+        Format: UTC time in seconds since January 1, 1970.
+        Notes: Coordinated Universal Time (UTC) is an international atomic 
+        standard of time
+        (sometimes referred to as GMT). Using a local time zone timestamp causes 
+        fingerprint authentication to fail.
+        """
+        return 
+
 
 
 @implementer(IStripeEnabledView)
