@@ -53,6 +53,10 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
     post_url_test = 'https://test.authorize.net/gateway/transact.dll'    
     post_url_production = 'https://secure.authorize.net/gateway/transact.dll'
 
+    # XXX Tell customer somewhere that they have about 15min to complete the
+    # checkout process as per:
+    # https://support.authorize.net/authkb/index?page=content&id=A592&actp=LIST
+
     @lazy_property
     def cart(self):
         return Cart.from_request(self.request)
@@ -99,10 +103,15 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
         Amount (x_amount)
         Currency code, if submitted (x_currency_code)
         Field values are concatenated and separated by a caret (^).
+
+        Also as per:
+        https://support.authorize.net/authkb/index?page=content&id=A569
+        trainig ^ is required
+        APIl0gin1D^Sequence123^1457632735^19.99^
         """
         values = (str(self.x_login), self.x_fp_sequence,
              self.x_fp_timestamp, str(self.amount))
-        source = "^".join(values)
+        source = "^".join(values) + '^'
         hashed_values = hmac.new(str(self.transaction_key), '', md5)
         hashed_values.update(source) ## add content
         return hashed_values.hexdigest()
@@ -128,6 +137,10 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
         standard of time
         (sometimes referred to as GMT). Using a local time zone timestamp causes 
         fingerprint authentication to fail.
+
+        In case of error code 97
+        For debugging local time vs authorize.net server time
+        http://developer.authorize.net/api/reference/responseCode97.html
         """
         return str(int(time.time()))
 
