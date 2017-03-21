@@ -31,7 +31,7 @@
         <input type="hidden" name="x_show_form" value="PAYMENT_FORM">
         <input type="hidden" name="x_method" value="CC">
         <input type="hidden" name="x_amount" tal:attributes="value string:${view/amount}">
-        <input type="hidden" name="x_replay_response" value="TRUE">
+        <input type="hidden" name="x_relay_response" value="TRUE">
 
         <div class="jaz-shop-buttons">
           <input type="submit" value="Complete Purchase with Authorize.Net" class="allowMultiSubmit context"
