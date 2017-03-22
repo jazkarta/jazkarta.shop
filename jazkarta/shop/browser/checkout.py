@@ -48,7 +48,7 @@ class CheckoutForm(BrowserView):
 class CheckoutFormAuthorizeNetSIM(BrowserView):
     """ Renders a checkout form with button to submit to Authorize.Net SIM """
 
-    cart_template = ViewPageTemplateFile('templates/checkout_cart.pt')
+    thankyou_template = ViewPageTemplateFile('templates/checkout_thankyou.pt')
     index = ViewPageTemplateFile('templates/checkout_form_authorize_net_sim.pt')
     post_url_test = 'https://test.authorize.net/gateway/transact.dll'    
     post_url_production = 'https://secure.authorize.net/gateway/transact.dll'
@@ -56,6 +56,18 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
     # XXX Tell customer somewhere that they have about 15min to complete the
     # checkout process as per:
     # https://support.authorize.net/authkb/index?page=content&id=A592&actp=LIST
+
+    def __call__(self):
+        #self.update()
+        if 'x_response_code' in self.request.form:
+            self.handle_submit()
+        return self.render()
+
+    def render(self):
+        if 'x_response_code' in self.request.form:
+            return self.thankyou_template()
+         else:
+            return self.index()
 
     @lazy_property
     def cart(self):
@@ -82,13 +94,6 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
         # NB XXX add check for production site here
         return get_setting('authorizenet_transaction_key_dev')
         # return get_setting('authorizenet_transaction_key_production')
-
-
-    def __call__(self):
-        return self.render()
-
-    def render(self):
-        return self.index()
 
     @lazy_property
     def x_fp_hash(self):
@@ -146,10 +151,70 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
 
     @lazy_property
     def x_relay_url(self):
-        # XXX set to 
+        # XXX set to /checkout view? or another view?
 
-        # debugging
+        # to debug canuse http://developer.authorize.net/bin/developer/paramdump
         return "http://developer.authorize.net/bin/developer/paramdump"
+
+
+    def handle_submit(self):
+        amount = self.amount
+        response = self.request['x_response_code']
+        if response != '1':            
+            # Authorize.Net SIM response codes
+            # 1—Approved
+            # 2—Declined
+            # 3—Error
+            # 4—Held for Review
+            self.error = self.request['x_response_reason_text']
+
+        try:
+            is_email(self.request.form['email'])
+        except Exception as e:
+            self.error = str(e)
+
+        if self.cart.shippable and not self.cart.data.get('ship_method'):
+            self.error = ('Something went wrong while calculating shipping. '
+                          'Your payment has not been processed. '
+                          'Please contact us for assistance.')
+
+        if self.error:
+            return
+
+        userid = get_current_userid()
+        contact_info = PersistentMapping()
+        # XXX if statements mostly for testing purposes
+        if 'x_first_name' in self.request.form:
+            contact_info['first_name'] = self.request.form['x_first_name']
+        if 'x_last_name' in self.request.form:
+            contact_info['last_name'] = self.request.form['x_last_name']
+        if 'x_email' in self.request.form:
+            contact_info['email'] = self.request.form['x_email']
+        if 'x_phone' in self.request.form:
+            contact_info['phone'] = self.request.form['x_phone']
+        if 'x_address' in self.request.form:
+            contact_info['address'] = self.request.form['x_address']
+        if 'x_city' in self.request.form:
+            contact_info['city'] = self.request.form['x_city']
+        if 'x_state' in self.request.form:
+            contact_info['state'] = self.request.form['x_state']
+        if 'x_zip' in self.request.form:
+            contact_info['zip'] = self.request.form['x_zip']
+        if 'x_country' in self.request.form:
+            contact_info['country'] = self.request.form['x_country']
+
+        method = 'Online Payment'
+        charge_result = {'success': True}
+
+        if not self.error:
+            try:
+                self.store_order(method, charge_result, userid, contact_info)
+                self.clear_cart()
+            except ConflictError:
+                raise Exception(
+                    'Failed to store results of payment after multiple '
+                    'retries. Please contact us for assistance.')
+
 
 @implementer(IStripeEnabledView)
 class CheckoutFormStripe(BrowserView):
