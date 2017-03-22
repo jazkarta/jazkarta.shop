@@ -159,13 +159,15 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
     @lazy_property
     def x_relay_url(self):
         return self.context.absolute_url() + '/checkout'
+
         # to debug use http://developer.authorize.net/bin/developer/paramdump
+        # and to prevent this error:
+        # (14) The referrer, relay response or receipt link URL is invalid.
         # return "http://developer.authorize.net/bin/developer/paramdump"
 
     @lazy_property
     def x_cancel_url(self):
-        # cancelling a transaction - take user to home page
-        # XXX or somewhere else?
+        # for optional cancel button on SIM form. Take the user to the homepage
         return self.context.absolute_url()
 
     def handle_submit(self):
