@@ -48,6 +48,7 @@ class CheckoutForm(BrowserView):
 class CheckoutFormAuthorizeNetSIM(BrowserView):
     """ Renders a checkout form with button to submit to Authorize.Net SIM """
 
+    cart_template = ViewPageTemplateFile('templates/checkout_cart.pt')
     thankyou_template = ViewPageTemplateFile('templates/checkout_thankyou.pt')
     index = ViewPageTemplateFile('templates/checkout_form_authorize_net_sim.pt')
     post_url_test = 'https://test.authorize.net/gateway/transact.dll'    
@@ -58,15 +59,21 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
     # https://support.authorize.net/authkb/index?page=content&id=A592&actp=LIST
 
     def __call__(self):
-        #self.update()
+        self.update()
         if 'x_response_code' in self.request.form:
             self.handle_submit()
         return self.render()
 
+    def update(self):
+        self.error = None
+        self.cart.calculate_taxes()
+        # Make sure writing tax to cart doesn't trigger CSRF warning
+        safeWrite(self.cart.data)
+
     def render(self):
         if 'x_response_code' in self.request.form:
             return self.thankyou_template()
-         else:
+        else:
             return self.index()
 
     @lazy_property
@@ -151,23 +158,33 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
 
     @lazy_property
     def x_relay_url(self):
-        # XXX set to /checkout view? or another view?
+        return self.context.absolute_url() + '/checkout'
+        # to debug use http://developer.authorize.net/bin/developer/paramdump
+        # return "http://developer.authorize.net/bin/developer/paramdump"
 
-        # to debug canuse http://developer.authorize.net/bin/developer/paramdump
-        return "http://developer.authorize.net/bin/developer/paramdump"
-
+    @lazy_property
+    def x_cancel_url(self):
+        # cancelling a transaction - take user to home page
+        # XXX or somewhere else?
+        return self.context.absolute_url()
 
     def handle_submit(self):
         amount = self.amount
         response = self.request['x_response_code']
-        if response != '1':            
+        if response != '1':
             # Authorize.Net SIM response codes
-            # 1—Approved
-            # 2—Declined
-            # 3—Error
-            # 4—Held for Review
-            self.error = self.request['x_response_reason_text']
-
+            # 1 = Approved
+            # 2 = Declined
+            # 3 = Error
+            # 4 = Held for Review
+            if 'x_response_reason_text' in self.request.form:
+                self.error = self.request['x_response_reason_text']
+            else:
+                # this scenario unlikely as every response should provide us 
+                # with x_response_reason_text
+                self.error = ('There was an error with your transaction. '
+                              'Your payment has not been processed. '
+                              'Please contact us for assistance.')
         try:
             is_email(self.request.form['email'])
         except Exception as e:
@@ -183,7 +200,6 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
 
         userid = get_current_userid()
         contact_info = PersistentMapping()
-        # XXX if statements mostly for testing purposes
         if 'x_first_name' in self.request.form:
             contact_info['first_name'] = self.request.form['x_first_name']
         if 'x_last_name' in self.request.form:
@@ -214,6 +230,72 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
                 raise Exception(
                     'Failed to store results of payment after multiple '
                     'retries. Please contact us for assistance.')
+
+    # This code runs after the payment is processed
+    # to update various data in the ZODB.
+    @run_in_transaction(retries=10)
+    def store_order(self, method, charge_result, userid, contact_info):
+        """Store various data following payment processing.
+
+        This code runs in a separate transaction (with up to 10 retries)
+        to make sure that ConflictErrors do not cause the Zope publisher
+        to retry the request which performs payment processing.
+
+        # ^ is the above still true when using Authorize.Net SIM??
+
+        IMPORTANT: Make sure that code which runs before this is called
+        does not try to make persistent changes, because they'll be lost.
+        """
+        order = self.cart.data
+        order['bill_to'] = contact_info
+        order['notes'] = self.request.form.get('notes')
+
+        # `success` is only present for purchases, not refunds
+        if 'success' in charge_result and charge_result['success']:
+
+            # Call `after_purchase` hook for each product
+            coupons_used = set()
+            for index, item in enumerate(self.cart.items):
+                ob = resolve_uid(item.uid)
+                if ob is not None:
+                    purchase_handler = IPurchaseHandler(ob)
+                    purchase_handler.after_purchase(item._item)
+
+                # keep track of coupons used
+                if item.is_discounted:
+                    coupons_used.add(item.coupon)
+
+            # store count of coupon usage
+            for coupon_uid in coupons_used:
+                storage.increment_shop_data(
+                    [userid, 'coupons', coupon_uid], 1)
+
+        # Store historic record of order
+        self.cart.store_order(userid)
+
+        # Keep cart as old_cart (for the thank you page) before clearing it
+        self.old_cart = self.cart.clone()
+
+        # Queue receipt email (email is actually sent at transaction commit)
+        if self.receipt_email:
+            subject = get_setting('receipt_subject')
+            unstyled_msg = self.receipt_email()
+            css = self.context.unrestrictedTraverse('plone.css')()
+            msg = Premailer(unstyled_msg, css_text=css).transform()
+            mto = self.request['email']
+            send_mail(subject, msg, mto=mto)
+
+    @run_in_transaction(retries=5)
+    def clear_cart(self):
+        """Clear the cart following checkout.
+
+        This is done in a separate transaction so that a cart in the session
+        is still intact in case `store_order` needs to be retried.
+        """
+        self.cart.clear()
+
+    def receipt_intro(self):
+        return get_setting('receipt_intro')
 
 
 @implementer(IStripeEnabledView)
