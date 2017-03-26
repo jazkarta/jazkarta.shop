@@ -4,9 +4,10 @@
 
 	<div tal:repeat="method methods">
 	  <label>
-	    <input name="shipping_method" type="radio" value="${method/id}"
-	           tal:attributes="checked python:'checked' if value == method['id'] else None" />
-	    $<tal:s replace="python:'{:.2f}'.format(method['price'])" /> - ${method/name}
+	    <input name="shipping_method" type="radio"
+	           tal:attributes="value string:${method/id};
+                               checked python:'checked' if value == method['id'] else None" />
+	    $<tal:s replace="python:'{:.2f}'.format(method['price'])" /> - <span tal:content="string:${method/name}"></span>
 	  </label>
 	</div>
 

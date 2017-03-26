@@ -4,11 +4,10 @@ from Acquisition import aq_parent
 from email.Header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from plone import api
 from plone.registry.interfaces import IRegistry
 from Products.CMFCore.interfaces import ISiteRoot
 from Products.CMFCore.utils import getToolByName
-from Products.CMFPlone.interfaces.controlpanel import IMailSchema
-from Products.CMFPlone.patterns.utils import get_portal_url
 from zope.component import getUtility
 from zope.component.hooks import getSite
 from zope.globalrequest import getRequest
@@ -17,6 +16,15 @@ from jazkarta.shop import config
 from .interfaces import ISettings
 import email
 import transaction
+
+PLONE_VERSION = api.env.plone_version()
+
+try:
+    from Products.CMFPlone.interfaces.controlpanel import IMailSchema
+    REGISTRY_HAS_MAIL_SETTINGS = True
+except ImportError:
+    # Plone4
+    REGISTRY_HAS_MAIL_SETTINGS = False
 
 
 def get_site():
@@ -30,8 +38,8 @@ def get_site():
         possible_site = aq_parent(possible_site)
     return possible_site
 
-
-get_navigation_root_url = get_portal_url
+def get_navigation_root_url():
+    return getSite().absolute_url()
 
 
 def get_catalog():
@@ -113,12 +121,18 @@ def send_mail(subject, message, mfrom=None, mto=None):
         realname, replyaddr = email.utils.parseaddr(mfrom)
         msg['Reply-To'] = Header(mfrom, 'utf-8')
 
-    registry = getUtility(IRegistry)
-    mail_settings = registry.forInterface(IMailSchema, prefix='plone')
+    if REGISTRY_HAS_MAIL_SETTINGS:
+        registry = getUtility(IRegistry)
+        mail_settings = registry.forInterface(IMailSchema, prefix="plone")
+        if not realname:
+            realname = mail_settings.email_from_name
+        mfrom = email.utils.formataddr((realname, mail_settings.email_from_address))
+    else:
+        portal = self.portal_state().portal()
+        if not realname:
+            realname = portal.getProperty('email_from_name')
+        mfrom = email.utils.formataddr((realname, portal.getProperty('email_from_address')))
 
-    if not realname:
-        realname = mail_settings.email_from_name
-    mfrom = email.utils.formataddr((realname, mail_settings.email_from_address))
     # Send to portal email address if no recipient was specified,
     # or if we're on a test site
     mailhost = site.MailHost

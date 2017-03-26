@@ -10,7 +10,7 @@
 <div class="portalMessage error"
      tal:condition="view/error|nothing">
   <strong>Error</strong>
-  ${view/error}
+  <span tal:content="string:${view/error}"></span>
 </div>
 
 <table class="listing cart-listing">
@@ -53,7 +53,7 @@
            tal:attributes="data-uid item/uid">+</a>
         <div class="error"
              tal:define="uid item/uid; cart_id item/cart_id; warning view/cart_warnings/?cart_id|view/cart_warnings/?uid|nothing"
-             tal:condition="warning">${warning}</div>
+             tal:condition="warning" tal:content="string:${warning}"></div>
       </td>
       <td tal:define="is_discounted item/is_discounted|nothing">
           <span class="original-item-price"
@@ -67,14 +67,14 @@
       </td>
       <td tal:condition="can_refund">
         $<input type="text" size="4"
-                name="item_${item/cart_id}"
+                tal:attributes="name string:item_${item/cart_id}"
                 value="${python:request.form.get('item_' + item.cart_id, '{:.2f}'.format(item.subtotal))}" />
       </td>
     </tr>
   </tal:items>
   <tal:shipping condition="cart/shipping">
     <tr>
-      <td>Shipping - ${cart/data/ship_method}</td>
+      <td tal:content="string:Shipping - ${cart/data/ship_method}"></td>
       <td></td>
       <td></td>
       <td tal:content="python:'${:,.2f}'.format(cart.shipping)" />
@@ -87,7 +87,7 @@
   </tal:shipping>
   <tal:tax tal:repeat="tax_item cart/taxes">
     <tr>
-      <td>${tax_item/label}</td>
+      <td tal:content="string:${tax_item/label}"></td>
       <td></td>
       <td></td>
       <td tal:content="python:'${:,.2f}'.format(tax_item['tax'])">TAX</td>

@@ -1,16 +1,49 @@
 <configure
-    xmlns="http://namespaces.zope.org/genericsetup"
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    xmlns:zcml="http://namespaces.zope.org/zcml"    
     i18n_domain="jazkarta.shop">
 
-  <registerProfile
+  <genericsetup:registerProfile
+      zcml:condition="not-have plone-5"
       name="default"
       title="jazkarta.shop"
-      directory="profiles/default"
-      description="A flexible web-based shop."
+      directory="profiles/plone4"
+      description="Installs the jazkarta.shop add-on Plone4 specific configuration"
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
 
-  <upgradeDepends
+  <genericsetup:registerProfile
+      zcml:condition="have plone-5"
+      name="default"
+      title="jazkarta.shop"
+      directory="profiles/plone5"
+      description="Installs the jazkarta.shop add-on Plone5 specific configuration"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
+  <genericsetup:registerProfile
+      zcml:condition="not-have plone-5"
+      name="uninstall"
+      title="jazkarta.shop (uninstall for Plone 4)"
+      directory="profiles/uninstall-plone4"
+      description="Uninstalls jazkarta.shop"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
+  <genericsetup:registerProfile
+      zcml:condition="have plone-5"
+      name="uninstall"
+      title="jazkarta.shop (uninstall for Plone 5)"
+      directory="profiles/uninstall-plone5"
+      description="Uninstalls jazkarta.shop"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
+  <utility factory=".setuphandlers.HiddenProfiles" name="jazkarta.shop" />
+  <utility factory=".setuphandlers.HiddenProducts" name="jazkarta.shop" />
+
+  <genericsetup:upgradeDepends
       profile="jazkarta.shop:default"
       source="1"
       destination="2"
@@ -19,7 +52,7 @@
       import_steps="browserlayer"
       />
 
-  <upgradeDepends
+  <genericsetup:upgradeDepends
       profile="jazkarta.shop:default"
       source="2"
       destination="3"
@@ -28,7 +61,7 @@
       import_steps="typeinfo"
       />
 
-  <upgradeDepends
+  <genericsetup:upgradeDepends
       profile="jazkarta.shop:default"
       source="3"
       destination="4"
@@ -37,7 +70,7 @@
       import_steps="typeinfo"
       />
 
-  <upgradeDepends
+  <genericsetup:upgradeDepends
       profile="jazkarta.shop:default"
       source="4"
       destination="5"
@@ -46,7 +79,7 @@
       import_steps="plone.app.registry"
       />
 
-  <upgradeDepends
+  <genericsetup:upgradeDepends
       profile="jazkarta.shop:default"
       source="5"
       destination="6"
@@ -55,7 +88,7 @@
       import_steps="plone.app.registry"
       />
 
-  <upgradeDepends
+  <genericsetup:upgradeDepends
       profile="jazkarta.shop:default"
       source="6"
       destination="7"
