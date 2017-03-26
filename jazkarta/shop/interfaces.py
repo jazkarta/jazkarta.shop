@@ -11,6 +11,8 @@ from z3c.form.browser.checkbox import CheckBoxWidget
 from zope.interface import alsoProvides
 from zope.interface import Attribute
 from zope.interface import Interface
+from zope.interface import Invalid
+from zope.interface import invariant
 from zope.interface import provider
 from zope import schema
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
@@ -158,24 +160,62 @@ class ICoupon(model.Schema):
 
 class ISettings(model.Schema):
 
+    payment_processors = schema.List(
+        title=u'Payment Processor',
+        description=u"Important - Please make sure that the relevant API keys"
+                    u" for the selected payment processor are completed below.",
+        value_type=schema.Choice(
+            vocabulary='jazkarta.shop.payment_processors',
+        ),
+        default=[],
+    )
+
     stripe_api_key_dev = schema.TextLine(
         title=u'Stripe Secret Key (Development)',
+        required=False,
     )
 
     stripe_pub_key_dev = schema.TextLine(
         title=u'Stripe Publishable Key (Development)',
+        required=False,
     )
 
     stripe_api_key_production = schema.TextLine(
         title=u'Stripe Secret Key (Production)',
         description=u"This key will be used when the JAZKARTA_SHOP_ENV "
-                    u"environment variable equals 'production'."
+                    u"environment variable equals 'production'.",
+        required=False,
     )
 
     stripe_pub_key_production = schema.TextLine(
         title=u'Stripe Publishable Key (Production)',
         description=u"This key will be used when the JAZKARTA_SHOP_ENV "
-                    u"environment variable equals 'production'."
+                    u"environment variable equals 'production'.",
+        required=False,
+    )
+
+    authorizenet_api_login_id_dev = schema.TextLine(
+        title=u'Authorize.Net API Login ID (Sandbox account)',
+        required=False,
+    )
+
+    authorizenet_transaction_key_dev = schema.TextLine(
+        title=u'Authorize.Net Transaction Key (Sandbox account)',
+        required=False,
+    )
+
+    authorizenet_api_login_id_production = schema.TextLine(
+        title=u'Authorize.Net API Login ID (Production)',
+        description=u"This key will be used when the JAZKARTA_SHOP_ENV "
+                    u"environment variable equals 'production'.",
+        required=False,
+    )
+
+    authorizenet_transaction_key_production = schema.TextLine(
+        title=u'Authorize.Net Transaction Key (Production)',
+        description=u"This key will be used when the JAZKARTA_SHOP_ENV "
+                    u"environment variable equals 'production'.",
+        required=False,
     )
 
     receipt_subject = schema.TextLine(
@@ -236,6 +276,25 @@ class ISettings(model.Schema):
         title=u'TaxJar SmartCalcs API Token',
         required=False,
         )
+
+    @invariant
+    def validate_payment_processor_keys(data):
+        if len(data.payment_processors) == 0:
+            raise Invalid(u"Payment processor not specified.")
+        elif len(data.payment_processors) > 1:
+            raise Invalid(u"Select only one payment processor.")        
+        elif data.payment_processors[0] == 'Authorize.Net SIM':
+            if data.authorizenet_api_login_id_dev is None or \
+                data.authorizenet_transaction_key_dev is None or \
+                data.authorizenet_api_login_id_production is None or \
+                data.authorizenet_transaction_key_production is None:
+                raise Invalid(u"Authorize.Net SIM API key data is missing.")
+        elif data.payment_processors[0] == 'Stripe':
+            if data.stripe_api_key_dev is None or \
+                data.stripe_pub_key_dev is None or \
+                data.stripe_api_key_production is None or \
+                data.stripe_pub_key_production is None:
+                raise Invalid(u"Stripe API key data is missing.")
 
 class IBrowserLayer(IDefaultBrowserLayer):
     """Browser layer to mark the request when this product is activated."""

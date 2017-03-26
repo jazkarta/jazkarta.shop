@@ -270,3 +270,8 @@ SHIPPING_COUNTRIES = (
     ("Zambia", "ZM"),
     ("Zimbabwe", "ZW"),
 )
+
+PAYMENT_PROCESSORS = [
+    u'Authorize.Net SIM',
+    u'Stripe',
+]

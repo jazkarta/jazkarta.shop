@@ -1,4 +1,10 @@
+import hmac
+import time
+import random
+from authorizenet import apicontractsv1
+from authorizenet.apicontrollers import *
 from datetime import date
+from hashlib import md5
 from persistent.mapping import PersistentMapping
 from plone.protect.utils import safeWrite
 from premailer import Premailer
@@ -24,13 +30,284 @@ from ..validators import is_email
 from ..vocabs import country_names
 
 
-@implementer(IStripeEnabledView)
 class CheckoutForm(BrowserView):
+
+    def __call__(self):
+        payment_processor = get_setting('payment_processors')
+        if payment_processor != []:
+            p_p = payment_processor[0]
+            if p_p == 'Authorize.Net SIM':
+                return CheckoutFormAuthorizeNetSIM(self.context, self.request)()
+            elif p_p == 'Stripe':
+                return CheckoutFormStripe(self.context, self.request)()
+        else:
+            raise Exception(
+                    'No payment processor has been specified.')
+
+
+class CheckoutFormAuthorizeNetSIM(BrowserView):
+    """ Renders a checkout form with button to submit to Authorize.Net SIM """
+
+    cart_template = ViewPageTemplateFile('templates/checkout_cart.pt')
+    thankyou_template = ViewPageTemplateFile('templates/checkout_thankyou.pt')
+    index = ViewPageTemplateFile('templates/checkout_form_authorize_net_sim.pt')
+    post_url_test = 'https://test.authorize.net/gateway/transact.dll'    
+    post_url_production = 'https://secure.authorize.net/gateway/transact.dll'
+
+    # XXX Tell customer somewhere that they have about 15min to complete the
+    # checkout process as per:
+    # https://support.authorize.net/authkb/index?page=content&id=A592&actp=LIST
+
+    def __call__(self):
+        self.update()
+        if 'x_response_code' in self.request.form:
+            self.handle_submit()
+        return self.render()
+
+    def update(self):
+        self.error = None
+        self.cart.calculate_taxes()
+        # Make sure writing tax to cart doesn't trigger CSRF warning
+        safeWrite(self.cart.data)
+
+    def render(self):
+        if 'x_response_code' in self.request.form:
+            return self.thankyou_template()
+        else:
+            return self.index()
+
+    @lazy_property
+    def cart(self):
+        return Cart.from_request(self.request)
+
+    @lazy_property
+    def amount(self):
+        return self.cart.amount
+    
+    @lazy_property
+    def post_url(self):
+        # NB XXX add check for production site here
+        return self.post_url_test
+        # return self.post_url_production
+
+    @lazy_property
+    def x_login(self):
+        # NB XXX add check for production site here
+        return get_setting('authorizenet_api_login_id_dev')
+        # return get_setting('authorizenet_api_login_id_production')    
+
+    @lazy_property
+    def transaction_key(self):
+        # NB XXX add check for production site here
+        return get_setting('authorizenet_transaction_key_dev')
+        # return get_setting('authorizenet_transaction_key_production')
+
+    @lazy_property
+    def x_fp_hash(self):
+        """
+        x_fp_hash Required.
+        Value: The unique transaction fingerprint.
+        Notes: The fingerprint is generated using the HMAC-MD5 hashing algorithm 
+        on the following field values:
+        API login ID (x_login)
+        The sequence number of the transaction (x_fp_sequence)
+        The timestamp of the sequence number creation (x_fp_timestamp)
+        Amount (x_amount)
+        Currency code, if submitted (x_currency_code)
+        Field values are concatenated and separated by a caret (^).
+
+        Also as per:
+        https://support.authorize.net/authkb/index?page=content&id=A569
+        trailing ^ is required!!
+        APIl0gin1D^Sequence123^1457632735^19.99^
+        """
+        values = (str(self.x_login), self.x_fp_sequence,
+             self.x_fp_timestamp, str(self.amount))
+        source = "^".join(values) + '^'
+        hashed_values = hmac.new(str(self.transaction_key), '', md5)
+        hashed_values.update(source) ## add content
+        return hashed_values.hexdigest()
+
+    @lazy_property
+    def x_fp_sequence(self):
+        """
+        x_fp_sequence Required
+        Value: The merchant-assigned sequence number for the transaction.
+        Format: Numeric.
+        Notes: The sequence number can be a merchant-assigned value, such as an 
+        invoice number or any randomly generated number.
+        """
+        return str(int(random.random() * 100000000000))
+
+    @lazy_property
+    def x_fp_timestamp(self):
+        """
+        x_fp_timestamp Required
+        Value: The timestamp at the time of fingerprint generation.
+        Format: UTC time in seconds since January 1, 1970.
+        Notes: Coordinated Universal Time (UTC) is an international atomic 
+        standard of time
+        (sometimes referred to as GMT). Using a local time zone timestamp causes 
+        fingerprint authentication to fail.
+
+        In case of error code 97
+        For debugging local time vs authorize.net server time
+        http://developer.authorize.net/api/reference/responseCode97.html
+        """
+        return str(int(time.time()))
+
+    @lazy_property
+    def x_relay_url(self):
+        return self.context.absolute_url() + '/checkout'
+
+        # to debug use http://developer.authorize.net/bin/developer/paramdump
+        # and to prevent this error:
+        # (14) The referrer, relay response or receipt link URL is invalid.
+        # return "http://developer.authorize.net/bin/developer/paramdump"
+
+    @lazy_property
+    def x_cancel_url(self):
+        # for optional cancel button on SIM form. Take the user to the homepage
+        return self.context.absolute_url()
+
+    def handle_submit(self):
+        amount = self.amount
+        response = self.request['x_response_code']
+        if response != '1':
+            # Authorize.Net SIM response codes
+            # 1 = Approved
+            # 2 = Declined
+            # 3 = Error
+            # 4 = Held for Review
+            if 'x_response_reason_text' in self.request.form:
+                self.error = self.request['x_response_reason_text']
+            else:
+                # this scenario unlikely as every response should provide us 
+                # with x_response_reason_text
+                self.error = ('There was an error with your transaction. '
+                              'Your payment has not been processed. '
+                              'Please contact us for assistance.')
+        try:
+            is_email(self.request.form['email'])
+        except Exception as e:
+            self.error = str(e)
+
+        if self.cart.shippable and not self.cart.data.get('ship_method'):
+            self.error = ('Something went wrong while calculating shipping. '
+                          'Your payment has not been processed. '
+                          'Please contact us for assistance.')
+
+        if self.error:
+            return
+
+        userid = get_current_userid()
+        contact_info = PersistentMapping()
+        if 'x_first_name' in self.request.form:
+            contact_info['first_name'] = self.request.form['x_first_name']
+        if 'x_last_name' in self.request.form:
+            contact_info['last_name'] = self.request.form['x_last_name']
+        if 'x_email' in self.request.form:
+            contact_info['email'] = self.request.form['x_email']
+        if 'x_phone' in self.request.form:
+            contact_info['phone'] = self.request.form['x_phone']
+        if 'x_address' in self.request.form:
+            contact_info['address'] = self.request.form['x_address']
+        if 'x_city' in self.request.form:
+            contact_info['city'] = self.request.form['x_city']
+        if 'x_state' in self.request.form:
+            contact_info['state'] = self.request.form['x_state']
+        if 'x_zip' in self.request.form:
+            contact_info['zip'] = self.request.form['x_zip']
+        if 'x_country' in self.request.form:
+            contact_info['country'] = self.request.form['x_country']
+
+        method = 'Online Payment'
+        charge_result = {'success': True}
+
+        if not self.error:
+            try:
+                self.store_order(method, charge_result, userid, contact_info)
+                self.clear_cart()
+            except ConflictError:
+                raise Exception(
+                    'Failed to store results of payment after multiple '
+                    'retries. Please contact us for assistance.')
+
+    # This code runs after the payment is processed
+    # to update various data in the ZODB.
+    @run_in_transaction(retries=10)
+    def store_order(self, method, charge_result, userid, contact_info):
+        """Store various data following payment processing.
+
+        This code runs in a separate transaction (with up to 10 retries)
+        to make sure that ConflictErrors do not cause the Zope publisher
+        to retry the request which performs payment processing.
+
+        # ^ is the above still true when using Authorize.Net SIM??
+
+        IMPORTANT: Make sure that code which runs before this is called
+        does not try to make persistent changes, because they'll be lost.
+        """
+        order = self.cart.data
+        order['bill_to'] = contact_info
+        order['notes'] = self.request.form.get('notes')
+
+        # `success` is only present for purchases, not refunds
+        if 'success' in charge_result and charge_result['success']:
+
+            # Call `after_purchase` hook for each product
+            coupons_used = set()
+            for index, item in enumerate(self.cart.items):
+                ob = resolve_uid(item.uid)
+                if ob is not None:
+                    purchase_handler = IPurchaseHandler(ob)
+                    purchase_handler.after_purchase(item._item)
+
+                # keep track of coupons used
+                if item.is_discounted:
+                    coupons_used.add(item.coupon)
+
+            # store count of coupon usage
+            for coupon_uid in coupons_used:
+                storage.increment_shop_data(
+                    [userid, 'coupons', coupon_uid], 1)
+
+        # Store historic record of order
+        self.cart.store_order(userid)
+
+        # Keep cart as old_cart (for the thank you page) before clearing it
+        self.old_cart = self.cart.clone()
+
+        # Queue receipt email (email is actually sent at transaction commit)
+        if self.receipt_email:
+            subject = get_setting('receipt_subject')
+            unstyled_msg = self.receipt_email()
+            css = self.context.unrestrictedTraverse('plone.css')()
+            msg = Premailer(unstyled_msg, css_text=css).transform()
+            mto = self.request['email']
+            send_mail(subject, msg, mto=mto)
+
+    @run_in_transaction(retries=5)
+    def clear_cart(self):
+        """Clear the cart following checkout.
+
+        This is done in a separate transaction so that a cart in the session
+        is still intact in case `store_order` needs to be retried.
+        """
+        self.cart.clear()
+
+    def receipt_intro(self):
+        return get_setting('receipt_intro')
+
+
+@implementer(IStripeEnabledView)
+class CheckoutFormStripe(BrowserView):
     """ Renders a checkout form set up to submit through Stripe """
 
     cart_template = ViewPageTemplateFile('templates/checkout_cart.pt')
     thankyou_template = ViewPageTemplateFile('templates/checkout_thankyou.pt')
     receipt_email = ViewPageTemplateFile('templates/receipt_email.pt')
+    index = ViewPageTemplateFile('templates/checkout_form.pt')
 
     @lazy_property
     def cart(self):

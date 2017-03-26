@@ -1,5 +1,5 @@
 <metadata>
-  <version>7</version>
+  <version>8</version>
   <dependencies>
   	<dependency>profile-collective.z3cform.datagridfield:default</dependency>
   </dependencies>
