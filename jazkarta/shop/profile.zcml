@@ -1,7 +1,7 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
-    xmlns:zcml="http://namespaces.zope.org/zcml"    
+    xmlns:zcml="http://namespaces.zope.org/zcml"
     i18n_domain="jazkarta.shop">
 
   <genericsetup:registerProfile
@@ -97,7 +97,7 @@
       import_steps="controlpanel"
       />
 
-  <upgradeDepends
+  <genericsetup:upgradeDepends
       profile="jazkarta.shop:default"
       source="7"
       destination="8"
