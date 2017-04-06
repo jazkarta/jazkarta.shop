@@ -169,6 +169,17 @@ class Cart(object):
 
         return Cart(cart, request)
 
+    @classmethod
+    def from_session_id(cls, request, user_id, session_id):
+
+        if user_id is not None:  # logged in
+            cart = storage.get_shop_data([user_id, 'cart'])
+        else:
+            session_manager = get_site.session_data_manager
+            cart = session_manager.getSessionDataByKey(session_id)['cart']
+
+        return Cart(cart, request)
+
     def __init__(self, data, request):
         if 'items' not in data:
             data['items'] = OrderedDict()
