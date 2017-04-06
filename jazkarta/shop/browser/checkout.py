@@ -51,6 +51,7 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
     cart_template = ViewPageTemplateFile('templates/checkout_cart.pt')
     thankyou_template = ViewPageTemplateFile('templates/checkout_thankyou.pt')
     index = ViewPageTemplateFile('templates/checkout_form_authorize_net_sim.pt')
+    receipt_email = ViewPageTemplateFile('templates/receipt_email.pt')
     post_url_test = 'https://test.authorize.net/gateway/transact.dll'    
     post_url_production = 'https://secure.authorize.net/gateway/transact.dll'
 
