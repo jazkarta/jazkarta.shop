@@ -61,8 +61,8 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
     def __call__(self):
         if 'x_response_code' in self.request.form:
             # recreate the cart from session or from storage (by user_id)
-            self.request.form.get('user_id', None)
-            self.request.form.get('session_id', None)
+            user_id = self.request.form.get('user_id', None)
+            session_id = self.request.form.get('session_id', None)
             cart = Cart.from_session_id(self.request, user_id, session_id)
         self.update()
         if 'x_response_code' in self.request.form:
