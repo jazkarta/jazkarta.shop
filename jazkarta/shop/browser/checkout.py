@@ -14,6 +14,7 @@ from zope.browserpage import ViewPageTemplateFile
 from zope.cachedescriptors.property import Lazy as lazy_property
 from zope.interface import implementer
 from zExceptions import Forbidden
+from jazkarta.shop import config
 from jazkarta.shop import storage
 from ..cart import Cart
 from ..interfaces import IPurchaseHandler
@@ -92,21 +93,24 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
     
     @lazy_property
     def post_url(self):
-        # NB XXX add check for production site here
-        return self.post_url_test
-        # return self.post_url_production
+        if config.IN_PRODUCTION:
+            return post_url_production
+        else:
+            return self.post_url_test
 
     @lazy_property
     def x_login(self):
-        # NB XXX add check for production site here
-        return get_setting('authorizenet_api_login_id_dev')
-        # return get_setting('authorizenet_api_login_id_production')    
+        if config.IN_PRODUCTION:
+            return get_setting('authorizenet_api_login_id_production')
+        else:
+            return get_setting('authorizenet_api_login_id_dev')
 
     @lazy_property
     def transaction_key(self):
-        # NB XXX add check for production site here
-        return get_setting('authorizenet_transaction_key_dev')
-        # return get_setting('authorizenet_transaction_key_production')
+        if config.IN_PRODUCTION:
+            return get_setting('authorizenet_transaction_key_production')
+        else:
+            return get_setting('authorizenet_transaction_key_dev')
 
     @lazy_property
     def x_fp_hash(self):
@@ -286,13 +290,13 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
         self.old_cart = self.cart.clone()
 
         # Queue receipt email (email is actually sent at transaction commit)
-        if self.receipt_email:
-            subject = get_setting('receipt_subject')
-            unstyled_msg = self.receipt_email()
-            css = self.context.unrestrictedTraverse('plone.css')()
-            msg = Premailer(unstyled_msg, css_text=css).transform()
-            mto = self.request['email']
-            send_mail(subject, msg, mto=mto)
+        #if self.receipt_email:
+        #    subject = get_setting('receipt_subject')
+        #    unstyled_msg = self.receipt_email()
+        #    css = self.context.unrestrictedTraverse('plone.css')()
+        #    msg = Premailer(unstyled_msg, css_text=css).transform()
+        #    mto = self.request['email']
+        #    send_mail(subject, msg, mto=mto)
 
     @run_in_transaction(retries=5)
     def clear_cart(self):
