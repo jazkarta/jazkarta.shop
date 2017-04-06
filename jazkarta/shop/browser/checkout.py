@@ -59,6 +59,11 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
     # https://support.authorize.net/authkb/index?page=content&id=A592&actp=LIST
 
     def __call__(self):
+        if 'x_response_code' in self.request.form:
+            # recreate the cart from session or from storage (by user_id)
+            user_id = self.request.form['user_id']
+            session_id = self.request.form['session_id']
+            cart = Cart.from_session_id(self.request, user_id, session_id)
         self.update()
         if 'x_response_code' in self.request.form:
             self.handle_submit()
@@ -155,6 +160,17 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
         http://developer.authorize.net/api/reference/responseCode97.html
         """
         return str(int(time.time()))
+
+    @lazy_property
+    def session_id(self):
+        return self.context.session_data_manager.getBrowserIdManager().getBrowserId()
+
+    @lazy_property
+    def user_id(self):
+        userid = get_current_userid()
+        if userid is not None:
+            return userid
+        return ""
 
     @lazy_property
     def x_relay_url(self):
