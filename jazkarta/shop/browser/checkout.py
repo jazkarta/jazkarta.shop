@@ -203,16 +203,6 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
                 self.error = ('There was an error with your transaction. '
                               'Your payment has not been processed. '
                               'Please contact us for assistance.')
-        try:
-            is_email(self.request.form['x_email'])
-        except Exception as e:
-            self.error = str(e)
-
-        if self.cart.shippable and not self.cart.data.get('ship_method'):
-            self.error = ('Something went wrong while calculating shipping. '
-                          'Your payment has not been processed. '
-                          'Please contact us for assistance.')
-
         if self.error:
             return
 
