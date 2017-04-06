@@ -188,7 +188,7 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
                               'Your payment has not been processed. '
                               'Please contact us for assistance.')
         try:
-            is_email(self.request.form['email'])
+            is_email(self.request.form['x_email'])
         except Exception as e:
             self.error = str(e)
 
