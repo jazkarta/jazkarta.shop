@@ -20,6 +20,7 @@ from ..cart import Cart
 from ..interfaces import IPurchaseHandler
 from ..interfaces import IStripeEnabledView
 from ..interfaces import PaymentProcessingException
+from ..interfaces import TaxRateException
 from ..stripe import process_interactive_payment
 from ..utils import get_current_userid
 from ..utils import get_setting
@@ -72,7 +73,13 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
 
     def update(self):
         self.error = None
-        self.cart.calculate_taxes()
+        try:
+            self.cart.calculate_taxes()
+        except TaxRateException:
+            # The sales tax could not be calculated as some of the
+            # required information was missing. (can be triggered by anon users,
+            # hitting the checkout url directly)
+            return 
         # Make sure writing tax to cart doesn't trigger CSRF warning
         safeWrite(self.cart.data)
 

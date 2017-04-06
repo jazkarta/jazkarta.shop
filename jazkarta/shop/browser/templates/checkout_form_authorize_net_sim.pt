@@ -49,7 +49,7 @@
 
     </form>
     <p class="subtotal">
-        <big>Note: You have 15 minutes to complete the authorize.net payment process.</big>
+        <big>Note: You have 15 minutes to complete the Authorize.Net payment process.</big>
     </p>
 </metal:main>
 </body>
