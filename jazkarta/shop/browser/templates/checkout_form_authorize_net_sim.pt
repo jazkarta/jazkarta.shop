@@ -36,7 +36,7 @@
         <tal:user_id tal:condition="python:view.user_id != None">
             <input type="hidden" name="user_id" tal:attributes="value string:${view/user_id}">
         </tal:user_id>
-        <tal:session_id tal:condition="python:view.session_id != None">
+        <tal:session_id tal:condition="python:view.user_id == None">
             <input type="hidden" name="session_id" tal:attributes="value string:${view/session_id}">
         </tal:session_id>
        <!-- <input type="hidden" name="x_cancel_url_text" value="Cancel">
