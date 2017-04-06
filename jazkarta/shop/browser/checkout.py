@@ -170,7 +170,7 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
         userid = get_current_userid()
         if userid is not None:
             return userid
-        return ""
+        return None
 
     @lazy_property
     def x_relay_url(self):
