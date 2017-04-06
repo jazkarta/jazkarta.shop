@@ -56,8 +56,7 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
     post_url_test = 'https://test.authorize.net/gateway/transact.dll'    
     post_url_production = 'https://secure.authorize.net/gateway/transact.dll'
 
-    # XXX Tell customer somewhere that they have about 15min to complete the
-    # checkout process as per:
+    # Note: Customer only has 15min to complete the checkout process as per:
     # https://support.authorize.net/authkb/index?page=content&id=A592&actp=LIST
 
     def __call__(self):
@@ -135,7 +134,7 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
              self.x_fp_timestamp, str(self.amount))
         source = "^".join(values) + '^'
         hashed_values = hmac.new(str(self.transaction_key), '', md5)
-        hashed_values.update(source) ## add content
+        hashed_values.update(source) # add content
         return hashed_values.hexdigest()
 
     @lazy_property
@@ -185,6 +184,8 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
         # and to prevent this error:
         # (14) The referrer, relay response or receipt link URL is invalid.
         # return "http://developer.authorize.net/bin/developer/paramdump"
+        # also useful:
+        # https://support.authorize.net/authkb/index?page=content&id=A663&pmv=print&impressions=false
 
     @lazy_property
     def x_cancel_url(self):
@@ -290,6 +291,7 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
         self.old_cart = self.cart.clone()
 
         # Queue receipt email (email is actually sent at transaction commit)
+        # XXX FIX and comment back in, at the moment breaking on a unicode error
         #if self.receipt_email:
         #    subject = get_setting('receipt_subject')
         #    unstyled_msg = self.receipt_email()

@@ -46,8 +46,11 @@
           <input type="submit" value="Complete Purchase with Authorize.Net" class="allowMultiSubmit context"
                  tal:attributes="disabled python:'disabled' if (not view.cart.items and not view.cart.amount) else None" />
         </div>
- 
+
     </form>
+    <p class="subtotal">
+        <big>Note: You have 15 minutes to complete the authorize.net payment process.</big>
+    </p>
 </metal:main>
 </body>
 </html>
