@@ -59,7 +59,6 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
     # https://support.authorize.net/authkb/index?page=content&id=A592&actp=LIST
 
     def __call__(self):
-        import pdb; pdb.set_trace()
         if 'x_response_code' in self.request.form:
             # recreate the cart from session or from storage (by user_id)
             self.request.form.get('user_id', None)
