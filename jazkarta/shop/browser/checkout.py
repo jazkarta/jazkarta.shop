@@ -59,10 +59,11 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
     # https://support.authorize.net/authkb/index?page=content&id=A592&actp=LIST
 
     def __call__(self):
+        import pdb; pdb.set_trace()
         if 'x_response_code' in self.request.form:
             # recreate the cart from session or from storage (by user_id)
-            user_id = self.request.form['user_id']
-            session_id = self.request.form['session_id']
+            self.request.form.get('user_id', None)
+            self.request.form.get('session_id', None)
             cart = Cart.from_session_id(self.request, user_id, session_id)
         self.update()
         if 'x_response_code' in self.request.form:
