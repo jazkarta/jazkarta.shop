@@ -65,7 +65,7 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
             # recreate the cart from session or from storage (by user_id)
             user_id = self.request.form.get('user_id', None)
             session_id = self.request.form.get('session_id', None)
-            self. cart = Cart.from_session_id(self.request, user_id, session_id)
+            self.cart = Cart.from_session_id(self.request, user_id, session_id)
         self.update()
         if 'x_response_code' in self.request.form:
             self.handle_submit()
@@ -312,8 +312,16 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
             cssp = "".join(css_parsed)
             # x--------------------------
             msg = Premailer(unstyled_msg, css_text=cssp).transform()
-            mto = self.request['email']
-            send_mail(subject, msg, mto=mto)
+            # only send email if the email field was entered in the SIM billing
+            # address section and if the email address is a valid email format
+            if 'x_email' in self.request.form:
+                try:
+                    is_email(self.request.form['x_email'])
+                except Exception as e:
+                    self.error = str(e)
+                if not self.error:
+                    mto = self.request['x_email']
+                    send_mail(subject, msg, mto=mto)
 
     @run_in_transaction(retries=5)
     def clear_cart(self):
