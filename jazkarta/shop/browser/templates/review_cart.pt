@@ -137,10 +137,10 @@
       </div>
 
       <div class="jaz-shop-buttons">
-        <a class="continue-exploring"
+       <!-- <a class="continue-exploring"
            tal:define="came_from request/came_from|request/HTTP_REFERER|portal_state/navigation_root_url;
                        came_from python:came_from if not came_from.endswith('/review-cart') else portal_state.navigation_root_url"
-           href="${came_from}"><button type="button">Continue Exploring</button></a>
+           href="${came_from}"><button type="button">Continue Exploring</button></a> -->
         <input type="submit" value="Proceed to Checkout" class="context"
                tal:attributes="style python:'display: none' if not view.cart else ''" />
       </div>
