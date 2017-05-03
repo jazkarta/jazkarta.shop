@@ -35,7 +35,7 @@
       zcml:condition="have plone-5"
       name="uninstall"
       title="jazkarta.shop (uninstall for Plone 5)"
-      directory="profiles/uninstall-plone5"
+      directory="profiles/uninstall"
       description="Uninstalls jazkarta.shop"
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
