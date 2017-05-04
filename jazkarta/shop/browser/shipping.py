@@ -156,6 +156,11 @@ class ShippingMethodForm(AutoExtensibleForm, Form):
     def handleRemove(self, action):
         del self.shipping_methods[self._name]
 
+    @button.buttonAndHandler(u'Cancel')
+    def handleCancel(self, action):
+        # do nothing
+        return
+
 
 class ShippingForm(AutoExtensibleForm, Form, P5Mixin):
     schema = IShippingAddress
