@@ -1,4 +1,5 @@
-<tal:b define="methods view/available_shipping_methods;
+<tal:b define="status python:view.available_shipping_methods()[0];
+               methods python:view.available_shipping_methods()[1];
 	           value request/form/shipping_method|nothing;
 	           value python:methods[0]['id'] if (methods and not value) else value;">
 
@@ -11,9 +12,14 @@
 	  </label>
 	</div>
 
-	<div class="portalMessage warning" tal:condition="not:methods">
+	<div class="portalMessage warning" tal:condition="python:status=='error'">
 	  <strong>No shipping available.</strong>
 	  Please enter a shipping address so we can check what shipping methods are available.
+	</div>
+
+	<div class="portalMessage warning" tal:condition="python:status=='ok' and methods==[]">
+	  <strong>No shipping available.</strong>
+	  We are currently unable to ship to this address.
 	</div>
 
 	<div class="jaz-shop-buttons" tal:condition="methods">

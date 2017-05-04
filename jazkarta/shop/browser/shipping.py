@@ -179,7 +179,7 @@ class ShippingForm(AutoExtensibleForm, Form, P5Mixin):
     def available_shipping_methods(self):
         recipient_address, errors = self.extractData()
         if errors:
-            return []
+            return ['error', []]
 
         zones = set()
 
@@ -220,7 +220,7 @@ class ShippingForm(AutoExtensibleForm, Form, P5Mixin):
                 'price': Decimal(price),
                 })
         methods.sort(key=lambda x: x['price'])
-        return methods
+        return ['ok', methods]
 
     def __call__(self):
         if 'update' in self.request.form:
