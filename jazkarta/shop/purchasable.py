@@ -24,7 +24,7 @@ class DefaultPurchaseHandler(object):
         return [{
             'uid': self.context.UID(),
             'name': self.context.title,
-            'price': Decimal('{:.2f}'.format(self.context.price)),
+            'price': Decimal('{:.2f}'.format(self.price)),
             'quantity': 1,
             'category': self.context.product_category,
             'taxable': self.context.taxable,
@@ -50,24 +50,22 @@ class DefaultPurchaseHandler(object):
 class DefaultArchetypesPurchaseHandler(object):
 
     def __init__(self, context):
-        # MAKE COMPAT AT
         self.context = context
 
     def in_stock(self):
-        # MAKE COMPAT AT
-        import pdb; pdb.set_trace()
-        min_stock_level = get_setting('min_stock_level')
+        if self.context.getField('min_stock_level') is None:
+            return True # if user has not specified, ignore this feature
+        min_stock_level = self.context.getField('min_stock_level').get(self.context)
         if (self.context.stock_level is not None and
                 self.context.stock_level < min_stock_level):
             return False
         return True
 
     def get_cart_items(self):
-        # MAKE COMPAT AT
         return [{
             'uid': self.context.UID(),
-            'name': self.context.title,
-            'price': Decimal('{:.2f}'.format(self.context.price)),
+            'name': self.context.Title(),
+            'price': Decimal('{:.2f}'.format(self.price)),
             'quantity': 1,
             'category': self.context.product_category,
             'taxable': self.context.taxable,
@@ -75,7 +73,6 @@ class DefaultArchetypesPurchaseHandler(object):
         }]
 
     def after_purchase(self, item):
-        # MAKE COMPAT AT?
         # Override this in a more specific adapter
         pass
 
