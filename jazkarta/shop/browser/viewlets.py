@@ -43,5 +43,5 @@ class AddToCartViewlet(ViewletBase):
 
     @property
     def item_price(self):
-        price = IProduct(self.context).price
+        price = IPurchaseHandler(self.context).price
         return format_currency(price)

@@ -1,10 +1,9 @@
 from decimal import Decimal
 from zope.component import adapter
 from zope.interface import implementer
-from .interfaces import IProduct
+from .interfaces import IProduct, IATProduct
 from .interfaces import IPurchaseHandler
 from .utils import get_setting, resolve_uid
-from jazkarta.shop.interfaces import IATProduct
 
 
 @implementer(IPurchaseHandler)
@@ -40,6 +39,10 @@ class DefaultPurchaseHandler(object):
         obj = resolve_uid(uid)
         if obj is not None:
             return obj.absolute_url()
+
+    @property
+    def price(self):
+        return self.context.price
 
 
 @implementer(IPurchaseHandler)
@@ -81,3 +84,7 @@ class DefaultArchetypesPurchaseHandler(object):
         obj = resolve_uid(uid)
         if obj is not None:
             return obj.absolute_url()
+
+    @property
+    def price(self):
+        return Decimal(self.context.getField('price').get(self.context))

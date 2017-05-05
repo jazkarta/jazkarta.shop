@@ -110,7 +110,7 @@
   <browser:viewlet
     name="jazkarta.shop.addtocart"
     for="..interfaces.IProduct"
-    manager="plone.app.layout.viewlets.interfaces.IBelowContentTitle"
+    manager="plone.app.layout.viewlets.interfaces.IAboveContent"
     class=".viewlets.AddToCartViewlet"
     template="templates/add_to_cart.pt"
     permission="zope2.View"
