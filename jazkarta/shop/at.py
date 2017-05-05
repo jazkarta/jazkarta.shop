@@ -43,7 +43,6 @@ class ProductSchemaExtender(object):
         ExtendedFixedPointField(
             schemata='shop',
             name='price',
-#        default=Decimal("0.00"),
             default="0.00",
 #        min=Decimal("0.00"),
             widget=atapi.DecimalWidget(
@@ -82,7 +81,7 @@ class ProductSchemaExtender(object):
                 description="Used to calculate shipping.",
                 description_msgid='help_weight',
             )
-        ),
+        )
         ]
         
     def __init__(self, context):
