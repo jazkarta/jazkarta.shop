@@ -72,6 +72,11 @@ class IProduct(model.Schema):
     )
 
 
+class IATProduct(IProduct):
+    """Marker for content that can be purchased - archetypes compatibility."""
+    pass
+
+
 class IPurchaseHandler(Interface):
     """Handles interaction between a product and the cart."""
 
