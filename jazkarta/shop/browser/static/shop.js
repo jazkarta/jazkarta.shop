@@ -1,6 +1,13 @@
 require(['jquery', 'mockup-utils'], function($, utils) {
 
 	var portal_url = $('body').attr('data-portal-url');
+
+    $(document).ready(function () {
+        $.get(portal_url + '/shopping-cart', function (data) {
+            $('.jaz-shop-cart-wrapper').replaceWith(data);
+        }, 'html');
+    });
+
     $(document).on('click', '.jaz-shop-add', function(e) {
         e.preventDefault();
         var uid = $(this).attr('data-uid');
@@ -8,7 +15,7 @@ require(['jquery', 'mockup-utils'], function($, utils) {
         	'add': uid,
         	'_authenticator': utils.getAuthenticator()
         }, function(data) {
-          $('.jaz-shop-cart-wrapper').replaceWith(data);
+            $('.jaz-shop-cart-wrapper').replaceWith(data);
         }, 'html');
     });
 
