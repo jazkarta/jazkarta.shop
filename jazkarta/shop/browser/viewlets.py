@@ -19,7 +19,9 @@ class CartViewlet(ViewletBase):
     """
 
     def render(self):
-        return '<div class="jaz-shop-cart-wrapper"></div>'
+        if self.request.URL.split('/')[-1] != 'review-cart':
+            return '<div class="jaz-shop-cart-wrapper"></div>'
+        return ''
 
 
 class CartView(CartViewMixin, BrowserView):
