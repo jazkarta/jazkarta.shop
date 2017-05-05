@@ -77,7 +77,6 @@ class DefaultArchetypesPurchaseHandler(object):
         pass
 
     def get_obj_href(self, uid):
-        # MAKE COMPAT AT
         obj = resolve_uid(uid)
         if obj is not None:
             return obj.absolute_url()
