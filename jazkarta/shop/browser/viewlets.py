@@ -14,9 +14,12 @@ class CartViewMixin(object):
         return Cart.from_request(self.request)
 
 
-class CartViewlet(CartViewMixin, ViewletBase):
+class CartViewlet(ViewletBase):
     """Display the shopping cart in the site header
     """
+
+    def render(self):
+        return '<div class="jaz-shop-cart-wrapper"></div>'
 
 
 class CartView(CartViewMixin, BrowserView):
@@ -25,6 +28,9 @@ class CartView(CartViewMixin, BrowserView):
     def __call__(self):
         # Don't theme this response
         self.request.response.setHeader('X-Theme-Disabled', 'True')
+        # Avoid caching
+        self.request.response.setHeader(
+            'Cache-Control', 'max-age=0, no-cache, must-revalidate')
 
         if 'add' in self.request.form:
             self.cart.add_product(self.request.form['add'])
