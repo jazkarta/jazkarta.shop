@@ -102,7 +102,6 @@
     for="*"
     manager="plone.app.layout.viewlets.interfaces.IPortalHeader"
     class=".viewlets.CartViewlet"
-    template="templates/cart.pt"
     permission="zope.Public"
     layer="..interfaces.IBrowserLayer"
     />
