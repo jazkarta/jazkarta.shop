@@ -82,15 +82,11 @@ class ShippingMethodControlPanel(BrowserView, P5Mixin):
 
     @lazy_property
     def shipping_methods(self):
-        items = storage.get_shop_data(['shipping_methods'], default={}).items()
+        method_map = storage.get_shop_data(['shipping_methods'], default={})
         methods = []
-        if len(items) == 0:
-            return []
-        # parse the BTree items into a dict
-        for x in range(len(items)):            
-            item = items[x][1]
-            item.update({'key': items[x][0]})
-            methods.append(item)
+        for key, method in method_map.items():
+            method['key'] = key
+            methods.append(method)
         return methods
 
     def format_calculation(self, value):

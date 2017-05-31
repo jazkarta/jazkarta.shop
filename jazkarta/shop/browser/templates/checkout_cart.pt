@@ -10,7 +10,7 @@
 <div class="portalMessage error"
      tal:condition="view/error|nothing">
   <strong>Error</strong>
-  <span tal:content="string:${view/error}"></span>
+  <tal:s content="view/error" />
 </div>
 
 <table class="listing cart-listing">
@@ -53,7 +53,7 @@
            tal:attributes="data-uid item/uid">+</a>
         <div class="error"
              tal:define="uid item/uid; cart_id item/cart_id; warning view/cart_warnings/?cart_id|view/cart_warnings/?uid|nothing"
-             tal:condition="warning" tal:content="string:${warning}"></div>
+             tal:condition="warning" tal:content="warning"></div>
       </td>
       <td tal:define="is_discounted item/is_discounted|nothing">
           <span class="original-item-price"

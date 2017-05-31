@@ -31,7 +31,6 @@ setup(
         'python-ups',
         'requests',
         'z3c.currency',
-        'authorizenet',
         'plone.protect>=3.0.19', # Plone 4.3.11 ships with 2.0.3. Version 3.0.9+
                                  # required for plone.protect.utils.safeWrite
                                  # Version 3.0.19 required for inclusion of

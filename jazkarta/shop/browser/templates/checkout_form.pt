@@ -10,7 +10,7 @@
   <script type="text/javascript" tal:condition="view/amount">
     var stripeResponseHandler = function(status, response) {
       var $form = $('#checkout-form');
- 
+
       if (response.error) {
         // Show the errors on the form
         $form.find('.checkout-error-wrapper').show();
@@ -25,7 +25,7 @@
         $form.get(0).submit();
       }
     };
- 
+
     jQuery(function($) {
       var $method = $('input[name="method"]');
       var $cc_field = $('.field-credit-card');
@@ -59,12 +59,12 @@
         if (method != 'Online Payment') return true;
 
         var $form = $(this);
- 
+
         // Disable the submit button to prevent repeated clicks
         $form.find('input[type="submit"]').prop('disabled', true);
- 
+
         Stripe.createToken($form, stripeResponseHandler);
- 
+
         // Prevent the form from submitting with the default action
         return false;
       });
@@ -94,7 +94,7 @@
       <div class="portalMessage error checkout-error-wrapper"
            tal:attributes="style python:'display: none;;' if not view.error else ''">
         <strong>Error</strong>
-        <span class="checkout-error" tal:content="string:${view/error}"></span>
+        <span class="checkout-error" tal:content="view/error"></span>
       </div>
 
       <fieldset class="fieldset-contact-info jaz-shop-half-form">
@@ -130,7 +130,7 @@
                  tal:define="value request/country|string:United States">
               <label>Country</label>
               <select name="country" required="required" class="pat-select2">
-                <option tal:repeat="country view/countries" 
+                <option tal:repeat="country view/countries"
                         tal:content="country"
                         tal:attributes="value country; selected python:'selected' if country == value else None">United States</option>
               </select>
@@ -146,12 +146,12 @@
           </div>
         </div>
       </fieldset>
-        
+
       <fieldset class="fieldset-payment-info jaz-shop-half-form" tal:condition="view/amount">
         <legend>
           <span class="step">2.</span> Payment Information
         </legend>
-        
+
         <div class="field"
              tal:define="value python:request.form.get('method', 'Online Payment')"
              tal:condition="view/is_superuser">
@@ -225,14 +225,14 @@
         <div class="portalMessage error checkout-error-wrapper"
              tal:attributes="style python:'display: none;;' if not view.error else ''">
           <strong>Error</strong>
-          <span class="checkout-error" tal:content="string:${view/error}"></span>
+          <span class="checkout-error" tal:content="view/error"></span>
         </div>
         <div class="jaz-shop-buttons">
           <input type="submit" value="Complete Purchase" class="allowMultiSubmit context"
                  tal:attributes="disabled python:'disabled' if (not view.cart.items and not view.cart.amount) else None" />
         </div>
       </div>
- 
+
     </form>
 </metal:main>
 </body>

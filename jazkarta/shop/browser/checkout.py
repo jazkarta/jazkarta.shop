@@ -1,8 +1,6 @@
 import hmac
 import time
 import random
-from authorizenet import apicontractsv1
-from authorizenet.apicontrollers import *
 from datetime import date
 from hashlib import md5
 from persistent.mapping import PersistentMapping
@@ -36,26 +34,29 @@ class CheckoutForm(BrowserView):
 
     def __call__(self):
         payment_processor = get_setting('payment_processors')
-        if payment_processor != []:
-            p_p = payment_processor[0]
-            if p_p == 'Authorize.Net SIM':
-                return CheckoutFormAuthorizeNetSIM(self.context, self.request)()
-            elif p_p == 'Stripe':
-                return CheckoutFormStripe(self.context, self.request)()
+        if payment_processor == 'Authorize.Net SIM':
+            return CheckoutFormAuthorizeNetSIM(self.context, self.request)()
+        elif payment_processor == 'Stripe':
+            return CheckoutFormStripe(self.context, self.request)()
         else:
             raise Exception(
-                    'No payment processor has been specified.')
+                    'No valid payment processor has been specified.')
 
+    @lazy_property
+    def cart(self):
+        return Cart.from_request(self.request)
 
-class CheckoutFormAuthorizeNetSIM(BrowserView):
+    @lazy_property
+    def amount(self):
+        return self.cart.amount
+
+class CheckoutFormAuthorizeNetSIM(CheckoutForm):
     """ Renders a checkout form with button to submit to Authorize.Net SIM """
 
     cart_template = ViewPageTemplateFile('templates/checkout_cart.pt')
     thankyou_template = ViewPageTemplateFile('templates/checkout_thankyou.pt')
     index = ViewPageTemplateFile('templates/checkout_form_authorize_net_sim.pt')
     receipt_email = ViewPageTemplateFile('templates/receipt_email.pt')
-    post_url_test = 'https://test.authorize.net/gateway/transact.dll'    
-    post_url_production = 'https://secure.authorize.net/gateway/transact.dll'
 
     # Note: Customer only has 15min to complete the checkout process as per:
     # https://support.authorize.net/authkb/index?page=content&id=A592&actp=LIST
@@ -75,11 +76,13 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
         self.error = None
         try:
             self.cart.calculate_taxes()
-        except TaxRateException:
+        except TaxRateException, e:
             # The sales tax could not be calculated as some of the
             # required information was missing. (can be triggered by anon users,
             # hitting the checkout url directly)
-            return 
+            self.error = ('There was an problem calculating the tax: ') + e.args[0]
+        if self.error:
+            return
         # Make sure writing tax to cart doesn't trigger CSRF warning
         safeWrite(self.cart.data)
 
@@ -90,19 +93,11 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
             return self.index()
 
     @lazy_property
-    def cart(self):
-        return Cart.from_request(self.request)
-
-    @lazy_property
-    def amount(self):
-        return self.cart.amount
-    
-    @lazy_property
     def post_url(self):
         if config.IN_PRODUCTION:
-            return post_url_production
+            return get_setting('authorizenet_sim_url_production')
         else:
-            return self.post_url_test
+            return get_setting('authorizenet_sim_url_dev')
 
     @lazy_property
     def x_login(self):
@@ -123,7 +118,7 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
         """
         x_fp_hash Required.
         Value: The unique transaction fingerprint.
-        Notes: The fingerprint is generated using the HMAC-MD5 hashing algorithm 
+        Notes: The fingerprint is generated using the HMAC-MD5 hashing algorithm
         on the following field values:
         API login ID (x_login)
         The sequence number of the transaction (x_fp_sequence)
@@ -150,7 +145,7 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
         x_fp_sequence Required
         Value: The merchant-assigned sequence number for the transaction.
         Format: Numeric.
-        Notes: The sequence number can be a merchant-assigned value, such as an 
+        Notes: The sequence number can be a merchant-assigned value, such as an
         invoice number or any randomly generated number.
         """
         return str(int(random.random() * 100000000000))
@@ -161,9 +156,9 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
         x_fp_timestamp Required
         Value: The timestamp at the time of fingerprint generation.
         Format: UTC time in seconds since January 1, 1970.
-        Notes: Coordinated Universal Time (UTC) is an international atomic 
+        Notes: Coordinated Universal Time (UTC) is an international atomic
         standard of time
-        (sometimes referred to as GMT). Using a local time zone timestamp causes 
+        (sometimes referred to as GMT). Using a local time zone timestamp causes
         fingerprint authentication to fail.
 
         In case of error code 97
@@ -211,7 +206,7 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
             if 'x_response_reason_text' in self.request.form:
                 self.error = self.request['x_response_reason_text']
             else:
-                # this scenario unlikely as every response should provide us 
+                # this scenario unlikely as every response should provide us
                 # with x_response_reason_text
                 self.error = ('There was an error with your transaction. '
                               'Your payment has not been processed. '
@@ -241,28 +236,25 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
             contact_info['country'] = self.request.form['x_country']
 
         method = 'Online Payment'
-        charge_result = {'success': True}
 
         if not self.error:
             try:
-                self.store_order(method, charge_result, userid, contact_info)
+                self.store_order(method, userid, contact_info)
                 self.clear_cart()
             except ConflictError:
-                raise Exception(
-                    'Failed to store results of payment after multiple '
-                    'retries. Please contact us for assistance.')
+                self.error = ('Failed to store results of payment after multiple '
+                              'retries. Please contact us for assistance. ')
+
 
     # This code runs after the payment is processed
     # to update various data in the ZODB.
     @run_in_transaction(retries=10)
-    def store_order(self, method, charge_result, userid, contact_info):
+    def store_order(self, method, userid, contact_info):
         """Store various data following payment processing.
 
         This code runs in a separate transaction (with up to 10 retries)
         to make sure that ConflictErrors do not cause the Zope publisher
         to retry the request which performs payment processing.
-
-        # ^ is the above still true when using Authorize.Net SIM??
 
         IMPORTANT: Make sure that code which runs before this is called
         does not try to make persistent changes, because they'll be lost.
@@ -271,25 +263,22 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
         order['bill_to'] = contact_info
         order['notes'] = self.request.form.get('notes')
 
-        # `success` is only present for purchases, not refunds
-        if 'success' in charge_result and charge_result['success']:
+        # Call `after_purchase` hook for each product
+        coupons_used = set()
+        for index, item in enumerate(self.cart.items):
+            ob = resolve_uid(item.uid)
+            if ob is not None:
+                purchase_handler = IPurchaseHandler(ob)
+                purchase_handler.after_purchase(item._item)
 
-            # Call `after_purchase` hook for each product
-            coupons_used = set()
-            for index, item in enumerate(self.cart.items):
-                ob = resolve_uid(item.uid)
-                if ob is not None:
-                    purchase_handler = IPurchaseHandler(ob)
-                    purchase_handler.after_purchase(item._item)
+            # keep track of coupons used
+            if item.is_discounted:
+                coupons_used.add(item.coupon)
 
-                # keep track of coupons used
-                if item.is_discounted:
-                    coupons_used.add(item.coupon)
-
-            # store count of coupon usage
-            for coupon_uid in coupons_used:
-                storage.increment_shop_data(
-                    [userid, 'coupons', coupon_uid], 1)
+        # store count of coupon usage
+        for coupon_uid in coupons_used:
+            storage.increment_shop_data(
+                [userid, 'coupons', coupon_uid], 1)
 
         # Store historic record of order
         self.cart.store_order(userid)
@@ -337,21 +326,13 @@ class CheckoutFormAuthorizeNetSIM(BrowserView):
 
 
 @implementer(IStripeEnabledView)
-class CheckoutFormStripe(BrowserView):
+class CheckoutFormStripe(CheckoutForm):
     """ Renders a checkout form set up to submit through Stripe """
 
     cart_template = ViewPageTemplateFile('templates/checkout_cart.pt')
     thankyou_template = ViewPageTemplateFile('templates/checkout_thankyou.pt')
     receipt_email = ViewPageTemplateFile('templates/receipt_email.pt')
     index = ViewPageTemplateFile('templates/checkout_form.pt')
-
-    @lazy_property
-    def cart(self):
-        return Cart.from_request(self.request)
-
-    @lazy_property
-    def amount(self):
-        return self.cart.amount
 
     def __call__(self):
         self.update()
@@ -445,9 +426,8 @@ class CheckoutFormStripe(BrowserView):
                 self.store_order(method, charge_result, userid, contact_info)
                 self.clear_cart()
             except ConflictError:
-                raise Exception(
-                    'Failed to store results of payment after multiple '
-                    'retries. Please contact us for assistance.')
+                    self.error = ('Failed to store results of payment after multiple '
+                                  'retries. Please contact us for assistance. ')
 
     # This code runs after the payment is processed
     # to update various data in the ZODB.

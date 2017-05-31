@@ -251,14 +251,14 @@ class Cart(object):
 
     def calculate_taxes(self):
         rates = OrderedDict()
-        for name in get_setting('tax_handlers'):
-            tax_handler = queryUtility(ITaxHandler, name=name)
-            if tax_handler is None:
-                logger.warning(
-                    'Tax handler enabled but not found: {}'.format(name))
-                continue
+        name = get_setting('tax_handlers')
 
-            rates.update(tax_handler.get_tax_rates(self))
+        tax_handler = queryUtility(ITaxHandler, name=name)
+        if tax_handler is None:
+            logger.warning(
+                'Tax handler enabled but not found: {}'.format(name))
+
+        rates.update(tax_handler.get_tax_rates(self))
 
         taxable_subtotal = sum(
             item.subtotal for item in self.items if item.taxable)

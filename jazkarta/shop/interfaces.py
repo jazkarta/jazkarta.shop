@@ -171,14 +171,11 @@ class ICoupon(model.Schema):
 
 class ISettings(model.Schema):
 
-    payment_processors = schema.List(
+    payment_processors = schema.Choice(
         title=u'Payment Processor',
         description=u"Important - Please make sure that the relevant API keys"
                     u" for the selected payment processor are completed below.",
-        value_type=schema.Choice(
-            vocabulary='jazkarta.shop.payment_processors',
-        ),
-        default=[],
+        vocabulary='jazkarta.shop.payment_processors',
     )
 
     stripe_api_key_dev = schema.TextLine(
@@ -224,6 +221,18 @@ class ISettings(model.Schema):
 
     authorizenet_transaction_key_production = schema.TextLine(
         title=u'Authorize.Net Transaction Key (Production)',
+        description=u"This key will be used when the JAZKARTA_SHOP_ENV "
+                    u"environment variable equals 'production'.",
+        required=False,
+    )
+
+    authorizenet_sim_url_dev = schema.TextLine(
+        title=u'Authorize.Net SIM URL (Sandbox)',
+        required=False,
+    )
+
+    authorizenet_sim_url_production = schema.TextLine(
+        title=u'Authorize.Net SIM URL (Production)',
         description=u"This key will be used when the JAZKARTA_SHOP_ENV "
                     u"environment variable equals 'production'.",
         required=False,
@@ -275,12 +284,9 @@ class ISettings(model.Schema):
 
     usps_userid = schema.TextLine(title=u'USPS WebTools API User Id')
 
-    tax_handlers = schema.List(
+    tax_handlers = schema.Choice(
         title=u'Calculate Tax Using',
-        value_type=schema.Choice(
-            vocabulary='jazkarta.shop.tax_handlers',
-        ),
-        default=[],
+        vocabulary='jazkarta.shop.tax_handlers',
     )
 
     taxjar_smartcalcs_api_key = schema.TextLine(
@@ -290,17 +296,15 @@ class ISettings(model.Schema):
 
     @invariant
     def validate_payment_processor_keys(data):
-        if len(data.payment_processors) == 0:
-            raise Invalid(u"Payment processor not specified.")
-        elif len(data.payment_processors) > 1:
-            raise Invalid(u"Select only one payment processor.")        
-        elif data.payment_processors[0] == 'Authorize.Net SIM':
+        if data.payment_processors == 'Authorize.Net SIM':
             if data.authorizenet_api_login_id_dev is None or \
                 data.authorizenet_transaction_key_dev is None or \
                 data.authorizenet_api_login_id_production is None or \
-                data.authorizenet_transaction_key_production is None:
+                data.authorizenet_transaction_key_production is None or \
+                data.authorizenet_sim_url_production is None or \
+                data.authorizenet_sim_url_dev is None:
                 raise Invalid(u"Authorize.Net SIM API key data is missing.")
-        elif data.payment_processors[0] == 'Stripe':
+        elif data.payment_processors == 'Stripe':
             if data.stripe_api_key_dev is None or \
                 data.stripe_pub_key_dev is None or \
                 data.stripe_api_key_production is None or \
@@ -340,7 +344,7 @@ class IWeightPrice(model.Schema):
 CALCULATION_METHODS = SimpleVocabulary([
     SimpleTerm(value='weight', token='weight', title=u'By weight'),
     SimpleTerm(
-        value='usps:USPS Priority Mail', token='usps_prioritymail', 
+        value='usps:USPS Priority Mail', token='usps_prioritymail',
         title=u'USPS Priority Mail'),
     SimpleTerm(
         value='usps:USPS Media Mail', token='usps_mediamail',

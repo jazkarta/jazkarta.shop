@@ -74,7 +74,7 @@
               <option value="WA">Washington</option>
               <option value="WV">West Virginia</option>
               <option value="WI">Wisconsin</option>
-              <option value="WY">Wyoming</option>              
+              <option value="WY">Wyoming</option>
             </select>
             <select id="province-select" class="pat-select2" style="display: none;">
               <option value=""></option>
@@ -147,7 +147,7 @@
                 $state_text.val('');
               }
               $state_text.attr('name', 'form.widgets.state').show();
-            }        
+            }
           };
           var update_form = function() {
             var $state = $('[name="form.widgets.state"]');
@@ -200,7 +200,7 @@
                 $state_text.val('');
               }
               $state_text.attr('name', 'form.widgets.state').show();
-            }        
+            }
           };
           var update_form = function() {
             var $state = $('[name="form.widgets.state"]');

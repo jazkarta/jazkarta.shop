@@ -106,4 +106,13 @@
       import_steps="plone.app.registry"
       />
 
+  <genericsetup:upgradeDepends
+      profile="jazkarta.shop:default"
+      source="8"
+      destination="9"
+      title="Add authorize.net url keys to shop settings"
+      description=""
+      import_steps="plone.app.registry"
+      />
+
 </configure>

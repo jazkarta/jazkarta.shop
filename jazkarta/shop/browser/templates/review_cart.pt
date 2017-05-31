@@ -37,7 +37,7 @@
           if ($('tr.item').length || new_order_total) {
             $('#checkout-button').show();
           } else {
-            $('#checkout-button').hide();          
+            $('#checkout-button').hide();
           }
         }
         var bind_cart_actions = function() {
@@ -114,8 +114,8 @@
           <div tal:repeat="coupon view/coupons">
             <span tal:content="string:Promo: ${coupon/id}"></span>
             <span class="coupon-amount" tal:content="string:(${coupon/discount} off)"></span>
-            <a tal:condition="coupon/can_remove" title="Remove this promo" 
-               tal:attributes="href string:${portal_state/navigation_root_url}/review-cart?remove_coupon=${coupon/id}" 
+            <a tal:condition="coupon/can_remove" title="Remove this promo"
+               tal:attributes="href string:${portal_state/navigation_root_url}/review-cart?remove_coupon=${coupon/id}"
                class="coupon_remove"></a>
           </div>
         </div>
@@ -148,7 +148,7 @@
         <input type="submit" value="Proceed to Checkout" class="context"
                tal:attributes="style python:'display: none' if not view.cart else ''" />
       </div>
- 
+
     </form>
 </metal:main>
 </body>
