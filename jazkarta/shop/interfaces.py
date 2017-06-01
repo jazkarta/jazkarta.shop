@@ -175,7 +175,7 @@ class ISettings(model.Schema):
         title=u'Payment Processor',
         description=u"Important - Please make sure that the relevant API keys"
                     u" for the selected payment processor are completed below.",
-        vocabulary='jazkarta.shop.payment_processor',
+        vocabulary='jazkarta.shop.payment_processors',
     )
 
     stripe_api_key_dev = schema.TextLine(
