@@ -171,11 +171,11 @@ class ICoupon(model.Schema):
 
 class ISettings(model.Schema):
 
-    payment_processors = schema.Choice(
+    payment_processor = schema.Choice(
         title=u'Payment Processor',
         description=u"Important - Please make sure that the relevant API keys"
                     u" for the selected payment processor are completed below.",
-        vocabulary='jazkarta.shop.payment_processors',
+        vocabulary='jazkarta.shop.payment_processor',
     )
 
     stripe_api_key_dev = schema.TextLine(
@@ -284,9 +284,12 @@ class ISettings(model.Schema):
 
     usps_userid = schema.TextLine(title=u'USPS WebTools API User Id')
 
-    tax_handlers = schema.Choice(
+    tax_handlers = schema.List(
         title=u'Calculate Tax Using',
-        vocabulary='jazkarta.shop.tax_handlers',
+        value_type=schema.Choice(
+            vocabulary='jazkarta.shop.tax_handlers',
+        ),
+        default=[],
     )
 
     taxjar_smartcalcs_api_key = schema.TextLine(
@@ -296,7 +299,7 @@ class ISettings(model.Schema):
 
     @invariant
     def validate_payment_processor_keys(data):
-        if data.payment_processors == 'Authorize.Net SIM':
+        if data.payment_processor == 'Authorize.Net SIM':
             if data.authorizenet_api_login_id_dev is None or \
                 data.authorizenet_transaction_key_dev is None or \
                 data.authorizenet_api_login_id_production is None or \
@@ -304,7 +307,7 @@ class ISettings(model.Schema):
                 data.authorizenet_sim_url_production is None or \
                 data.authorizenet_sim_url_dev is None:
                 raise Invalid(u"Authorize.Net SIM API key data is missing.")
-        elif data.payment_processors == 'Stripe':
+        elif data.payment_processor == 'Stripe':
             if data.stripe_api_key_dev is None or \
                 data.stripe_pub_key_dev is None or \
                 data.stripe_api_key_production is None or \
