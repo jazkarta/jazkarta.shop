@@ -33,7 +33,7 @@ from ..vocabs import country_names
 class CheckoutForm(BrowserView):
 
     def __call__(self):
-        payment_processor = get_setting('payment_processors')
+        payment_processor = get_setting('payment_processor')
         if payment_processor == 'Authorize.Net SIM':
             return CheckoutFormAuthorizeNetSIM(self.context, self.request)()
         elif payment_processor == 'Stripe':
