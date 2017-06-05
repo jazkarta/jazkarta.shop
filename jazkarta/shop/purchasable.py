@@ -3,7 +3,7 @@ from zope.component import adapter
 from zope.interface import implementer
 from .interfaces import IProduct, IATProduct
 from .interfaces import IPurchaseHandler
-from .utils import get_setting, resolve_uid
+from .utils import get_setting, resolve_uid, uid_has_suffix
 
 
 @implementer(IPurchaseHandler)
@@ -20,7 +20,8 @@ class DefaultPurchaseHandler(object):
             return False
         return True
 
-    def get_cart_items(self):
+    def get_cart_items(self, uid_data):
+        # uid_data is an optional parameter that can be provided to this method
         return [{
             'uid': self.context.UID(),
             'name': self.context.title,
@@ -61,7 +62,8 @@ class DefaultArchetypesPurchaseHandler(object):
             return False
         return True
 
-    def get_cart_items(self):
+    def get_cart_items(self, uid_data):
+        # uid_data is an optional parameter that can be provided to this method
         return [{
             'uid': self.context.UID(),
             'name': self.context.Title(),

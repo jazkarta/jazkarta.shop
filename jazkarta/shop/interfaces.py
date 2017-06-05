@@ -83,7 +83,7 @@ class IPurchaseHandler(Interface):
     def in_stock():
         """Returns True if this product's stock level is above the minimum."""
 
-    def get_cart_items():
+    def get_cart_items(uid_data):
         """Returns a list of items to add to the cart for this product."""
 
     def after_purchase(item):

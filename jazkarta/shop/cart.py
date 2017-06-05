@@ -16,6 +16,7 @@ from .utils import get_setting
 from .utils import get_site
 from .utils import resolve_uid
 from .utils import resolve_uid_to_url
+from .utils import uid_has_suffix
 
 
 class LineItem(object):
@@ -35,7 +36,11 @@ class LineItem(object):
 
     @property
     def product(self):
-        return resolve_uid(self.uid)
+        uid_data = uid_has_suffix(self.uid)
+        if uid_data[0]:
+            return resolve_uid(uid_data[1])
+        else:
+            return resolve_uid(self.uid)
 
     @property
     def quantity(self):
@@ -302,7 +307,13 @@ class Cart(object):
         Returns a boolean indicating whether there are items in the
         cart that need checkout.
         """
-        context = resolve_uid(product_uid)
+
+        uid_data = uid_has_suffix(product_uid)
+        if uid_data[0]:
+            context = resolve_uid(uid_data[1])
+        else:
+            context = resolve_uid(product_uid)
+
         if context is None:
             raise ValueError('Product {} not found.'.format(product_uid))
         purchase_handler = IPurchaseHandler(context)
@@ -311,7 +322,12 @@ class Cart(object):
         if userid is None:
             userid = get_current_userid()
 
-        for lineitem_info in purchase_handler.get_cart_items():
+        if uid_data[0]:
+            cart_items = purchase_handler.get_cart_items(uid_data)
+        else:
+            cart_items = purchase_handler.get_cart_items(uid_data=None)
+
+        for lineitem_info in cart_items:
             lineitem_info.update(kw)
             lineitem_info['user'] = userid
             cart_id = lineitem_info['uid'] + '_' + (userid or '')

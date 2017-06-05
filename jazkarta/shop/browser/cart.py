@@ -74,8 +74,8 @@ class UpdateCartView(CartViewMixin, BrowserView):
     def update(self):
         try:
             if 'add' in self.request.form:
-                cart_id = uid = self.request.form['add']
-                self.cart.add_product(uid)
+                cart_id = self.request.form['add']
+                self.cart.add_product(cart_id)
             if 'change' in self.request.form:
                 cart_id = self.request.form['change']
                 self.cart[cart_id].quantity = int(self.request.form['quantity'])
