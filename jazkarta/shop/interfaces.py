@@ -445,3 +445,8 @@ class OutOfStock(Exception):
 
 class TaxRateException(Exception):
     """Failure to calculate tax rate."""
+
+
+class IDontShowJazkartaShopPortlets(Interface):
+    """marker for views that need not display jazkarta.shop related portlets
+    """

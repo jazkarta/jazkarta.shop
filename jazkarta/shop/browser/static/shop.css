@@ -2,7 +2,8 @@
 	float: right;
 	position: relative;
 }
-.jaz-shop-cart {
+.jaz-shop-cart,
+.jaz-shop-cart-portlet {
 	position: absolute;
 	right: 0;
 	display: none;
@@ -11,6 +12,9 @@
 	color: #fff;
 	width: 200px;
 	padding: .5em;
+}
+.jaz-shop-cart-portlet {
+	width: 400px !important;
 }
 .collapse[aria-expanded="true"] {
 	display: block;

@@ -19,6 +19,7 @@ from ..interfaces import IPurchaseHandler
 from ..interfaces import IStripeEnabledView
 from ..interfaces import PaymentProcessingException
 from ..interfaces import TaxRateException
+from ..interfaces import IDontShowJazkartaShopPortlets
 from ..stripe import process_interactive_payment
 from ..utils import get_current_userid
 from ..utils import get_setting
@@ -29,7 +30,7 @@ from ..utils import send_mail
 from ..validators import is_email
 from ..vocabs import country_names
 
-
+@implementer(IDontShowJazkartaShopPortlets)
 class CheckoutForm(BrowserView):
 
     def __call__(self):

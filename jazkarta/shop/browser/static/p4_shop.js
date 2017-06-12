@@ -25,6 +25,13 @@ jQuery(function($){
             $('.jaz-shop-cart').toggle();
         });
 
+        $(document).on('click', '.jaz-shop-cart-portlet-trigger', function(e) {
+            e.preventDefault();
+            // Plone5 uses data-attributes which Plone4 does not recognize
+            // add manual event handler to toggle the cart contents
+            $('.jaz-shop-cart-portlet').toggle();
+        });
+
     });
 
 });

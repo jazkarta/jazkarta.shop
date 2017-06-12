@@ -10,6 +10,7 @@ from zope.cachedescriptors.property import Lazy as lazy_property
 from zope.globalrequest import getRequest
 from zope.interface import implementer
 from zope.interface import Invalid
+
 from zope.publisher.interfaces.browser import IPublishTraverse
 from ZPublisher.BaseRequest import DefaultPublishTraverse
 from jazkarta.shop import config
@@ -19,6 +20,7 @@ from ..cart import Cart
 from ..interfaces import CALCULATION_METHODS
 from ..interfaces import IShippingAddress
 from ..interfaces import IShippingMethod
+from ..interfaces import IDontShowJazkartaShopPortlets
 from ..ship_ups import calculate_ups_rates
 from ..ship_usps import calculate_usps_rate
 from ..utils import get_current_userid
@@ -157,7 +159,7 @@ class ShippingMethodForm(AutoExtensibleForm, Form):
         # do nothing
         return
 
-
+@implementer(IDontShowJazkartaShopPortlets)
 class ShippingForm(AutoExtensibleForm, Form, P5Mixin):
     schema = IShippingAddress
     template = ViewPageTemplateFile('templates/shipping_form.pt')

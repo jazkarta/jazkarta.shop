@@ -2,7 +2,9 @@ from decimal import Decimal
 from Products.Five import BrowserView
 from zope.browserpage import ViewPageTemplateFile
 from zope.cachedescriptors.property import Lazy as lazy_property
+from zope.interface import implementer
 from ..interfaces import OutOfStock
+from ..interfaces import IDontShowJazkartaShopPortlets
 from ..cart import Cart
 from ..utils import get_navigation_root_url
 from ..utils import get_user_fullname
@@ -22,7 +24,7 @@ class CartViewMixin(object):
     def validate_cart(self):
         self.error = None
 
-
+@implementer(IDontShowJazkartaShopPortlets)
 class ReviewCartForm(CartViewMixin, BrowserView):
     """A form to review the cart and enter coupon codes."""
 
