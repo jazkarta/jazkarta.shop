@@ -13,8 +13,8 @@
 	width: 200px;
 	padding: .5em;
 }
-.jaz-shop-cart-portlet {
-	width: 400px !important;
+.portlet .jaz-shop-cart-portlet {
+	width: 400px;
 }
 .collapse[aria-expanded="true"] {
 	display: block;

@@ -5,8 +5,7 @@
 <body>
 
 <div metal:define-macro="portlet">
-  <dl class="portlet" id="portlet-cart"
-      tal:condition="python:view.cart and view.size != 0">
+  <dl class="portlet jazkarta-cart-portlet" id="portlet-cart" style="display: none">
 
       <dt class="portletHeader">
           <span class="portletTopLeft"></span>
@@ -15,7 +14,7 @@
       </dt>
 
       <dd class="portletItem">
-          <span i18n:translate="text_contains_items">Contains <span tal:content="string:${view/size}" i18n:name="size"> 5 </span> Items</span>
+          <span i18n:translate="text_contains_items">Contains <span class="jazkarta-shop-portlet-cartsize" tal:content="string:${view/size}" i18n:name="size"> 5 </span> Items</span>
       </dd>
 
       <dd class="portletFooter">
@@ -23,21 +22,23 @@
             data-toggle="collapse" data-target=".jaz-shop-cart-portlet">My Cart</a>
       </dd>
 
-      <div class="jaz-shop-cart-portlet"
-          tal:define="cart view/cart/items">
-        <div class="cart-items" tal:condition="not:cart">
-          You have no items in your cart.
-        </div>
-        <tal:block condition="cart">
-          <div class="jaz-shop-items">
-            <div class="jaz-shop-item"
-                 tal:repeat="item view/cart/items">
-              <span class="jaz-shop-quantity" tal:content="item/quantity" />
-              <span class="jaz-shop-name" tal:content="item/name" />
-              <span class="jaz-shop-total" tal:content="python: '${:,.2f}'.format(item.subtotal)" />
+      <div class="jaz-shop-cart-portlet-wrapper">
+          <div class="jaz-shop-cart-portlet"
+              tal:define="cart view/cart/items">
+            <div class="cart-items" tal:condition="not:cart">
+              You have no items in your cart.
             </div>
+            <tal:block condition="cart">
+              <div class="jaz-shop-items">
+                <div class="jaz-shop-item"
+                     tal:repeat="item view/cart/items">
+                  <span class="jaz-shop-quantity" tal:content="item/quantity" />
+                  <span class="jaz-shop-name" tal:content="item/name" />
+                  <span class="jaz-shop-total" tal:content="python: '${:,.2f}'.format(item.subtotal)" />
+                </div>
+              </div>
+            </tal:block>
           </div>
-        </tal:block>
       </div>
 
       <dd class="portletFooter">

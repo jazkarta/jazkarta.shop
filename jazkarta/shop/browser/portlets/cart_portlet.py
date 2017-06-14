@@ -1,6 +1,7 @@
 from zope.interface import implements
 from plone.app.portlets.portlets import base
 from plone.portlets.interfaces import IPortletDataProvider
+from Products.Five import BrowserView
 
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from jazkarta.shop.interfaces import IDontShowJazkartaShopPortlets
@@ -28,7 +29,24 @@ class AddForm(base.NullAddForm):
         return Assignment()
 
 
-class Renderer(base.Renderer):
+class JazkartaCartPortletMixin:
+
+    @property
+    def size(self):
+        cart = Cart.from_request(self.request)
+        if len(cart) == 0:
+            return 0
+        size = 0
+        for x in cart.items:
+            size += x.quantity
+        return size
+
+    @property
+    def cart(self):
+        return Cart.from_request(self.request)
+
+
+class Renderer(base.Renderer, JazkartaCartPortletMixin):
     render = ViewPageTemplateFile('../templates/portlet-cart.pt')
 
     @property
@@ -39,10 +57,19 @@ class Renderer(base.Renderer):
         """
         return not IDontShowJazkartaShopPortlets.providedBy(self.view)
 
-    @lazy_property
-    def cart(self):
-        return Cart.from_request(self.request)
 
-    @property
-    def size(self):
-        return len(Cart.from_request(self.request))
+class PortletData(BrowserView, JazkartaCartPortletMixin):
+    """ Used for rendering portlet-cart snippet and for serving
+        ajax queries related to information about the cart, at the moment
+        only the number of items in the cart
+    """
+
+    def __call__(self):
+        if 'query' in self.request.keys():
+            query = self.request['query']
+            if query == 'cart_size':
+                return str(self.size)
+            else:
+                return "BAD PORTLET QUERY REQUEST"
+
+        return self.index()
