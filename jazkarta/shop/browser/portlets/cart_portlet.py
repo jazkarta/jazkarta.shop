@@ -65,6 +65,9 @@ class PortletData(BrowserView, JazkartaCartPortletMixin):
     """
 
     def __call__(self):
+        # Avoid caching
+        self.request.response.setHeader(
+            'Cache-Control', 'max-age=0, no-cache, must-revalidate')
         if 'query' in self.request.keys():
             query = self.request['query']
             if query == 'cart_size':
