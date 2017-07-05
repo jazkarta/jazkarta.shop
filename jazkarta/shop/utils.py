@@ -90,18 +90,6 @@ def resolve_uid(uid):
     return result[0]._unrestrictedGetObject()
 
 
-def uid_has_suffix(uid):
-    """ helper utility to handle 'uids' that contain additional information
-        uid_suffix -> 394k91ks931k4391k419sa14_1
-        Tests if uid contains a suffix and returns the uid and suffix
-        if applicable
-    """
-    if len(uid.split('_')) > 1:
-        return [True, uid.split('_')[0], uid.split('_')[1]]
-    else:
-        return [False]
-
-
 def resolve_uid_to_url(uid):
     obj = resolve_uid(uid)
     if obj is not None:
