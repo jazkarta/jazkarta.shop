@@ -2,7 +2,6 @@ from plone.app.layout.viewlets.common import ViewletBase
 from Products.Five import BrowserView
 from zope.cachedescriptors.property import Lazy as lazy_property
 from ..cart import Cart
-from ..interfaces import IProduct
 from ..interfaces import IPurchaseHandler
 from ..utils import format_currency
 
