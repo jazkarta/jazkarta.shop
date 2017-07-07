@@ -1,6 +1,7 @@
 from plone.app.layout.viewlets.common import ViewletBase
 from Products.Five import BrowserView
 from zope.cachedescriptors.property import Lazy as lazy_property
+import json
 from ..cart import Cart
 from ..interfaces import IProduct
 from ..interfaces import IPurchaseHandler
@@ -35,7 +36,9 @@ class CartView(CartViewMixin, BrowserView):
             'Cache-Control', 'max-age=0, no-cache, must-revalidate')
 
         if 'add' in self.request.form:
-            self.cart.add_product(self.request.form['add'])
+            uid = self.request.form['add']
+            options = json.loads(self.request.form.get('options') or '{}')
+            self.cart.add_product(uid, **options)
 
         # Re-render the cart so the display can be updated
         return self.index()
