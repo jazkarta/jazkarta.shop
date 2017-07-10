@@ -2,9 +2,11 @@ from collections import OrderedDict
 from cPickle import dumps, loads
 from datetime import datetime
 from decimal import Decimal
+from hashlib import sha1
 from persistent.mapping import PersistentMapping
 from zope.component import queryUtility
 import copy
+import json
 
 from jazkarta.shop import logger
 from jazkarta.shop import storage
@@ -316,6 +318,9 @@ class Cart(object):
         for lineitem_info in cart_items:
             lineitem_info['user'] = userid
             cart_id = lineitem_info['uid'] + '_' + (userid or '')
+            if kw:
+                cart_id += '_' + sha1(
+                    json.dumps(kw, sort_keys=True)).hexdigest()
 
             lineitem = LineItem(self, cart_id, lineitem_info)
 
