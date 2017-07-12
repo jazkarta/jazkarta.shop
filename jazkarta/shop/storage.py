@@ -26,6 +26,16 @@ def set_shop_data(path, value):
     storage[path[-1]] = value
 
 
+def del_shop_data(path):
+    storage = get_storage(for_write=True)
+    for key in path[:-1]:
+        if key not in storage:
+            storage[key] = OOBTree()
+    key = path[-1]
+    if key in storage:
+        del storage[key]
+
+
 def increment_shop_data(path, delta):
     storage = get_storage(for_write=True)
     for key in path[:-1]:

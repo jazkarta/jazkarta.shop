@@ -1,6 +1,7 @@
 import hmac
 import time
 import random
+from AccessControl import getSecurityManager
 from datetime import date
 from hashlib import md5
 from persistent.mapping import PersistentMapping
@@ -30,6 +31,7 @@ from ..utils import send_mail
 from ..validators import is_email
 from ..vocabs import country_names
 
+
 @implementer(IDontShowJazkartaShopPortlets)
 class CheckoutForm(BrowserView):
 
@@ -51,6 +53,7 @@ class CheckoutForm(BrowserView):
     def amount(self):
         return self.cart.amount
 
+
 class CheckoutFormAuthorizeNetSIM(CheckoutForm):
     """ Renders a checkout form with button to submit to Authorize.Net SIM """
 
@@ -64,10 +67,11 @@ class CheckoutFormAuthorizeNetSIM(CheckoutForm):
 
     def __call__(self):
         if 'x_response_code' in self.request.form:
-            # recreate the cart from session or from storage (by user_id)
+            # recreate the cart from storage (by user_id or browser_id)
             user_id = self.request.form.get('user_id', None)
-            session_id = self.request.form.get('session_id', None)
-            self.cart = Cart.from_session_id(self.request, user_id, session_id)
+            browser_id = self.request.form.get('browser_id', None)
+            self.cart = Cart.from_request(
+                user_id=user_id, browser_id=browser_id)
         self.update()
         if 'x_response_code' in self.request.form:
             self.handle_submit()
@@ -169,7 +173,7 @@ class CheckoutFormAuthorizeNetSIM(CheckoutForm):
         return str(int(time.time()))
 
     @lazy_property
-    def session_id(self):
+    def browser_id(self):
         return self.context.session_data_manager.getBrowserIdManager().getBrowserId()
 
     @lazy_property
@@ -457,7 +461,7 @@ class CheckoutFormStripe(CheckoutForm):
             )
 
         if self.is_superuser():
-            order['proxy_userid'] = self.request.SESSION.get('superuser')
+            order['proxy_userid'] = getSecurityManager().getUser().getId()
             order['payment_method'] = method
             number = self.request.form.get('number')
             if number:

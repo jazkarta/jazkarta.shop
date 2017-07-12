@@ -3,7 +3,6 @@ from Products.Five import BrowserView
 from zope.cachedescriptors.property import Lazy as lazy_property
 import json
 from ..cart import Cart
-from ..interfaces import IProduct
 from ..interfaces import IPurchaseHandler
 from ..utils import format_currency
 
