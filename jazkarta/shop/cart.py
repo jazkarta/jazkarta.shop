@@ -2,9 +2,11 @@ from collections import OrderedDict
 from cPickle import dumps, loads
 from datetime import datetime
 from decimal import Decimal
+from hashlib import sha1
 from persistent.mapping import PersistentMapping
 from zope.component import queryUtility
 import copy
+import json
 
 from jazkarta.shop import logger
 from jazkarta.shop import storage
@@ -15,8 +17,6 @@ from .utils import get_current_userid
 from .utils import get_setting
 from .utils import get_site
 from .utils import resolve_uid
-from .utils import resolve_uid_to_url
-from .utils import uid_has_suffix
 
 
 class LineItem(object):
@@ -36,11 +36,7 @@ class LineItem(object):
 
     @property
     def product(self):
-        uid_data = uid_has_suffix(self.uid)
-        if uid_data[0]:
-            return resolve_uid(uid_data[1])
-        else:
-            return resolve_uid(self.uid)
+        return resolve_uid(self.uid)
 
     @property
     def quantity(self):
@@ -308,12 +304,7 @@ class Cart(object):
         cart that need checkout.
         """
 
-        uid_data = uid_has_suffix(product_uid)
-        if uid_data[0]:
-            context = resolve_uid(uid_data[1])
-        else:
-            context = resolve_uid(product_uid)
-
+        context = resolve_uid(product_uid)
         if context is None:
             raise ValueError('Product {} not found.'.format(product_uid))
         purchase_handler = IPurchaseHandler(context)
@@ -322,15 +313,14 @@ class Cart(object):
         if userid is None:
             userid = get_current_userid()
 
-        if uid_data[0]:
-            cart_items = purchase_handler.get_cart_items(uid_data)
-        else:
-            cart_items = purchase_handler.get_cart_items(uid_data=None)
+        cart_items = purchase_handler.get_cart_items(**kw)
 
         for lineitem_info in cart_items:
-            lineitem_info.update(kw)
             lineitem_info['user'] = userid
             cart_id = lineitem_info['uid'] + '_' + (userid or '')
+            if kw:
+                cart_id += '_' + sha1(
+                    json.dumps(kw, sort_keys=True)).hexdigest()
 
             lineitem = LineItem(self, cart_id, lineitem_info)
 

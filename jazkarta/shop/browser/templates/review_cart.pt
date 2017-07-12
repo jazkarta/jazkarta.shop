@@ -55,7 +55,7 @@
           $('.jaz-shop-incr').unbind('click').click(function(e) {
               e.stopPropagation();
               $.post(portal_url + '/update-cart',
-                {'add': $(this).attr('data-uid'),
+                {'add': $(this).attr('rel'),
                  _authenticator: _authenticator}, function(data) {
                 $('#cartFormWrapper').replaceWith(data);
                 update_order_totals();

@@ -50,7 +50,7 @@
                                rel item/cart_id" />
         <a href="javascript:;" class="jaz-shop-incr"
            tal:condition="can_edit"
-           tal:attributes="data-uid item/uid">+</a>
+           tal:attributes="rel item/cart_id">+</a>
         <div class="error"
              tal:define="uid item/uid; cart_id item/cart_id; warning view/cart_warnings/?cart_id|view/cart_warnings/?uid|nothing"
              tal:condition="warning" tal:content="warning"></div>

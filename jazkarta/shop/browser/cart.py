@@ -3,6 +3,8 @@ from Products.Five import BrowserView
 from zope.browserpage import ViewPageTemplateFile
 from zope.cachedescriptors.property import Lazy as lazy_property
 from zope.interface import implementer
+import json
+
 from ..interfaces import OutOfStock
 from ..interfaces import IDontShowJazkartaShopPortlets
 from ..cart import Cart
@@ -23,6 +25,7 @@ class CartViewMixin(object):
 
     def validate_cart(self):
         self.error = None
+
 
 @implementer(IDontShowJazkartaShopPortlets)
 class ReviewCartForm(CartViewMixin, BrowserView):
@@ -77,7 +80,8 @@ class UpdateCartView(CartViewMixin, BrowserView):
         try:
             if 'add' in self.request.form:
                 cart_id = self.request.form['add']
-                self.cart.add_product(cart_id)
+                self.cart[cart_id].quantity += 1
+
             if 'change' in self.request.form:
                 cart_id = self.request.form['change']
                 self.cart[cart_id].quantity = int(self.request.form['quantity'])
