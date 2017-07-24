@@ -39,6 +39,10 @@
       <strong>There was a problem with your order</strong>
       <p tal:content="view/error">Error</p>
     </div>
+    <div class="portalMessage error" tal:condition="view/mail_not_sent">
+      <strong>There was a problem with your order</strong>
+      <p tal:content="view/mail_not_sent">Error</p>
+    </div>
   </tal:cart>
 </metal:core>
 </body>

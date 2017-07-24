@@ -312,8 +312,9 @@ class CheckoutFormAuthorizeNetSIM(CheckoutForm):
                 try:
                     is_email(self.request.form['x_email'])
                 except Exception as e:
-                    self.error = str(e)
-                if not self.error:
+                    self.mail_not_sent = ('Receipt email was not sent as the '
+                                        'email address entered was not valid.')
+                if not self.mail_not_sent:
                     mto = self.request['x_email']
                     send_mail(subject, msg, mto=mto)
 
@@ -348,6 +349,7 @@ class CheckoutFormStripe(CheckoutForm):
 
     def update(self):
         self.error = None
+        self.mail_not_sent = None
         self.prepopulate_billing_info()
         self.cart.calculate_taxes()
         # Make sure writing tax to cart doesn't trigger CSRF warning
