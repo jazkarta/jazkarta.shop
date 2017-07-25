@@ -35,6 +35,9 @@ def calculate_shipping(cart, method, addr):
         if weight == 0:
             return 0
 
+        if method['calculation'] == 'free':
+            return 0
+
         if method['calculation'] == 'weight':
             for row in method['weight_table']:
                 if row['min'] and weight < row['min']:

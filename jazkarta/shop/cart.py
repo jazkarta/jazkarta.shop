@@ -264,10 +264,12 @@ class Cart(object):
         for label, rate in rates.items():
             # Calculate tax, rounded to nearest cent
             tax = (taxable_subtotal * rate).quantize(Decimal('0.01'))
-            taxes.append({
-                'label': label,
-                'tax': tax,
-            })
+            if tax != 0:
+                # only append non-zero taxes to cart
+                taxes.append({
+                    'label': label,
+                    'tax': tax,
+                })
 
         self.data['taxes'] = taxes
 

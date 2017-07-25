@@ -360,6 +360,7 @@ CALCULATION_METHODS = SimpleVocabulary([
         title=u'UPS 3 Day Select'),
     SimpleTerm(
         value='ups:UPS Standard', token='ups_standard', title=u'UPS Standard'),
+    SimpleTerm(value='free', token='free', title=u'Free shipping'),
 ])
 
 

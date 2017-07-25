@@ -61,5 +61,6 @@
   <utility name="jazkarta.shop.tax.sd_state.SDStateTaxHandler" factory=".tax.sd_state.SDStateTaxHandler" />
   <utility name="jazkarta.shop.tax.wa_state.WAStateTaxHandler" factory=".tax.wa_state.WAStateTaxHandler" />
   <utility name="jazkarta.shop.tax.taxjar.TaxJarStateTaxHandler" factory=".tax.taxjar.TaxJarStateTaxHandler" />
+  <utility name="jazkarta.shop.tax.no_tax.NoTaxHandler" factory=".tax.no_tax.NoTaxHandler" />
 
 </configure>
