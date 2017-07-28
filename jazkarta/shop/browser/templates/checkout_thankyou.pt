@@ -11,7 +11,7 @@
   <h1 class="documentFirstHeading"
       tal:condition="not:view/error">Thank You</h1>
 </metal:title>
-<metal:description fill-slot="description">
+<metal:description fill-slot="content-description">
 </metal:description>
 
 <metal:core fill-slot="content-core">
