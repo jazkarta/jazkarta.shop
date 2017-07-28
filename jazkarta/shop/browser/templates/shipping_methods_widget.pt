@@ -17,12 +17,12 @@
 	  </label>
 	</div>
 
-	<div class="portalMessage warning" tal:condition="python:status=='error'">
+	<div class="jaz-shop-message warning" tal:condition="python:status=='error'">
 	  <strong>No shipping available.</strong>
 	  Please enter a shipping address so we can check what shipping methods are available.
 	</div>
 
-	<div class="portalMessage warning" tal:condition="python:status=='ok' and methods==[]">
+	<div class="jaz-shop-message warning" tal:condition="python:status=='ok' and methods==[]">
 	  <strong>No shipping available.</strong>
 	  We are currently unable to ship to this address.
 	</div>

@@ -77,3 +77,12 @@ input[type="text"].jaz-shop-coupon {
 	display: inline;
 	width: 30%;
 }
+
+jaz-shop-message.warning,
+jaz-shop-message.error {
+    margin: 1em 0;
+    font-size: 80%;
+    border: 1px solid #996;
+    background-color: #ffffe3;
+    clear: both;
+}

@@ -10,8 +10,8 @@
 <metal:title fill-slot="content-title">
   <h1 class="documentFirstHeading"
       tal:condition="not:view/error">Thank You</h1>
-</metal:description>
-<metal:title fill-slot="description">
+</metal:title>
+<metal:description fill-slot="description">
 </metal:description>
 
 <metal:core fill-slot="content-core">
@@ -39,11 +39,11 @@
       </tal:b>
       <p tal:replace="structure cart/thankyou_message" />
     </tal:no-error>
-    <div class="portalMessage error" tal:condition="view/error">
+    <div class="jaz-shop-message error" tal:condition="view/error">
       <strong>There was a problem with your order</strong>
       <p tal:content="view/error">Error</p>
     </div>
-    <div class="portalMessage error" tal:condition="view/mail_not_sent">
+    <div class="jaz-shop-message error" tal:condition="view/mail_not_sent">
       <strong>There was a problem with your order</strong>
       <p tal:content="view/mail_not_sent">Error</p>
     </div>
