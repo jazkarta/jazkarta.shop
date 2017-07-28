@@ -8,10 +8,11 @@
 	    <input name="shipping_method" type="radio"
 	           tal:attributes="value string:${method/id};
                                checked python:'checked' if value == method['id'] else None" />
-        <tal:freeshipping tal:condition="python:method['name'] == 'Free shipping'">
+        <tal:freeshipping tal:condition="python:method['calculation'] == 'free'">
+            <!--! do not show the amount calculated if the shipping is supposed to be free even if the amount is 0 -->
             <span tal:content="string:${method/name}"></span>
         </tal:freeshipping>
-        <tal:standard_shipping tal:condition="python:method['name'] != 'Free shipping'">
+        <tal:standard_shipping tal:condition="python:method['calculation'] != 'free'">
             $<tal:s replace="python:'{:.2f}'.format(method['price'])" /> - <span tal:content="string:${method/name}"></span>
         </tal:standard_shipping>
 	  </label>

@@ -218,6 +218,7 @@ class ShippingForm(AutoExtensibleForm, Form, P5Mixin):
             methods.append({
                 'id': id,
                 'name': method['name'],
+                'calculation': method['calculation'],
                 'price': Decimal(price),
                 })
         methods.sort(key=lambda x: x['price'])

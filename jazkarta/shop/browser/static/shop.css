@@ -88,6 +88,7 @@ jaz-shop-message.error {
     clear: both;
 }
 
+/* extra styling to shipping form's select drop downs under p4 */
 .p4_select {
     margin: 0em 0em 0em 2em;
 }
