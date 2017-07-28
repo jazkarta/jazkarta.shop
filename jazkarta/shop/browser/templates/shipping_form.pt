@@ -93,7 +93,261 @@
               <option value="YT">Yukon</option>
             </select>
             <tal:block tal:replace="structure view/widgets/postal_code/@@ploneform-render-widget" />
-            <tal:block tal:replace="structure view/widgets/country/@@ploneform-render-widget" />
+            <!--! country select was not being properly rendered under p4, thats why we need to differentiate here between p4 and p5 -->
+            <tal:using_p5 tal:condition="view/using_plone5">
+                <tal:block tal:replace="structure view/widgets/country/@@ploneform-render-widget" />
+            </tal:using_p5>
+            <tal:using_p4 tal:condition="not:view/using_plone5">
+                <div data-fieldname="form.widgets.country" 
+                     class="field z3cformInlineValidation kssattr-fieldname-form.widgets.country" 
+                     id="formfield-form-widgets-country">
+                    <label for="form-widgets-country" class="horizontal">Country
+                    <span class="required horizontal" title="Required">&nbsp;</span>
+                    </label>
+                    <div class="fieldErrorBox"></div>
+                </div>
+                <div>
+                    <select id="form-widgets-country" name="form.widgets.country:list" 
+                            class="select-widget required choice-field" size="1">
+                        <option id="form-widgets-country-0" value="United States" selected="selected">United States</option>
+                        <option id="form-widgets-country-1" value="Canada">Canada</option>
+                        <option id="form-widgets-country-2" value="Afghanistan">Afghanistan</option>
+                        <option id="form-widgets-country-3" value="Aland Island (Finland)">Aland Island (Finland)</option>
+                        <option id="form-widgets-country-4" value="Albania">Albania</option>
+                        <option id="form-widgets-country-5" value="Algeria">Algeria</option>
+                        <option id="form-widgets-country-6" value="American Samoa">American Samoa</option>
+                        <option id="form-widgets-country-7" value="Andorra">Andorra</option>
+                        <option id="form-widgets-country-8" value="Angola">Angola</option>
+                        <option id="form-widgets-country-9" value="Anguilla">Anguilla</option>
+                        <option id="form-widgets-country-10" value="Antigua and Barbuda">Antigua and Barbuda</option>
+                        <option id="form-widgets-country-11" value="Argentina">Argentina</option>
+                        <option id="form-widgets-country-12" value="Armenia">Armenia</option>
+                        <option id="form-widgets-country-13" value="Aruba">Aruba</option>
+                        <option id="form-widgets-country-14" value="Australia">Australia</option>
+                        <option id="form-widgets-country-15" value="Austria">Austria</option>
+                        <option id="form-widgets-country-16" value="Azerbaijan">Azerbaijan</option>
+                        <option id="form-widgets-country-17" value="Bahamas">Bahamas</option>
+                        <option id="form-widgets-country-18" value="Bahrain">Bahrain</option>
+                        <option id="form-widgets-country-19" value="Bangladesh">Bangladesh</option>
+                        <option id="form-widgets-country-20" value="Barbados">Barbados</option>
+                        <option id="form-widgets-country-21" value="Belarus">Belarus</option>
+                        <option id="form-widgets-country-22" value="Belgium">Belgium</option>
+                        <option id="form-widgets-country-23" value="Belize">Belize</option>
+                        <option id="form-widgets-country-24" value="Benin">Benin</option>
+                        <option id="form-widgets-country-25" value="Bermuda">Bermuda</option>
+                        <option id="form-widgets-country-26" value="Bhutan">Bhutan</option>
+                        <option id="form-widgets-country-27" value="Bolivia">Bolivia</option>
+                        <option id="form-widgets-country-28" value="Bonaire (Curacao)">Bonaire (Curacao)</option>
+                        <option id="form-widgets-country-29" value="Bosnia-Herzegovina">Bosnia-Herzegovina</option>
+                        <option id="form-widgets-country-30" value="Botswana">Botswana</option>
+                        <option id="form-widgets-country-31" value="Brazil">Brazil</option>
+                        <option id="form-widgets-country-32" value="British Virgin Islands">British Virgin Islands</option>
+                        <option id="form-widgets-country-33" value="Brunei Darussalam">Brunei Darussalam</option>
+                        <option id="form-widgets-country-34" value="Bulgaria">Bulgaria</option>
+                        <option id="form-widgets-country-35" value="Burkina Faso">Burkina Faso</option>
+                        <option id="form-widgets-country-36" value="Burundi">Burundi</option>
+                        <option id="form-widgets-country-37" value="Cambodia">Cambodia</option>
+                        <option id="form-widgets-country-38" value="Cameroon">Cameroon</option>
+                        <option id="form-widgets-country-39" value="Cape Verde">Cape Verde</option>
+                        <option id="form-widgets-country-40" value="Cayman Islands">Cayman Islands</option>
+                        <option id="form-widgets-country-41" value="Central African Republic">Central African Republic</option>
+                        <option id="form-widgets-country-42" value="Chad">Chad</option>
+                        <option id="form-widgets-country-43" value="Chile">Chile</option>
+                        <option id="form-widgets-country-44" value="China">China</option>
+                        <option id="form-widgets-country-45" value="Christmas Island (Australia)">Christmas Island (Australia)</option>
+                        <option id="form-widgets-country-46" value="Christmas Island (Kiribati)">Christmas Island (Kiribati)</option>
+                        <option id="form-widgets-country-47" value="Cocos Island (Australia)">Cocos Island (Australia)</option>
+                        <option id="form-widgets-country-48" value="Colombia">Colombia</option>
+                        <option id="form-widgets-country-49" value="Comoros">Comoros</option>
+                        <option id="form-widgets-country-50" value="Congo, Democratic Republic of the">Congo, Democratic Republic of the</option>
+                        <option id="form-widgets-country-51" value="Congo, Republic of the">Congo, Republic of the</option>
+                        <option id="form-widgets-country-52" value="Cook Islands (New Zealand)">Cook Islands (New Zealand)</option>
+                        <option id="form-widgets-country-53" value="Costa Rica">Costa Rica</option>
+                        <option id="form-widgets-country-54" value="Cote d Ivoire">Cote d Ivoire</option>
+                        <option id="form-widgets-country-55" value="Croatia">Croatia</option>
+                        <option id="form-widgets-country-56" value="Cuba">Cuba</option>
+                        <option id="form-widgets-country-57" value="Curacao">Curacao</option>
+                        <option id="form-widgets-country-58" value="Cyprus">Cyprus</option>
+                        <option id="form-widgets-country-59" value="Czech Republic">Czech Republic</option>
+                        <option id="form-widgets-country-60" value="Denmark">Denmark</option>
+                        <option id="form-widgets-country-61" value="Djibouti">Djibouti</option>
+                        <option id="form-widgets-country-62" value="Dominica">Dominica</option>
+                        <option id="form-widgets-country-63" value="Dominican Republic">Dominican Republic</option>
+                        <option id="form-widgets-country-64" value="Ecuador">Ecuador</option>
+                        <option id="form-widgets-country-65" value="Egypt">Egypt</option>
+                        <option id="form-widgets-country-66" value="El Salvador">El Salvador</option>
+                        <option id="form-widgets-country-67" value="Equatorial Guinea">Equatorial Guinea</option>
+                        <option id="form-widgets-country-68" value="Eritrea">Eritrea</option>
+                        <option id="form-widgets-country-69" value="Estonia">Estonia</option>
+                        <option id="form-widgets-country-70" value="Ethiopia">Ethiopia</option>
+                        <option id="form-widgets-country-71" value="Falkland Islands">Falkland Islands</option>
+                        <option id="form-widgets-country-72" value="Faroe Islands">Faroe Islands</option>
+                        <option id="form-widgets-country-73" value="Fiji">Fiji</option>
+                        <option id="form-widgets-country-74" value="Finland">Finland</option>
+                        <option id="form-widgets-country-75" value="France">France</option>
+                        <option id="form-widgets-country-76" value="French Guiana">French Guiana</option>
+                        <option id="form-widgets-country-77" value="French Polynesia">French Polynesia</option>
+                        <option id="form-widgets-country-78" value="Gabon">Gabon</option>
+                        <option id="form-widgets-country-79" value="Gambia">Gambia</option>
+                        <option id="form-widgets-country-80" value="Georgia, Republic of">Georgia, Republic of</option>
+                        <option id="form-widgets-country-81" value="Germany">Germany</option>
+                        <option id="form-widgets-country-82" value="Ghana">Ghana</option>
+                        <option id="form-widgets-country-83" value="Gibraltar">Gibraltar</option>
+                        <option id="form-widgets-country-84" value="Greece">Greece</option>
+                        <option id="form-widgets-country-85" value="Greenland">Greenland</option>
+                        <option id="form-widgets-country-86" value="Grenada">Grenada</option>
+                        <option id="form-widgets-country-87" value="Guadeloupe">Guadeloupe</option>
+                        <option id="form-widgets-country-88" value="Guatemala">Guatemala</option>
+                        <option id="form-widgets-country-89" value="Guernsey (Channel Islands) (Great Britain and Northern Ireland)">Guernsey (Channel Islands) (Great Britain and Northern Ireland)</option>
+                        <option id="form-widgets-country-90" value="Guinea">Guinea</option>
+                        <option id="form-widgets-country-91" value="Guinea-Bissau">Guinea-Bissau</option>
+                        <option id="form-widgets-country-92" value="Guyana">Guyana</option>
+                        <option id="form-widgets-country-93" value="Haiti">Haiti</option>
+                        <option id="form-widgets-country-94" value="Honduras">Honduras</option>
+                        <option id="form-widgets-country-95" value="Hong Kong">Hong Kong</option>
+                        <option id="form-widgets-country-96" value="Hungary">Hungary</option>
+                        <option id="form-widgets-country-97" value="Iceland">Iceland</option>
+                        <option id="form-widgets-country-98" value="India">India</option>
+                        <option id="form-widgets-country-99" value="Indonesia">Indonesia</option>
+                        <option id="form-widgets-country-100" value="Iran">Iran</option>
+                        <option id="form-widgets-country-101" value="Iraq">Iraq</option>
+                        <option id="form-widgets-country-102" value="Ireland">Ireland</option>
+                        <option id="form-widgets-country-103" value="Isle of Man (Great Britain and Northern Ireland)">Isle of Man (Great Britain and Northern Ireland)</option>
+                        <option id="form-widgets-country-104" value="Israel">Israel</option>
+                        <option id="form-widgets-country-105" value="Italy">Italy</option>
+                        <option id="form-widgets-country-106" value="Jamaica">Jamaica</option>
+                        <option id="form-widgets-country-107" value="Japan">Japan</option>
+                        <option id="form-widgets-country-108" value="Jersey (Channel Islands) (Great Britain and Northern Ireland)">Jersey (Channel Islands) (Great Britain and Northern Ireland)</option>
+                        <option id="form-widgets-country-109" value="Jordan">Jordan</option>
+                        <option id="form-widgets-country-110" value="Kazakhstan">Kazakhstan</option>
+                        <option id="form-widgets-country-111" value="Keeling Islands (Australia)">Keeling Islands (Australia)</option>
+                        <option id="form-widgets-country-112" value="Kenya">Kenya</option>
+                        <option id="form-widgets-country-113" value="Kiribati">Kiribati</option>
+                        <option id="form-widgets-country-114" value="Kosovo, Republic of">Kosovo, Republic of</option>
+                        <option id="form-widgets-country-115" value="Kuwait">Kuwait</option>
+                        <option id="form-widgets-country-116" value="Kyrgyzstan">Kyrgyzstan</option>
+                        <option id="form-widgets-country-117" value="Laos">Laos</option>
+                        <option id="form-widgets-country-118" value="Latvia">Latvia</option>
+                        <option id="form-widgets-country-119" value="Lebanon">Lebanon</option>
+                        <option id="form-widgets-country-120" value="Lesotho">Lesotho</option>
+                        <option id="form-widgets-country-121" value="Liberia">Liberia</option>
+                        <option id="form-widgets-country-122" value="Libya">Libya</option>
+                        <option id="form-widgets-country-123" value="Liechtenstein">Liechtenstein</option>
+                        <option id="form-widgets-country-124" value="Lithuania">Lithuania</option>
+                        <option id="form-widgets-country-125" value="Luxembourg">Luxembourg</option>
+                        <option id="form-widgets-country-126" value="Macao">Macao</option>
+                        <option id="form-widgets-country-127" value="Macedonia, Republic of">Macedonia, Republic of</option>
+                        <option id="form-widgets-country-128" value="Madagascar">Madagascar</option>
+                        <option id="form-widgets-country-129" value="Malawi">Malawi</option>
+                        <option id="form-widgets-country-130" value="Malaysia">Malaysia</option>
+                        <option id="form-widgets-country-131" value="Maldives">Maldives</option>
+                        <option id="form-widgets-country-132" value="Mali">Mali</option>
+                        <option id="form-widgets-country-133" value="Malta">Malta</option>
+                        <option id="form-widgets-country-134" value="Marshall Islands, Republic of the">Marshall Islands, Republic of the</option>
+                        <option id="form-widgets-country-135" value="Martinique">Martinique</option>
+                        <option id="form-widgets-country-136" value="Mauritania">Mauritania</option>
+                        <option id="form-widgets-country-137" value="Mauritius">Mauritius</option>
+                        <option id="form-widgets-country-138" value="Mexico">Mexico</option>
+                        <option id="form-widgets-country-139" value="Micronesia, Federated States of">Micronesia, Federated States of</option>
+                        <option id="form-widgets-country-140" value="Moldova">Moldova</option>
+                        <option id="form-widgets-country-141" value="Monaco (France)">Monaco (France)</option>
+                        <option id="form-widgets-country-142" value="Mongolia">Mongolia</option>
+                        <option id="form-widgets-country-143" value="Montenegro">Montenegro</option>
+                        <option id="form-widgets-country-144" value="Montserrat">Montserrat</option>
+                        <option id="form-widgets-country-145" value="Morocco">Morocco</option>
+                        <option id="form-widgets-country-146" value="Mozambique">Mozambique</option>
+                        <option id="form-widgets-country-147" value="Myanmar (Burma)">Myanmar (Burma)</option>
+                        <option id="form-widgets-country-148" value="Namibia">Namibia</option>
+                        <option id="form-widgets-country-149" value="Nauru">Nauru</option>
+                        <option id="form-widgets-country-150" value="Nepal">Nepal</option>
+                        <option id="form-widgets-country-151" value="Netherlands">Netherlands</option>
+                        <option id="form-widgets-country-152" value="New Caledonia">New Caledonia</option>
+                        <option id="form-widgets-country-153" value="New Zealand">New Zealand</option>
+                        <option id="form-widgets-country-154" value="Nicaragua">Nicaragua</option>
+                        <option id="form-widgets-country-155" value="Niger">Niger</option>
+                        <option id="form-widgets-country-156" value="Nigeria">Nigeria</option>
+                        <option id="form-widgets-country-157" value="Norfolk Island (Australia)">Norfolk Island (Australia)</option>
+                        <option id="form-widgets-country-158" value="North Korea (Korea, Democratic People's Republic of)">North Korea (Korea, Democratic People's Republic of)</option>
+                        <option id="form-widgets-country-159" value="Norway">Norway</option>
+                        <option id="form-widgets-country-160" value="Oman">Oman</option>
+                        <option id="form-widgets-country-161" value="Pakistan">Pakistan</option>
+                        <option id="form-widgets-country-162" value="Palau">Palau</option>
+                        <option id="form-widgets-country-163" value="Panama">Panama</option>
+                        <option id="form-widgets-country-164" value="Papua New Guinea">Papua New Guinea</option>
+                        <option id="form-widgets-country-165" value="Paraguay">Paraguay</option>
+                        <option id="form-widgets-country-166" value="Peru">Peru</option>
+                        <option id="form-widgets-country-167" value="Philippines">Philippines</option>
+                        <option id="form-widgets-country-168" value="Pitcairn Island">Pitcairn Island</option>
+                        <option id="form-widgets-country-169" value="Poland">Poland</option>
+                        <option id="form-widgets-country-170" value="Portugal">Portugal</option>
+                        <option id="form-widgets-country-171" value="Qatar">Qatar</option>
+                        <option id="form-widgets-country-172" value="Reunion">Reunion</option>
+                        <option id="form-widgets-country-173" value="Romania">Romania</option>
+                        <option id="form-widgets-country-174" value="Russia">Russia</option>
+                        <option id="form-widgets-country-175" value="Rwanda">Rwanda</option>
+                        <option id="form-widgets-country-176" value="Saint Christopher and Nevis">Saint Christopher and Nevis</option>
+                        <option id="form-widgets-country-177" value="Saint Helena">Saint Helena</option>
+                        <option id="form-widgets-country-178" value="Saint Lucia">Saint Lucia</option>
+                        <option id="form-widgets-country-179" value="Saint Pierre and Miquelon">Saint Pierre and Miquelon</option>
+                        <option id="form-widgets-country-180" value="Saint Vincent and the Grenadines">Saint Vincent and the Grenadines</option>
+                        <option id="form-widgets-country-181" value="San Marino">San Marino</option>
+                        <option id="form-widgets-country-182" value="Sao Tome and Principe">Sao Tome and Principe</option>
+                        <option id="form-widgets-country-183" value="Saudi Arabia">Saudi Arabia</option>
+                        <option id="form-widgets-country-184" value="Senegal">Senegal</option>
+                        <option id="form-widgets-country-185" value="Serbia, Republic of">Serbia, Republic of</option>
+                        <option id="form-widgets-country-186" value="Seychelles">Seychelles</option>
+                        <option id="form-widgets-country-187" value="Sierra Leone">Sierra Leone</option>
+                        <option id="form-widgets-country-188" value="Singapore">Singapore</option>
+                        <option id="form-widgets-country-189" value="Sint Maarten (Dutch)">Sint Maarten (Dutch)</option>
+                        <option id="form-widgets-country-190" value="Slovak Republic (Slovakia)">Slovak Republic (Slovakia)</option>
+                        <option id="form-widgets-country-191" value="Slovenia">Slovenia</option>
+                        <option id="form-widgets-country-192" value="Solomon Islands">Solomon Islands</option>
+                        <option id="form-widgets-country-193" value="Somalia">Somalia</option>
+                        <option id="form-widgets-country-194" value="South Africa">South Africa</option>
+                        <option id="form-widgets-country-195" value="South Georgia (Falkland Islands)">South Georgia (Falkland Islands)</option>
+                        <option id="form-widgets-country-196" value="South Korea (Korea, Republic of)">South Korea (Korea, Republic of)</option>
+                        <option id="form-widgets-country-197" value="Spain">Spain</option>
+                        <option id="form-widgets-country-198" value="Sri Lanka">Sri Lanka</option>
+                        <option id="form-widgets-country-199" value="Sudan">Sudan</option>
+                        <option id="form-widgets-country-200" value="Suriname">Suriname</option>
+                        <option id="form-widgets-country-201" value="Swaziland">Swaziland</option>
+                        <option id="form-widgets-country-202" value="Sweden">Sweden</option>
+                        <option id="form-widgets-country-203" value="Switzerland">Switzerland</option>
+                        <option id="form-widgets-country-204" value="Syrian Arab Republic (Syria)">Syrian Arab Republic (Syria)</option>
+                        <option id="form-widgets-country-205" value="Taiwan">Taiwan</option>
+                        <option id="form-widgets-country-206" value="Tajikistan">Tajikistan</option>
+                        <option id="form-widgets-country-207" value="Tanzania">Tanzania</option>
+                        <option id="form-widgets-country-208" value="Thailand">Thailand</option>
+                        <option id="form-widgets-country-209" value="Timor-Leste, Democratic Republic of">Timor-Leste, Democratic Republic of</option>
+                        <option id="form-widgets-country-210" value="Togo">Togo</option>
+                        <option id="form-widgets-country-211" value="Tokelau (Western Samoa)">Tokelau (Western Samoa)</option>
+                        <option id="form-widgets-country-212" value="Tonga">Tonga</option>
+                        <option id="form-widgets-country-213" value="Trinidad and Tobago">Trinidad and Tobago</option>
+                        <option id="form-widgets-country-214" value="Tunisia">Tunisia</option>
+                        <option id="form-widgets-country-215" value="Turkey">Turkey</option>
+                        <option id="form-widgets-country-216" value="Turkmenistan">Turkmenistan</option>
+                        <option id="form-widgets-country-217" value="Turks and Caicos Islands">Turks and Caicos Islands</option>
+                        <option id="form-widgets-country-218" value="Tuvalu">Tuvalu</option>
+                        <option id="form-widgets-country-219" value="Uganda">Uganda</option>
+                        <option id="form-widgets-country-220" value="Ukraine">Ukraine</option>
+                        <option id="form-widgets-country-221" value="United Arab Emirates">United Arab Emirates</option>
+                        <option id="form-widgets-country-222" value="United Kingdom (Great Britain and Northern Ireland)">United Kingdom (Great Britain and Northern Ireland)</option>
+                        <option id="form-widgets-country-223" value="Uruguay">Uruguay</option>
+                        <option id="form-widgets-country-224" value="Uzbekistan">Uzbekistan</option>
+                        <option id="form-widgets-country-225" value="Vanuatu">Vanuatu</option>
+                        <option id="form-widgets-country-226" value="Vatican City">Vatican City</option>
+                        <option id="form-widgets-country-227" value="Venezuela">Venezuela</option>
+                        <option id="form-widgets-country-228" value="Vietnam">Vietnam</option>
+                        <option id="form-widgets-country-229" value="Virgin Islands (British)">Virgin Islands (British)</option>
+                        <option id="form-widgets-country-230" value="Wallis and Futuna Islands">Wallis and Futuna Islands</option>
+                        <option id="form-widgets-country-231" value="Yemen">Yemen</option>
+                        <option id="form-widgets-country-232" value="Zambia">Zambia</option>
+                        <option id="form-widgets-country-233" value="Zimbabwe">Zimbabwe</option>
+                        </select>
+                        <input name="form.widgets.country-empty-marker" type="hidden" value="1" originalvalue="1">
+
+                </div>
+            </tal:using_p4>
           </fieldset>
 
         </div>
@@ -175,6 +429,11 @@
           var $prov_select = $('#province-select');
           var $zip = $('input[name="form.widgets.postal_code"]');
           var $country = $('select[name="form.widgets.country:list"]'); // P4 specific
+
+          // add styling adjustment hooks for select inputs under p4
+          $state_select.addClass("p4_select");
+          $prov_select.addClass("p4_select");
+          $country.addClass("p4_select");
 
           var update_states = function() {
             if ($country.val() == 'United States') {

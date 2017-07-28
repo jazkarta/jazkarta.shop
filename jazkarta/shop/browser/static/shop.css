@@ -78,6 +78,7 @@ input[type="text"].jaz-shop-coupon {
 	width: 30%;
 }
 
+
 jaz-shop-message.warning,
 jaz-shop-message.error {
     margin: 1em 0;
@@ -85,4 +86,8 @@ jaz-shop-message.error {
     border: 1px solid #996;
     background-color: #ffffe3;
     clear: both;
+}
+
+.p4_select {
+    margin: 0em 0em 0em 2em;
 }

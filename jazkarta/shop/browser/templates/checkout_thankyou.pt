@@ -16,6 +16,10 @@
 
 <metal:core fill-slot="content-core">
   <tal:cart tal:define="cart view/old_cart|nothing">
+    <div class="jaz-shop-message error" tal:condition="view/mail_not_sent">
+      <strong>There was a problem with your order</strong>
+      <p tal:content="view/mail_not_sent">Error</p>
+    </div>
     <tal:no-error tal:condition="not:view/error">
       <div tal:condition="cart/items">
         <p><strong>Order Complete</strong><br />
@@ -34,18 +38,14 @@
         <tal:b condition="cart/data/notes|nothing">
           <h3>Notes/Questions:</h3>
           <p tal:content="cart/data/notes" />
+          <br />
         </tal:b>
-        <br />
       </tal:b>
       <p tal:replace="structure cart/thankyou_message" />
     </tal:no-error>
     <div class="jaz-shop-message error" tal:condition="view/error">
       <strong>There was a problem with your order</strong>
       <p tal:content="view/error">Error</p>
-    </div>
-    <div class="jaz-shop-message error" tal:condition="view/mail_not_sent">
-      <strong>There was a problem with your order</strong>
-      <p tal:content="view/mail_not_sent">Error</p>
     </div>
   </tal:cart>
 </metal:core>
