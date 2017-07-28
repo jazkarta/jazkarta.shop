@@ -15,16 +15,18 @@
 <metal:core fill-slot="content-core">
   <tal:cart tal:define="cart view/old_cart|nothing">
     <tal:no-error tal:condition="not:view/error">
-      <div class="portalMessage info" tal:condition="cart/items">
-        <strong>Order Complete</strong>
-        <p>Thank you for your purchase.</p>
+      <div tal:condition="cart/items">
+        <p><strong>Order Complete</strong>
+        <span>Thank you for your purchase.</span>
+        </p>
       </div>
       <br />
       <tal:b condition="cart/items">
         <tal:b replace="structure view/cart_template" />
         <div class="subtotal">
-          <strong>Your purchases total</strong>
+          <p><strong>Your purchases total</strong>
           <span tal:content="python:'${:,.2f}'.format(view.amount)"></span>
+          </p>
         </div>
         <br />
         <tal:b condition="cart/data/notes|nothing">

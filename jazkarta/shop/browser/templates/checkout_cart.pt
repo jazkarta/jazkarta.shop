@@ -96,4 +96,5 @@
       </tal:tax>
   </tal:no_tax_or_shipping_on_review_cart>
 </table>
+<br />
 </div>
