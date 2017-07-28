@@ -10,13 +10,15 @@
 <metal:title fill-slot="content-title">
   <h1 class="documentFirstHeading"
       tal:condition="not:view/error">Thank You</h1>
-</metal:title>
+</metal:description>
+<metal:title fill-slot="description">
+</metal:description>
 
 <metal:core fill-slot="content-core">
   <tal:cart tal:define="cart view/old_cart|nothing">
     <tal:no-error tal:condition="not:view/error">
       <div tal:condition="cart/items">
-        <p><strong>Order Complete</strong>
+        <p><strong>Order Complete</strong><br />
         <span>Thank you for your purchase.</span>
         </p>
       </div>
