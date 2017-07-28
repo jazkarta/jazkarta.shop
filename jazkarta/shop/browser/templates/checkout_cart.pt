@@ -7,11 +7,20 @@
 <input type="hidden" name="total_order_discount" id="total_order_discount"
        tal:condition="can_edit" tal:attributes="value view/cart/discount" />
 
-<div class="jaz-shop-message error"
-     tal:condition="view/error|nothing">
-  <strong>Error</strong>
-  <tal:s content="view/error" />
-</div>
+<tal:using_p5 tal:condition="view/using_plone5">
+    <div class="portalMessage error"
+         tal:condition="view/error|nothing">
+      <strong>Error</strong>
+      <tal:s content="view/error" />
+    </div>
+</tal:using_p5>
+<tal:using_p4 tal:condition="not:view/using_plone5">
+    <div class="jaz-shop-message error"
+         tal:condition="view/error|nothing">
+      <strong>Error</strong>
+      <tal:s content="view/error" />
+    </div>
+</tal:using_p4>
 
 <table class="listing cart-listing">
   <tr>

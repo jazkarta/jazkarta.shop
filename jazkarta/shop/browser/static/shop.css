@@ -78,7 +78,7 @@ input[type="text"].jaz-shop-coupon {
 	width: 30%;
 }
 
-
+/* for p4 only */
 jaz-shop-message.warning,
 jaz-shop-message.error {
     margin: 1em 0;

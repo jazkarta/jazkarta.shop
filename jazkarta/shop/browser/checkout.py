@@ -30,6 +30,16 @@ from ..utils import run_in_transaction
 from ..utils import send_mail
 from ..validators import is_email
 from ..vocabs import country_names
+from ..utils import PLONE_VERSION
+
+
+class P5Mixin():
+    """ utility method to distinguish between Plone 4 and 5 """
+
+    def using_plone5(self):
+        if PLONE_VERSION[0] == '5':
+            return True
+        return False
 
 
 @implementer(IDontShowJazkartaShopPortlets)
@@ -54,7 +64,7 @@ class CheckoutForm(BrowserView):
         return self.cart.amount
 
 
-class CheckoutFormAuthorizeNetSIM(CheckoutForm):
+class CheckoutFormAuthorizeNetSIM(CheckoutForm, P5Mixin):
     """ Renders a checkout form with button to submit to Authorize.Net SIM """
 
     cart_template = ViewPageTemplateFile('templates/checkout_cart.pt')
@@ -333,7 +343,7 @@ class CheckoutFormAuthorizeNetSIM(CheckoutForm):
 
 
 @implementer(IStripeEnabledView)
-class CheckoutFormStripe(CheckoutForm):
+class CheckoutFormStripe(CheckoutForm, P5Mixin):
     """ Renders a checkout form set up to submit through Stripe """
 
     cart_template = ViewPageTemplateFile('templates/checkout_cart.pt')

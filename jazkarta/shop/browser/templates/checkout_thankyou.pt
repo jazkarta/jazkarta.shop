@@ -11,15 +11,25 @@
   <h1 class="documentFirstHeading"
       tal:condition="not:view/error">Thank You</h1>
 </metal:title>
-<metal:description fill-slot="content-description">
-</metal:description>
+<tal:using_p4 tal:condition="not:view/using_plone5">
+    <metal:description fill-slot="content-description">
+    </metal:description>
+</tal:using_p4>
 
 <metal:core fill-slot="content-core">
   <tal:cart tal:define="cart view/old_cart|nothing">
-    <div class="jaz-shop-message error" tal:condition="view/mail_not_sent">
-      <strong>There was a problem with your order</strong>
-      <p tal:content="view/mail_not_sent">Error</p>
-    </div>
+    <tal:using_p5 tal:condition="view/using_plone5">
+        <div class="portalMessage error" tal:condition="view/mail_not_sent">
+          <strong>There was a problem with your order</strong>
+          <p tal:content="view/mail_not_sent">Error</p>
+        </div>
+    </tal:using_p5>
+    <tal:using_p4 tal:condition="not:view/using_plone5">
+        <div class="jaz-shop-message error" tal:condition="view/mail_not_sent">
+          <strong>There was a problem with your order</strong>
+          <p tal:content="view/mail_not_sent">Error</p>
+        </div>
+    </tal:using_p4>
     <tal:no-error tal:condition="not:view/error">
       <div tal:condition="cart/items">
         <p><strong>Order Complete</strong><br />
@@ -43,10 +53,18 @@
       </tal:b>
       <p tal:replace="structure cart/thankyou_message" />
     </tal:no-error>
-    <div class="jaz-shop-message error" tal:condition="view/error">
-      <strong>There was a problem with your order</strong>
-      <p tal:content="view/error">Error</p>
-    </div>
+    <tal:using_p5 tal:condition="view/using_plone5">
+        <div class="portalMessage error" tal:condition="view/error">
+          <strong>There was a problem with your order</strong>
+          <p tal:content="view/error">Error</p>
+        </div>
+    </tal:using_p5>
+    <tal:using_p4 tal:condition="not:view/using_plone5">
+        <div class="jaz-shop-message error" tal:condition="view/error">
+          <strong>There was a problem with your order</strong>
+          <p tal:content="view/error">Error</p>
+        </div>
+    </tal:using_p4>
   </tal:cart>
 </metal:core>
 </body>

@@ -12,6 +12,7 @@ from ..utils import get_navigation_root_url
 from ..utils import get_user_fullname
 from ..utils import resolve_uid
 from .coupons import CouponCodeForm
+from .checkout import P5Mixin
 
 
 class CartViewMixin(object):
@@ -28,7 +29,7 @@ class CartViewMixin(object):
 
 
 @implementer(IDontShowJazkartaShopPortlets)
-class ReviewCartForm(CartViewMixin, BrowserView):
+class ReviewCartForm(CartViewMixin, BrowserView, P5Mixin):
     """A form to review the cart and enter coupon codes."""
 
     cart_template = ViewPageTemplateFile('templates/checkout_cart.pt')

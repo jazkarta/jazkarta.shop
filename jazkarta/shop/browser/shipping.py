@@ -17,6 +17,7 @@ from jazkarta.shop import config
 from jazkarta.shop import storage
 from .. import logger
 from ..cart import Cart
+from .checkout import P5Mixin
 from ..interfaces import CALCULATION_METHODS
 from ..interfaces import IShippingAddress
 from ..interfaces import IShippingMethod
@@ -24,7 +25,6 @@ from ..interfaces import IDontShowJazkartaShopPortlets
 from ..ship_ups import calculate_ups_rates
 from ..ship_usps import calculate_usps_rate
 from ..utils import get_current_userid
-from ..utils import PLONE_VERSION
 
 
 def calculate_shipping(cart, method, addr):
@@ -71,15 +71,6 @@ def calculate_shipping(cart, method, addr):
     except:
         logger.exception('Could not calculate shipping.')
         return
-
-
-class P5Mixin():
-    """ utility method to distinguish between Plone 4 and 5 """
-
-    def using_plone5(self):
-        if PLONE_VERSION[0] == '5':
-            return True
-        return False
 
 
 @implementer(IPublishTraverse)

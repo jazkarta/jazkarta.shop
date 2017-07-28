@@ -91,11 +91,20 @@
       <input type="hidden" name="amount" tal:attributes="value view/amount" />
       <input type="hidden" name="submitted" value="1"/>
 
-      <div class="jaz-shop-message error checkout-error-wrapper"
-           tal:attributes="style python:'display: none;;' if not view.error else ''">
-        <strong>Error</strong>
-        <span class="checkout-error" tal:content="view/error"></span>
-      </div>
+      <tal:using_p5 tal:condition="view/using_plone5">
+          <div class="portalMessage error checkout-error-wrapper"
+               tal:attributes="style python:'display: none;;' if not view.error else ''">
+            <strong>Error</strong>
+            <span class="checkout-error" tal:content="view/error"></span>
+          </div>
+      </tal:using_p5>
+      <tal:using_p4 tal:condition="not:view/using_plone5">
+          <div class="jaz-shop-message error checkout-error-wrapper"
+               tal:attributes="style python:'display: none;;' if not view.error else ''">
+            <strong>Error</strong>
+            <span class="checkout-error" tal:content="view/error"></span>
+          </div>
+      </tal:using_p4>
 
       <fieldset class="fieldset-contact-info jaz-shop-half-form">
         <legend><span class="step">1.</span> Billing Address</legend>
