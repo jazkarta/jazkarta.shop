@@ -72,26 +72,28 @@
       </td>
     </tr>
   </tal:items>
-  <tal:shipping condition="cart/shipping">
-    <tr>
-      <td tal:content="string:Shipping - ${cart/data/ship_method}"></td>
-      <td></td>
-      <td></td>
-      <td tal:content="python:'${:,.2f}'.format(cart.shipping)" />
-      <td tal:condition="can_refund">
-        $<input type="text" size="4"
-                name="item_shipping"
-                value="${python:request.form.get('item_shipping', cart.shipping)}" />
-      </td>
-    </tr>
-  </tal:shipping>
-  <tal:tax tal:repeat="tax_item cart/taxes">
-    <tr>
-      <td tal:content="string:${tax_item/label}"></td>
-      <td></td>
-      <td></td>
-      <td tal:content="python:'${:,.2f}'.format(tax_item['tax'])">TAX</td>
-    </tr>
-  </tal:tax>
+  <tal:no_tax_or_shipping_on_review_cart tal:condition="python:view.request['PUBLISHED'].__name__ != 'review-cart'"> 
+      <tal:shipping condition="cart/shipping">
+        <tr>
+          <td tal:content="string:Shipping - ${cart/data/ship_method}"></td>
+          <td></td>
+          <td></td>
+          <td tal:content="python:'${:,.2f}'.format(cart.shipping)" />
+          <td tal:condition="can_refund">
+            $<input type="text" size="4"
+                    name="item_shipping"
+                    value="${python:request.form.get('item_shipping', cart.shipping)}" />
+          </td>
+        </tr>
+      </tal:shipping>
+      <tal:tax tal:repeat="tax_item cart/taxes">
+        <tr>
+          <td tal:content="string:${tax_item/label}"></td>
+          <td></td>
+          <td></td>
+          <td tal:content="python:'${:,.2f}'.format(tax_item['tax'])">TAX</td>
+        </tr>
+      </tal:tax>
+  </tal:no_tax_or_shipping_on_review_cart>
 </table>
 </div>
