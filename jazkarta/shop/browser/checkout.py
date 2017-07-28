@@ -79,6 +79,7 @@ class CheckoutFormAuthorizeNetSIM(CheckoutForm):
 
     def update(self):
         self.error = None
+        self.mail_not_sent = None
         try:
             self.cart.calculate_taxes()
         except TaxRateException, e:
@@ -349,7 +350,6 @@ class CheckoutFormStripe(CheckoutForm):
 
     def update(self):
         self.error = None
-        self.mail_not_sent = None
         self.prepopulate_billing_info()
         self.cart.calculate_taxes()
         # Make sure writing tax to cart doesn't trigger CSRF warning
