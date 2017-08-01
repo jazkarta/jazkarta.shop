@@ -37,7 +37,7 @@
             <a class="pat-plone-modal" href="${context/absolute_url}/${view/__name__}/${method/key}">Edit</a>
           </tal:using_p5>
           <tal:using_p4 tal:condition="not:view/using_plone5">
-            <a class="p4-modal" tal:attributes="href string:${context/absolute_url}/${view/__name__}/${method/key}">Edit</a>
+            <a tal:attributes="href string:${context/absolute_url}/${view/__name__}/${method/key}">Edit</a>
           </tal:using_p4>
         </td>
       </tr>
