@@ -72,7 +72,7 @@ class ReviewCartForm(CartViewMixin, BrowserView, P5Mixin):
         return items
 
 
-class UpdateCartView(CartViewMixin, BrowserView):
+class UpdateCartView(CartViewMixin, BrowserView, P5Mixin):
     """Re-renders just the cart after user takes an AJAX action."""
     index = ViewPageTemplateFile('templates/checkout_cart.pt')
     cart_is_editable = True
