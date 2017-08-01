@@ -52,7 +52,11 @@ def _fetch_orders(part, key=()):
                 if uid:
                     product = resolve_uid(uid)
                     title = i['name']
-                    href = product.absolute_url()
+                    # do an attr check in case the product is no longer present in the system
+                    if hasattr(product,'absolute_url'):
+                        href = product.absolute_url()
+                    else:
+                        href = '';
                 else:
                     href = title = i.get('href', '')
 
