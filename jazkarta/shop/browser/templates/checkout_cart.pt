@@ -81,7 +81,8 @@
       </td>
     </tr>
   </tal:items>
-  <tal:no_tax_or_shipping_on_review_cart tal:condition="python:view.request['PUBLISHED'].__name__ != 'review-cart'"> 
+  <tal:no_tax_or_shipping_on_review_cart
+       tal:condition="python:view.request['PUBLISHED'].__name__ not in ['review-cart','update-cart']">
       <tal:shipping condition="cart/shipping">
         <tr>
           <td tal:content="string:Shipping - ${cart/data/ship_method}"></td>
