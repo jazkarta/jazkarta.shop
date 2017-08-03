@@ -90,17 +90,23 @@ class CheckoutFormAuthorizeNetSIM(CheckoutForm, P5Mixin):
     def update(self):
         self.error = None
         self.mail_not_sent = None
-        try:
-            self.cart.calculate_taxes()
-        except TaxRateException, e:
-            # The sales tax could not be calculated as some of the
-            # required information was missing. (can be triggered by anon users,
-            # hitting the checkout url directly)
-            self.error = ('There was an problem calculating the tax: ') + e.args[0]
-        if self.error:
-            return
-        # Make sure writing tax to cart doesn't trigger CSRF warning
-        safeWrite(self.cart.data)
+
+        # only calculate taxes if some items in cart are taxable
+        taxable_subtotal = sum(
+            item.subtotal for item in self.cart.items if item.taxable)
+        if taxable_subtotal != 0:
+            try:
+                self.cart.calculate_taxes()
+            except TaxRateException, e:
+                # The sales tax could not be calculated as some of the
+                # required information was missing. (can be triggered by anon
+                # users, hitting the checkout url directly)
+                self.error = ('There was an problem calculating '
+                              'the tax: ') + e.args[0]
+            if self.error:
+                return
+            # Make sure writing tax to cart doesn't trigger CSRF warning
+            safeWrite(self.cart.data)
 
     def render(self):
         if 'x_response_code' in self.request.form:
@@ -185,7 +191,8 @@ class CheckoutFormAuthorizeNetSIM(CheckoutForm, P5Mixin):
 
     @lazy_property
     def browser_id(self):
-        return self.context.session_data_manager.getBrowserIdManager().getBrowserId()
+        session_dm = self.context.session_data_manager
+        return session_dm.getBrowserIdManager().getBrowserId()
 
     @lazy_property
     def user_id(self):
@@ -203,7 +210,8 @@ class CheckoutFormAuthorizeNetSIM(CheckoutForm, P5Mixin):
         # (14) The referrer, relay response or receipt link URL is invalid.
         # return "http://developer.authorize.net/bin/developer/paramdump"
         # also useful:
-        # https://support.authorize.net/authkb/index?page=content&id=A663&pmv=print&impressions=false
+        # https://support.authorize.net/authkb/index?page=content&id=A663&pmv=
+        # print&impressions=false
 
     @lazy_property
     def x_cancel_url(self):
@@ -258,8 +266,9 @@ class CheckoutFormAuthorizeNetSIM(CheckoutForm, P5Mixin):
                 self.store_order(method, userid, contact_info)
                 self.clear_cart()
             except ConflictError:
-                self.error = ('Failed to store results of payment after multiple '
-                              'retries. Please contact us for assistance. ')
+                self.error = ('Failed to store results of payment after '
+                              'multiple retries. Please contact us for '
+                              'assistance. ')
 
 
     # This code runs after the payment is processed
@@ -360,10 +369,26 @@ class CheckoutFormStripe(CheckoutForm, P5Mixin):
 
     def update(self):
         self.error = None
+        self.mail_not_sent = None # not used by stripe but required in thankyou
+                                  # template. used by Auth.net
         self.prepopulate_billing_info()
-        self.cart.calculate_taxes()
-        # Make sure writing tax to cart doesn't trigger CSRF warning
-        safeWrite(self.cart.data)
+
+        # only calculate taxes if some items in cart are taxable
+        taxable_subtotal = sum(
+            item.subtotal for item in self.cart.items if item.taxable)
+        if taxable_subtotal != 0:
+            try:
+                self.cart.calculate_taxes()
+            except TaxRateException, e:
+                # The sales tax could not be calculated as some of the
+                # required information was missing. (can be triggered by anon
+                # users, hitting the checkout url directly)
+                self.error = ('There was an problem calculating '
+                              'the tax: ') + e.args[0]
+            if self.error:
+                return
+            # Make sure writing tax to cart doesn't trigger CSRF warning
+            safeWrite(self.cart.data)
 
     def render(self):
         if 'submitted' in self.request.form and not self.error:
@@ -443,8 +468,9 @@ class CheckoutFormStripe(CheckoutForm, P5Mixin):
                 self.store_order(method, charge_result, userid, contact_info)
                 self.clear_cart()
             except ConflictError:
-                    self.error = ('Failed to store results of payment after multiple '
-                                  'retries. Please contact us for assistance. ')
+                    self.error = ('Failed to store results of payment after '
+                                  'multiple retries. Please contact us for '
+                                  'assistance. ')
 
     # This code runs after the payment is processed
     # to update various data in the ZODB.
@@ -513,9 +539,23 @@ class CheckoutFormStripe(CheckoutForm, P5Mixin):
             subject = get_setting('receipt_subject')
             unstyled_msg = self.receipt_email()
             css = self.context.unrestrictedTraverse('plone.css')()
-            msg = Premailer(unstyled_msg, css_text=css).transform()
+            # remove specific lines of css that were causing premailer to fail
+            # due to:'unicodeescape' codec can't decode byte 0x5c in position 26
+            # x--------------------------
+            css_parsed = []
+            for x in css.split("\n"):
+                if '\.' not in x:
+                    css_parsed.append(x)
+            cssp = "".join(css_parsed)
+            # x--------------------------
+            msg = Premailer(unstyled_msg, css_text=cssp).transform()
             mto = self.request['email']
             send_mail(subject, msg, mto=mto)
+            # assume here that email was sent since stripe does email address 
+            # validation in the checkout form but this var is needed by
+            # the thankyouform due to auth.net requiring it
+            self.mail_not_sent == False 
+
 
     @run_in_transaction(retries=5)
     def clear_cart(self):
