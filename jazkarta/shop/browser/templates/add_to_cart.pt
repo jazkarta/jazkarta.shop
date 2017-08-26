@@ -2,7 +2,7 @@
    <h3 class="jaz-shop-name" tal:content="context/title"></h3>
    <div>Price: <span class="jaz-shop-price" tal:content="view/item_price"></span></div>
    <a href="javascript:;" class="jaz-shop-add"
-      data-uid="${context/UID}"
+      tal:attributes="data-uid string:${context/UID}"
    	  tal:define="in_stock view/purchasable/in_stock"
    	  tal:omit-tag="not:in_stock"><button tal:attributes="disabled python:'disabled' if not in_stock else None"
    	                                      tal:content="python:'Add to cart' if in_stock else 'Out of stock'">Add to Cart</button></a>

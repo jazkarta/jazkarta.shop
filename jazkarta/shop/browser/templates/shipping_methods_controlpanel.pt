@@ -12,7 +12,13 @@
   <div data-pat-plone-modal='{"actionOptions": {"displayInModal": false}}'>
     <h1 class="documentFirstHeading">Shipping Methods</h1>
 
-    <a class="pat-plone-modal green button" href="${context/absolute_url}/${view/__name__}/+"><button>Add Shipping Method</button></a>
+    <tal:using_p5 tal:condition="view/using_plone5">
+        <a class="pat-plone-modal green button" href="${context/absolute_url}/${view/__name__}/+"><button>Add Shipping Method</button></a>
+    </tal:using_p5>
+    <tal:using_p4 tal:condition="not:view/using_plone5">
+        <a tal:attributes="href string:${context/absolute_url}/${view/__name__}/+"><button>Add Shipping Method</button></a>
+    </tal:using_p4>
+
     <table class="listing">
       <tr>
         <th>Name</th>
@@ -21,13 +27,18 @@
         <th>Calculation</th>
         <th></th>
       </tr>
-      <tr tal:repeat="(name, method) view/shipping_methods/items">
-        <td>${method/name}</td>
+      <tr tal:repeat="method view/shipping_methods">
+        <td tal:content="method/name"></td>
         <td tal:content="python:', '.join(method['zones'])" />
         <td tal:content="python:'${:.2f}'.format(method['min_purchase']) if method['min_purchase'] else ''" />
         <td tal:content="python:view.format_calculation(method['calculation'])" tal:on-error="nothing" />
         <td>
-          <a class="pat-plone-modal" href="${context/absolute_url}/${view/__name__}/${name}">Edit</a>
+          <tal:using_p5 tal:condition="view/using_plone5">
+            <a class="pat-plone-modal" href="${context/absolute_url}/${view/__name__}/${method/key}">Edit</a>
+          </tal:using_p5>
+          <tal:using_p4 tal:condition="not:view/using_plone5">
+            <a tal:attributes="href string:${context/absolute_url}/${view/__name__}/${method/key}">Edit</a>
+          </tal:using_p4>
         </td>
       </tr>
     </table>

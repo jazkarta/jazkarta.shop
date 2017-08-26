@@ -1,7 +1,10 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
     xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:plone="http://namespaces.plone.org/plone"
     i18n_domain="jazkarta.shop">
+
+  <include package=".portlets" />
 
   <browser:page
     name="jazkarta-shop-settings"
@@ -68,7 +71,22 @@
     name="checkout"
     for="plone.app.layout.navigation.interfaces.INavigationRoot"
     class=".checkout.CheckoutForm"
-    template="templates/checkout_form.pt"
+    permission="zope2.View"
+    layer="..interfaces.IBrowserLayer"
+    />
+
+  <browser:page
+    name="checkout_authorizenet_sim"
+    for="plone.app.layout.navigation.interfaces.INavigationRoot"
+    class=".checkout.CheckoutFormAuthorizeNetSIM"
+    permission="zope2.View"
+    layer="..interfaces.IBrowserLayer"
+    />
+
+  <browser:page
+    name="checkout_stripe"
+    for="plone.app.layout.navigation.interfaces.INavigationRoot"
+    class=".checkout.CheckoutFormStripe"
     permission="zope2.View"
     layer="..interfaces.IBrowserLayer"
     />

@@ -2,7 +2,6 @@ from collective.z3cform.datagridfield import DataGridFieldFactory
 from collective.z3cform.datagridfield import DictRow
 from decimal import Decimal
 from plone.app.vocabularies.catalog import CatalogSource
-from plone.app.z3cform.widget import SelectWidget
 from plone.autoform import directives as form
 from plone.autoform.interfaces import IFormFieldProvider
 from plone.supermodel import model
@@ -11,6 +10,8 @@ from z3c.form.browser.checkbox import CheckBoxWidget
 from zope.interface import alsoProvides
 from zope.interface import Attribute
 from zope.interface import Interface
+from zope.interface import Invalid
+from zope.interface import invariant
 from zope.interface import provider
 from zope import schema
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
@@ -18,6 +19,13 @@ from zope.schema.interfaces import IField
 from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
 from jazkarta.shop import config
+
+try:
+    from plone.app.z3cform.widget import SelectWidget
+    SELECT_WIDGET_PRESENT = True
+except ImportError:
+    # Plone4
+    SELECT_WIDGET_PRESENT = False
 
 
 @provider(IFormFieldProvider)
@@ -64,13 +72,18 @@ class IProduct(model.Schema):
     )
 
 
+class IATProduct(IProduct):
+    """Marker for content that can be purchased - archetypes compatibility."""
+    pass
+
+
 class IPurchaseHandler(Interface):
     """Handles interaction between a product and the cart."""
 
     def in_stock():
         """Returns True if this product's stock level is above the minimum."""
 
-    def get_cart_items():
+    def get_cart_items(**options):
         """Returns a list of items to add to the cart for this product."""
 
     def after_purchase(item):
@@ -158,24 +171,71 @@ class ICoupon(model.Schema):
 
 class ISettings(model.Schema):
 
+    payment_processor = schema.Choice(
+        title=u'Payment Processor',
+        description=u"Important - Please make sure that the relevant API keys"
+                    u" for the selected payment processor are completed below.",
+        vocabulary='jazkarta.shop.payment_processors',
+    )
+
     stripe_api_key_dev = schema.TextLine(
         title=u'Stripe Secret Key (Development)',
+        required=False,
     )
 
     stripe_pub_key_dev = schema.TextLine(
         title=u'Stripe Publishable Key (Development)',
+        required=False,
     )
 
     stripe_api_key_production = schema.TextLine(
         title=u'Stripe Secret Key (Production)',
         description=u"This key will be used when the JAZKARTA_SHOP_ENV "
-                    u"environment variable equals 'production'."
+                    u"environment variable equals 'production'.",
+        required=False,
     )
 
     stripe_pub_key_production = schema.TextLine(
         title=u'Stripe Publishable Key (Production)',
         description=u"This key will be used when the JAZKARTA_SHOP_ENV "
-                    u"environment variable equals 'production'."
+                    u"environment variable equals 'production'.",
+        required=False,
+    )
+
+    authorizenet_api_login_id_dev = schema.TextLine(
+        title=u'Authorize.Net API Login ID (Sandbox account)',
+        required=False,
+    )
+
+    authorizenet_transaction_key_dev = schema.TextLine(
+        title=u'Authorize.Net Transaction Key (Sandbox account)',
+        required=False,
+    )
+
+    authorizenet_api_login_id_production = schema.TextLine(
+        title=u'Authorize.Net API Login ID (Production)',
+        description=u"This key will be used when the JAZKARTA_SHOP_ENV "
+                    u"environment variable equals 'production'.",
+        required=False,
+    )
+
+    authorizenet_transaction_key_production = schema.TextLine(
+        title=u'Authorize.Net Transaction Key (Production)',
+        description=u"This key will be used when the JAZKARTA_SHOP_ENV "
+                    u"environment variable equals 'production'.",
+        required=False,
+    )
+
+    authorizenet_sim_url_dev = schema.TextLine(
+        title=u'Authorize.Net SIM URL (Sandbox)',
+        required=False,
+    )
+
+    authorizenet_sim_url_production = schema.TextLine(
+        title=u'Authorize.Net SIM URL (Production)',
+        description=u"This key will be used when the JAZKARTA_SHOP_ENV "
+                    u"environment variable equals 'production'.",
+        required=False,
     )
 
     receipt_subject = schema.TextLine(
@@ -237,6 +297,23 @@ class ISettings(model.Schema):
         required=False,
         )
 
+    @invariant
+    def validate_payment_processor_keys(data):
+        if data.payment_processor == 'Authorize.Net SIM':
+            if data.authorizenet_api_login_id_dev is None or \
+                data.authorizenet_transaction_key_dev is None or \
+                data.authorizenet_api_login_id_production is None or \
+                data.authorizenet_transaction_key_production is None or \
+                data.authorizenet_sim_url_production is None or \
+                data.authorizenet_sim_url_dev is None:
+                raise Invalid(u"Authorize.Net SIM API key data is missing.")
+        elif data.payment_processor == 'Stripe':
+            if data.stripe_api_key_dev is None or \
+                data.stripe_pub_key_dev is None or \
+                data.stripe_api_key_production is None or \
+                data.stripe_pub_key_production is None:
+                raise Invalid(u"Stripe API key data is missing.")
+
 class IBrowserLayer(IDefaultBrowserLayer):
     """Browser layer to mark the request when this product is activated."""
 
@@ -270,7 +347,7 @@ class IWeightPrice(model.Schema):
 CALCULATION_METHODS = SimpleVocabulary([
     SimpleTerm(value='weight', token='weight', title=u'By weight'),
     SimpleTerm(
-        value='usps:USPS Priority Mail', token='usps_prioritymail', 
+        value='usps:USPS Priority Mail', token='usps_prioritymail',
         title=u'USPS Priority Mail'),
     SimpleTerm(
         value='usps:USPS Media Mail', token='usps_mediamail',
@@ -283,6 +360,7 @@ CALCULATION_METHODS = SimpleVocabulary([
         title=u'UPS 3 Day Select'),
     SimpleTerm(
         value='ups:UPS Standard', token='ups_standard', title=u'UPS Standard'),
+    SimpleTerm(value='free', token='free', title=u'Free shipping'),
 ])
 
 
@@ -332,10 +410,13 @@ class IShippingAddress(model.Schema):
         title=u'Country',
         vocabulary='jazkarta.shop.countries',
     )
-    form.widget('country', SelectWidget)
+    if SELECT_WIDGET_PRESENT:
+        form.widget('country', SelectWidget)
+
     state = schema.TextLine(
         title=u'State/Province',
     )
+
     postal_code = schema.TextLine(
         title=u'ZIP',
         required=False,
@@ -365,3 +446,8 @@ class OutOfStock(Exception):
 
 class TaxRateException(Exception):
     """Failure to calculate tax rate."""
+
+
+class IDontShowJazkartaShopPortlets(Interface):
+    """marker for views that need not display jazkarta.shop related portlets
+    """

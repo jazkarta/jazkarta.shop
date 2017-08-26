@@ -1,8 +1,8 @@
 from plone.app.layout.viewlets.common import ViewletBase
 from Products.Five import BrowserView
 from zope.cachedescriptors.property import Lazy as lazy_property
+import json
 from ..cart import Cart
-from ..interfaces import IProduct
 from ..interfaces import IPurchaseHandler
 from ..utils import format_currency
 
@@ -19,7 +19,9 @@ class CartViewlet(ViewletBase):
     """
 
     def render(self):
-        return '<div class="jaz-shop-cart-wrapper"></div>'
+        if self.request.URL.split('/')[-1] != 'review-cart':
+            return '<div class="jaz-shop-cart-wrapper"></div>'
+        return ''
 
 
 class CartView(CartViewMixin, BrowserView):
@@ -33,7 +35,9 @@ class CartView(CartViewMixin, BrowserView):
             'Cache-Control', 'max-age=0, no-cache, must-revalidate')
 
         if 'add' in self.request.form:
-            self.cart.add_product(self.request.form['add'])
+            uid = self.request.form['add']
+            options = json.loads(self.request.form.get('options') or '{}')
+            self.cart.add_product(uid, **options)
 
         # Re-render the cart so the display can be updated
         return self.index()
@@ -49,5 +53,5 @@ class AddToCartViewlet(ViewletBase):
 
     @property
     def item_price(self):
-        price = IProduct(self.context).price
+        price = IPurchaseHandler(self.context).price
         return format_currency(price)

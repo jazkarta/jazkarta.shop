@@ -1,0 +1,56 @@
+<tal:block tal:define="dummy python:request.set('disable_border', True)"/><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="context/main_template/macros/master"
+      i18n:domain="plone">
+<head>
+</head>
+
+<body>
+
+<metal:main fill-slot="main">
+    <h1 class="documentFirstHeading">Check out</h1>
+
+    <tal:block tal:replace="structure view/cart_template" />
+
+    <p class="subtotal">
+      <big>
+        Your purchases total:
+        <strong tal:content="python:'${:,.2f}'.format(view.amount)"></strong>
+      </big>
+    </p>
+
+    <form method="post" tal:attributes="action view/post_url" id="checkout-form" class="jaz-shop-checkout-form">
+        <input type="hidden" name="x_fp_hash" tal:attributes="value string:${view/x_fp_hash}">
+        <input type="hidden" name="x_fp_sequence" tal:attributes="value string:${view/x_fp_sequence}">
+        <input type="hidden" name="x_fp_timestamp" tal:attributes="value string:${view/x_fp_timestamp}">
+        <input type="hidden" name="x_version" value="3.1">
+        <input type="hidden" name="x_login" tal:attributes="value string:${view/x_login}">
+        <input type="hidden" name="x_show_form" value="PAYMENT_FORM">
+        <input type="hidden" name="x_method" value="CC">
+        <input type="hidden" name="x_amount" tal:attributes="value string:${view/amount}">
+        <input type="hidden" name="x_relay_response" value="TRUE">
+        <input type="hidden" name="x_relay_url" tal:attributes="value string:${view/x_relay_url}">
+        <tal:user_id tal:condition="python:view.user_id != None">
+            <input type="hidden" name="user_id" tal:attributes="value string:${view/user_id}">
+        </tal:user_id>
+        <tal:browser_id tal:condition="python:view.user_id == None">
+            <input type="hidden" name="browser_id" tal:attributes="value view/browser_id">
+        </tal:browser_id>
+       <!-- <input type="hidden" name="x_cancel_url_text" value="Cancel">
+        <input type="hidden" name="x_cancel_url" tal:attributes="value string:${view/x_cancel_url}"> -->
+
+        <div class="jaz-shop-buttons">
+          <input type="submit" value="Complete Purchase with Authorize.Net" class="allowMultiSubmit context"
+                 tal:attributes="disabled python:'disabled' if (not view.cart.items and not view.cart.amount) else None" />
+        </div>
+
+    </form>
+    <p class="subtotal">
+        <big>Note: You have 15 minutes to complete the Authorize.Net payment process.</big>
+    </p>
+</metal:main>
+</body>
+</html>

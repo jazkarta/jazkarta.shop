@@ -1,0 +1,18 @@
+<div class="jaz-shop-cart-portlet-wrapper">
+  <div class="jaz-shop-cart-portlet"
+      tal:define="cart view/cart/items">
+    <div class="cart-items" tal:condition="not:cart">
+      You have no items in your cart.
+    </div>
+    <tal:block condition="cart">
+      <div class="jaz-shop-items">
+        <div class="jaz-shop-item"
+             tal:repeat="item view/cart/items">
+          <span class="jaz-shop-quantity" tal:content="item/quantity" />
+          <span class="jaz-shop-name" tal:content="item/name" />
+          <span class="jaz-shop-total" tal:content="python: '${:,.2f}'.format(item.subtotal)" />
+        </div>
+      </div>
+    </tal:block>
+  </div>
+</div>

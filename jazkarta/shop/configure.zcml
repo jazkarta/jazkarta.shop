@@ -40,6 +40,10 @@
     provides=".interfaces.IProduct"
     />
   <adapter factory=".purchasable.DefaultPurchaseHandler" />
+  <adapter factory=".purchasable.DefaultArchetypesPurchaseHandler" />
+
+  <adapter factory=".at.ProductSchemaExtender"
+    name="jazkarta.shop.product" />
 
   <!-- Handle storing form fields in a PersistentMapping -->
   <adapter
@@ -51,10 +55,12 @@
   <utility name="jazkarta.shop.countries" component=".vocabs.get_country_vocab" />
   <utility name="jazkarta.shop.product_categories" component=".vocabs.product_categories" />
   <utility name="jazkarta.shop.tax_handlers" component=".vocabs.get_tax_handler_vocab" />
+  <utility name="jazkarta.shop.payment_processors" component=".vocabs.get_payment_processor_vocab" />
 
   <!-- Tax handlers -->
   <utility name="jazkarta.shop.tax.sd_state.SDStateTaxHandler" factory=".tax.sd_state.SDStateTaxHandler" />
   <utility name="jazkarta.shop.tax.wa_state.WAStateTaxHandler" factory=".tax.wa_state.WAStateTaxHandler" />
   <utility name="jazkarta.shop.tax.taxjar.TaxJarStateTaxHandler" factory=".tax.taxjar.TaxJarStateTaxHandler" />
+  <utility name="jazkarta.shop.tax.no_tax.NoTaxHandler" factory=".tax.no_tax.NoTaxHandler" />
 
 </configure>

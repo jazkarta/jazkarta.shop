@@ -2,13 +2,17 @@ from decimal import Decimal
 from Products.Five import BrowserView
 from zope.browserpage import ViewPageTemplateFile
 from zope.cachedescriptors.property import Lazy as lazy_property
+from zope.interface import implementer
+import json
 
 from ..interfaces import OutOfStock
+from ..interfaces import IDontShowJazkartaShopPortlets
 from ..cart import Cart
 from ..utils import get_navigation_root_url
 from ..utils import get_user_fullname
 from ..utils import resolve_uid
 from .coupons import CouponCodeForm
+from .checkout import P5Mixin
 
 
 class CartViewMixin(object):
@@ -24,7 +28,8 @@ class CartViewMixin(object):
         self.error = None
 
 
-class ReviewCartForm(CartViewMixin, BrowserView):
+@implementer(IDontShowJazkartaShopPortlets)
+class ReviewCartForm(CartViewMixin, BrowserView, P5Mixin):
     """A form to review the cart and enter coupon codes."""
 
     cart_template = ViewPageTemplateFile('templates/checkout_cart.pt')
@@ -41,7 +46,7 @@ class ReviewCartForm(CartViewMixin, BrowserView):
             return
 
         if 'submitted' in self.request.form:
-            base_url = get_navigation_root_url(self.context)
+            base_url = get_navigation_root_url()
             if self.cart.shippable:
                 return self.request.response.redirect(base_url + '/shipping')
             else:
@@ -67,7 +72,7 @@ class ReviewCartForm(CartViewMixin, BrowserView):
         return items
 
 
-class UpdateCartView(CartViewMixin, BrowserView):
+class UpdateCartView(CartViewMixin, BrowserView, P5Mixin):
     """Re-renders just the cart after user takes an AJAX action."""
     index = ViewPageTemplateFile('templates/checkout_cart.pt')
     cart_is_editable = True
@@ -75,8 +80,9 @@ class UpdateCartView(CartViewMixin, BrowserView):
     def update(self):
         try:
             if 'add' in self.request.form:
-                cart_id = uid = self.request.form['add']
-                self.cart.add_product(uid)
+                cart_id = self.request.form['add']
+                self.cart[cart_id].quantity += 1
+
             if 'change' in self.request.form:
                 cart_id = self.request.form['change']
                 self.cart[cart_id].quantity = int(self.request.form['quantity'])

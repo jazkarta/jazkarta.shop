@@ -2,7 +2,8 @@
 	float: right;
 	position: relative;
 }
-.jaz-shop-cart {
+.jaz-shop-cart,
+.jaz-shop-cart-portlet {
 	position: absolute;
 	right: 0;
 	display: none;
@@ -11,6 +12,9 @@
 	color: #fff;
 	width: 200px;
 	padding: .5em;
+}
+.portlet .jaz-shop-cart-portlet {
+	width: 400px;
 }
 .collapse[aria-expanded="true"] {
 	display: block;
@@ -72,4 +76,19 @@ input[type="text"].jaz-shop-coupon {
 .jaz-shop-checkout-form .fieldset-payment-info select {
 	display: inline;
 	width: 30%;
+}
+
+/* for p4 only */
+jaz-shop-message.warning,
+jaz-shop-message.error {
+    margin: 1em 0;
+    font-size: 80%;
+    border: 1px solid #996;
+    background-color: #ffffe3;
+    clear: both;
+}
+
+/* extra styling to shipping form's select drop downs under p4 */
+.p4_select {
+    margin: 0em 0em 0em 2em;
 }

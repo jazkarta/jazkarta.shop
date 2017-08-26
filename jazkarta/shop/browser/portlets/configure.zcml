@@ -1,0 +1,23 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+       xmlns:plone="http://namespaces.plone.org/plone"
+       xmlns:browser="http://namespaces.zope.org/browser">
+
+  <include package="plone.app.portlets" />
+
+  <plone:portlet
+      name="jazkarta.shop.cart"
+      interface=".cart_portlet.ICartPortlet"
+      assignment=".cart_portlet.Assignment"
+      renderer=".cart_portlet.Renderer"
+      addview=".cart_portlet.AddForm"
+      />
+
+  <browser:page
+      for="*"
+      name="jazkarta_shop_portletdata"
+      class=".cart_portlet.PortletData"
+      template="portlet-cart-snippet.pt"
+      permission="zope2.View"
+      />
+
+</configure>

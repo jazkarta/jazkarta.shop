@@ -1,10 +1,11 @@
 from collections import OrderedDict
-from cPickle import dumps, loads
 from datetime import datetime
 from decimal import Decimal
+from hashlib import sha1
 from persistent.mapping import PersistentMapping
 from zope.component import queryUtility
 import copy
+import json
 
 from jazkarta.shop import logger
 from jazkarta.shop import storage
@@ -15,7 +16,6 @@ from .utils import get_current_userid
 from .utils import get_setting
 from .utils import get_site
 from .utils import resolve_uid
-from .utils import resolve_uid_to_url
 
 
 class LineItem(object):
@@ -135,49 +135,56 @@ class LineItem(object):
 class Cart(object):
 
     @classmethod
-    def from_request(cls, request):
+    def from_request(cls, request, user_id=None, browser_id=None):
         """Get the user's shopping cart.
 
         The cart is an OrderedDict keyed by product UID.
 
-        It's stored in a session for anonymous users
-        and in a BTree on the site for logged-in users.
+        It's stored in a BTree on the site,
+        keyed by user id for logged-in users
+        and by the browser id cookie for anonymous users.
         If a user starts logged out and then logs in, the cart is moved.
         """
-        userid = get_current_userid()
-        if userid is not None:  # logged in
-            cart = storage.get_shop_data([userid, 'cart'])
-            if cart is None:
-                # not found; see if there's one in the session
-                # we can upgrade to persistent storage
-                if request.SESSION.has_key('cart'):
-                    # avoid cross-db reference
-                    cart = loads(dumps(request.SESSION['cart']))
-                    for item in cart['items']:
-                        item['user'] = userid
-                    del request.SESSION['cart']
+        if user_id is None:
+            user_id = get_current_userid()
+        if browser_id is None:
+            bm = get_site().session_data_manager.getBrowserIdManager()
+            browser_id = bm.getBrowserId()
+
+        if user_id is not None:  # logged in
+            storage_id = user_id
+            data = storage.get_shop_data([user_id, 'cart'])
+            if data is None:
+                # not found; see if there's an anonymous one
+                # we can upgrade to be stored by user id
+                data = storage.get_shop_data([browser_id, 'cart'])
+                if data is not None:
+                    for item in data['items']:
+                        item['user'] = user_id
+                    storage.del_shop_data([browser_id])
                 else:
                     # create a new cart
-                    cart = PersistentMapping()
-                storage.set_shop_data([userid, 'cart'], cart)
+                    data = PersistentMapping()
+                storage.set_shop_data([user_id, 'cart'], data)
         else:
-            # not logged in; keep cart in session
-            session = request.SESSION
-            if not session.has_key('cart'):
-                session.set('cart', PersistentMapping())
-            cart = session['cart']
+            storage_id = browser_id
+            data = storage.get_shop_data([browser_id, 'cart'])
+            if data is None:
+                data = PersistentMapping()
 
-        return Cart(cart, request)
+        return Cart(storage_id, data, request)
 
-    def __init__(self, data, request):
+    def __init__(self, storage_id, data, request):
         if 'items' not in data:
             data['items'] = OrderedDict()
         self._items = data['items']
+        self.storage_id = storage_id
         self.data = data
         self.request = request
 
     def clone(self):
         return Cart(
+            self.storage_id,
             copy.deepcopy(self.data),
             self.request,
         )
@@ -208,6 +215,7 @@ class Cart(object):
         This is necessary since OrderedDict isn't persistence-aware.
         """
         self.data['items'] = self._items
+        storage.set_shop_data([self.storage_id, 'cart'], self.data)
 
     def clear(self):
         items = self._items
@@ -256,10 +264,12 @@ class Cart(object):
         for label, rate in rates.items():
             # Calculate tax, rounded to nearest cent
             tax = (taxable_subtotal * rate).quantize(Decimal('0.01'))
-            taxes.append({
-                'label': label,
-                'tax': tax,
-            })
+            if tax != 0:
+                # only append non-zero taxes to cart
+                taxes.append({
+                    'label': label,
+                    'tax': tax,
+                })
 
         self.data['taxes'] = taxes
 
@@ -290,6 +300,7 @@ class Cart(object):
         Returns a boolean indicating whether there are items in the
         cart that need checkout.
         """
+
         context = resolve_uid(product_uid)
         if context is None:
             raise ValueError('Product {} not found.'.format(product_uid))
@@ -299,10 +310,14 @@ class Cart(object):
         if userid is None:
             userid = get_current_userid()
 
-        for lineitem_info in purchase_handler.get_cart_items():
-            lineitem_info.update(kw)
+        cart_items = purchase_handler.get_cart_items(**kw)
+
+        for lineitem_info in cart_items:
             lineitem_info['user'] = userid
             cart_id = lineitem_info['uid'] + '_' + (userid or '')
+            if kw:
+                cart_id += '_' + sha1(
+                    json.dumps(kw, sort_keys=True)).hexdigest()
 
             lineitem = LineItem(self, cart_id, lineitem_info)
 

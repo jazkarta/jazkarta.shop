@@ -6,8 +6,10 @@ from plone.app.registry.browser.controlpanel import RegistryEditForm
 from plone.app.registry.browser.controlpanel import ControlPanelFormWrapper
 from plone.batching import Batch
 from plone.z3cform import layout
+from zope.interface import implementer
 from z3c.form import form
 from ..interfaces import ISettings
+from ..interfaces import IDontShowJazkartaShopPortlets
 from ..utils import resolve_uid
 from .. import storage
 from .. import _
@@ -50,7 +52,11 @@ def _fetch_orders(part, key=()):
                 if uid:
                     product = resolve_uid(uid)
                     title = i['name']
-                    href = product.absolute_url()
+                    # do an attr check in case the product is no longer present in the system
+                    if hasattr(product,'absolute_url'):
+                        href = product.absolute_url()
+                    else:
+                        href = '';
                 else:
                     href = title = i.get('href', '')
 
@@ -75,7 +81,7 @@ class OrderControlPanelForm(form.Form):
     id = "JazkartaShopOrders"
     label = _(u"Jazkarta Shop Orders")
 
-
+@implementer(IDontShowJazkartaShopPortlets)
 class OrderControlPanelView(ControlPanelFormWrapper):
     label = _(u"Jazkarta Shop Orders")
     form = OrderControlPanelForm

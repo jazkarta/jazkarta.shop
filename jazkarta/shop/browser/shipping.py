@@ -10,15 +10,18 @@ from zope.cachedescriptors.property import Lazy as lazy_property
 from zope.globalrequest import getRequest
 from zope.interface import implementer
 from zope.interface import Invalid
+
 from zope.publisher.interfaces.browser import IPublishTraverse
 from ZPublisher.BaseRequest import DefaultPublishTraverse
 from jazkarta.shop import config
 from jazkarta.shop import storage
 from .. import logger
 from ..cart import Cart
+from .checkout import P5Mixin
 from ..interfaces import CALCULATION_METHODS
 from ..interfaces import IShippingAddress
 from ..interfaces import IShippingMethod
+from ..interfaces import IDontShowJazkartaShopPortlets
 from ..ship_ups import calculate_ups_rates
 from ..ship_usps import calculate_usps_rate
 from ..utils import get_current_userid
@@ -30,6 +33,9 @@ def calculate_shipping(cart, method, addr):
         subtotal = cart.shippable_subtotal
 
         if weight == 0:
+            return 0
+
+        if method['calculation'] == 'free':
             return 0
 
         if method['calculation'] == 'weight':
@@ -68,11 +74,16 @@ def calculate_shipping(cart, method, addr):
 
 
 @implementer(IPublishTraverse)
-class ShippingMethodControlPanel(BrowserView):
+class ShippingMethodControlPanel(BrowserView, P5Mixin):
 
     @lazy_property
     def shipping_methods(self):
-        return storage.get_shop_data(['shipping_methods'], default={})
+        method_map = storage.get_shop_data(['shipping_methods'], default={})
+        methods = []
+        for key, method in method_map.items():
+            method['key'] = key
+            methods.append(method)
+        return methods
 
     def format_calculation(self, value):
         return CALCULATION_METHODS.by_value[value].title
@@ -84,7 +95,7 @@ class ShippingMethodControlPanel(BrowserView):
         return ShippingMethodForm(self.context, request, name)
 
 
-class ShippingMethodForm(AutoExtensibleForm, Form):
+class ShippingMethodForm(AutoExtensibleForm, Form, P5Mixin):
     schema = IShippingMethod
 
     def __init__(self, context, request, name):
@@ -111,6 +122,11 @@ class ShippingMethodForm(AutoExtensibleForm, Form):
     def ignoreContext(self):
         return bool(self.getContent() is None)
 
+    def redirect_to_shipping_methods_view(self):
+        abs_url = self.context.absolute_url()
+        redirect_url = abs_url + '/@@jazkarta-shop-shipping-methods'
+        self.request.response.redirect(redirect_url)
+
     @button.buttonAndHandler(u'Save')
     def handleSave(self, action):
         data, errors = self.extractData()
@@ -132,13 +148,24 @@ class ShippingMethodForm(AutoExtensibleForm, Form):
 
         method.update(data)
         storage.set_shop_data(['shipping_methods', shipping_method_id], method)
+        if not self.using_plone5(): # redirect if P4
+            self.redirect_to_shipping_methods_view()
 
     @button.buttonAndHandler(u'Delete', condition=getContent)
     def handleRemove(self, action):
         del self.shipping_methods[self._name]
+        if not self.using_plone5(): # redirect if P4
+            self.redirect_to_shipping_methods_view()
 
+    @button.buttonAndHandler(u'Cancel')
+    def handleCancel(self, action):
+        # do nothing
+        if not self.using_plone5(): # redirect if P4
+            self.redirect_to_shipping_methods_view()
+        return
 
-class ShippingForm(AutoExtensibleForm, Form):
+@implementer(IDontShowJazkartaShopPortlets)
+class ShippingForm(AutoExtensibleForm, Form, P5Mixin):
     schema = IShippingAddress
     template = ViewPageTemplateFile('templates/shipping_form.pt')
     shipping_methods_template = ViewPageTemplateFile(
@@ -155,7 +182,7 @@ class ShippingForm(AutoExtensibleForm, Form):
     def available_shipping_methods(self):
         recipient_address, errors = self.extractData()
         if errors:
-            return []
+            return ['error', []]
 
         zones = set()
 
@@ -193,10 +220,11 @@ class ShippingForm(AutoExtensibleForm, Form):
             methods.append({
                 'id': id,
                 'name': method['name'],
+                'calculation': method['calculation'],
                 'price': Decimal(price),
                 })
         methods.sort(key=lambda x: x['price'])
-        return methods
+        return ['ok', methods]
 
     def __call__(self):
         if 'update' in self.request.form:

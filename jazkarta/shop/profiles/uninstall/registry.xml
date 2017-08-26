@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<registry>
+
+  <records prefix="plone.bundles/jazkarta-shop"
+            interface='Products.CMFPlone.interfaces.IBundleRegistry'
+            remove="true">
+  </records>
+
+</registry>

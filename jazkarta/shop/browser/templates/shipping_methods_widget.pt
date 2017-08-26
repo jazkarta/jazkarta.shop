@@ -1,19 +1,45 @@
-<tal:b define="methods view/available_shipping_methods;
+<tal:b define="status python:view.available_shipping_methods()[0];
+               methods python:view.available_shipping_methods()[1];
 	           value request/form/shipping_method|nothing;
 	           value python:methods[0]['id'] if (methods and not value) else value;">
 
 	<div tal:repeat="method methods">
 	  <label>
-	    <input name="shipping_method" type="radio" value="${method/id}"
-	           tal:attributes="checked python:'checked' if value == method['id'] else None" />
-	    $<tal:s replace="python:'{:.2f}'.format(method['price'])" /> - ${method/name}
+	    <input name="shipping_method" type="radio"
+	           tal:attributes="value string:${method/id};
+                               checked python:'checked' if value == method['id'] else None" />
+        <tal:freeshipping tal:condition="python:method['calculation'] == 'free'">
+            <!--! do not show the amount calculated if the shipping is supposed to be free even if the amount is 0 -->
+            <span tal:content="string:${method/name}"></span>
+        </tal:freeshipping>
+        <tal:standard_shipping tal:condition="python:method['calculation'] != 'free'">
+            $<tal:s replace="python:'{:.2f}'.format(method['price'])" /> - <span tal:content="string:${method/name}"></span>
+        </tal:standard_shipping>
 	  </label>
 	</div>
 
-	<div class="portalMessage warning" tal:condition="not:methods">
-	  <strong>No shipping available.</strong>
-	  Please enter a shipping address so we can check what shipping methods are available.
-	</div>
+    <tal:using_p5 tal:condition="view/using_plone5">
+	    <div class="portalMessage warning" tal:condition="python:status=='error'">
+	      <strong>No shipping available.</strong>
+	      Please enter a shipping address so we can check what shipping methods are available.
+	    </div>
+
+	    <div class="portalMessage warning" tal:condition="python:status=='ok' and methods==[]">
+	      <strong>No shipping available.</strong>
+	      We are currently unable to ship to this address.
+	    </div>
+    </tal:using_p5>
+    <tal:using_p4 tal:condition="not:view/using_plone5">
+	    <div class="jaz-shop-message warning" tal:condition="python:status=='error'">
+	      <strong>No shipping available.</strong>
+	      Please enter a shipping address so we can check what shipping methods are available.
+	    </div>
+
+	    <div class="jaz-shop-message warning" tal:condition="python:status=='ok' and methods==[]">
+	      <strong>No shipping available.</strong>
+	      We are currently unable to ship to this address.
+	    </div>
+    </tal:using_p4>
 
 	<div class="jaz-shop-buttons" tal:condition="methods">
 	  <tal:b replace="structure view/actions/proceed/render" />

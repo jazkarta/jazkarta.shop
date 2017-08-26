@@ -1,0 +1,11 @@
+<portlets
+    xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    i18n:domain="plone">
+
+  <portlet
+      addview="jazkarta.shop.cart"
+      title="Jazkarta Shopping Cart portlet"
+      description="A portlet that shows the shopping cart"
+      i18n:attributes="title; description"
+      />
+</portlets>
