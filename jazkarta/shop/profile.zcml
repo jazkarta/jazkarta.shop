@@ -115,4 +115,13 @@
       import_steps="plone.app.registry"
       />
 
+  <genericsetup:upgradeDepends
+      profile="jazkarta.shop:default"
+      source="9"
+      destination="10"
+      title="Add after callback url key to shop settings"
+      description=""
+      import_steps="plone.app.registry"
+      />
+
 </configure>

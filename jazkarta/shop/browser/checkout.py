@@ -45,6 +45,8 @@ class P5Mixin():
 @implementer(IDontShowJazkartaShopPortlets)
 class CheckoutForm(BrowserView):
 
+    order_id = None
+
     def __call__(self):
         payment_processor = get_setting('payment_processor')
         if payment_processor == 'Authorize.Net SIM':
@@ -62,6 +64,15 @@ class CheckoutForm(BrowserView):
     @lazy_property
     def amount(self):
         return self.cart.amount
+
+    def thankyou_page(self):
+        url = get_setting('after_checkout_callback_url')
+        if url:
+            order_id = self.order_id
+            url = url + "?order_id=%s" % order_id
+            self.request.response.redirect(url)
+        else:
+            return self.thankyou_template()
 
 
 class CheckoutFormAuthorizeNetSIM(CheckoutForm, P5Mixin):
@@ -110,7 +121,7 @@ class CheckoutFormAuthorizeNetSIM(CheckoutForm, P5Mixin):
 
     def render(self):
         if 'x_response_code' in self.request.form:
-            return self.thankyou_template()
+            return self.thankyou_page()
         else:
             return self.index()
 
@@ -306,7 +317,7 @@ class CheckoutFormAuthorizeNetSIM(CheckoutForm, P5Mixin):
                 [userid, 'coupons', coupon_uid], 1)
 
         # Store historic record of order
-        self.cart.store_order(userid)
+        self.order_id = self.cart.store_order(userid)
 
         # Keep cart as old_cart (for the thank you page) before clearing it
         self.old_cart = self.cart.clone()
@@ -392,7 +403,7 @@ class CheckoutFormStripe(CheckoutForm, P5Mixin):
 
     def render(self):
         if 'submitted' in self.request.form and not self.error:
-            return self.thankyou_template()
+            return self.thankyou_page()
         else:
             return self.index()
 
@@ -529,7 +540,7 @@ class CheckoutFormStripe(CheckoutForm, P5Mixin):
                     [userid, 'coupons', coupon_uid], 1)
 
         # Store historic record of order
-        self.cart.store_order(userid)
+        self.order_id = self.cart.store_order(userid)
 
         # Keep cart as old_cart (for the thank you page) before clearing it
         self.old_cart = self.cart.clone()
@@ -551,10 +562,10 @@ class CheckoutFormStripe(CheckoutForm, P5Mixin):
             msg = Premailer(unstyled_msg, css_text=cssp).transform()
             mto = self.request['email']
             send_mail(subject, msg, mto=mto)
-            # assume here that email was sent since stripe does email address 
+            # assume here that email was sent since stripe does email address
             # validation in the checkout form but this var is needed by
             # the thankyouform due to auth.net requiring it
-            self.mail_not_sent == False 
+            self.mail_not_sent == False
 
 
     @run_in_transaction(retries=5)

@@ -392,6 +392,9 @@ class Cart(object):
     def store_order(self, userid):
         data = copy.deepcopy(self.data)
         now = datetime.now()
-        storage.set_shop_data(['orders', now], data)
+        path = ['orders', now]
+        storage.set_shop_data(path, data)
         if userid is not None:
-            storage.set_shop_data([userid, 'orders', now], data)
+            path = [userid, 'orders', now]
+            storage.set_shop_data(path, data)
+        return '|'.join([path[0], path[-1].isoformat()])
