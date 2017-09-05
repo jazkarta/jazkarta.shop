@@ -299,7 +299,7 @@ class ISettings(model.Schema):
 
     after_checkout_callback_url = schema.TextLine(
         title=u'After checkout callback URL',
-        description=u"If this key is not empty, users will be redirected "
+        description=u"If specified, users will be redirected "
                     u"to this URL with an 'order_id' parameter, instead "
                     u"of being shown the default 'Thank you' page.",
         required=False,
