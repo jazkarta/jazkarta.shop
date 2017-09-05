@@ -297,6 +297,14 @@ class ISettings(model.Schema):
         required=False,
         )
 
+    after_checkout_callback_url = schema.TextLine(
+        title=u'After checkout callback URL',
+        description=u"If specified, users will be redirected "
+                    u"to this URL with an 'order_id' parameter, instead "
+                    u"of being shown the default 'Thank you' page.",
+        required=False,
+    )
+
     @invariant
     def validate_payment_processor_keys(data):
         if data.payment_processor == 'Authorize.Net SIM':
