@@ -399,4 +399,4 @@ class Cart(object):
             path = [userid, 'orders', now]
             ident = userid
             storage.set_shop_data(path, data)
-        return '|'.join(ident, path[-1].isoformat()])
+        return '|'.join([ident, path[-1].isoformat()])
