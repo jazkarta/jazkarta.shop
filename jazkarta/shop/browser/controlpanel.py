@@ -65,7 +65,7 @@ def _fetch_orders(part, key=()):
                 )
             data['items'] = item_str + '</ul>'
             address = data.get('ship_to', {})
-            data['ship_to'] = '<p>{} {}</p><p>{}</p><p>{}, {} {}</p><p>{}</p>'.format(
+            data['ship_to'] = u'<p>{} {}</p><p>{}</p><p>{}, {} {}</p><p>{}</p>'.format(
                 escape(address.get('first_name', '')),
                 escape(address.get('last_name', '')),
                 escape(address.get('street', '')),
