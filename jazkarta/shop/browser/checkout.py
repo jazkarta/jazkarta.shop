@@ -78,6 +78,10 @@ class CheckoutForm(BrowserView):
                 url = url + "&user_id=%s" % user_id
             if browser_id != None:
                 url = url + "&browser_id=%s" % browser_id
+            if self.error:
+                error = self.error
+                error.replace(" ", "_")
+                url = url + "&error=%s" % error
             self.request.response.redirect(url)
         else:
             return self.thankyou_template()
