@@ -70,6 +70,14 @@ class CheckoutForm(BrowserView):
         if url:
             order_id = self.order_id
             url = url + "?order_id=%s" % order_id
+            # get user_id or browser_id back from authorize.net
+            # merchant defined fields if and pass them onto callback url
+            user_id = self.request.form.get('user_id', None)
+            browser_id = self.request.form.get('browser_id', None)
+            if user_id != None:
+                url = url + "&user_id=%s" % user_id
+            if browser_id != None:
+                url = url + "&browser_id=%s" % browser_id
             self.request.response.redirect(url)
         else:
             return self.thankyou_template()
