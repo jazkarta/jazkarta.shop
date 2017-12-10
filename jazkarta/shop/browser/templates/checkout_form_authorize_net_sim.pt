@@ -39,7 +39,8 @@
         <tal:browser_id tal:condition="python:view.user_id == None">
             <input type="hidden" name="browser_id" tal:attributes="value view/browser_id">
         </tal:browser_id>
-        <input type="hidden" name="x_logo_url" value="https://www.authorize.net/content/dam/authorize/images/authorizenet_150_42.gif">
+        <!--<input type="hidden" name="x_logo_url" value="https://www.authorize.net/content/dam/authorize/images/authorizenet_150_42.gif">-->
+        <input type="hidden" name="x_logo_url" value="https://ump.jazkarta.com/++theme++ump.theme/_images/logo.gif">
        <!-- <input type="hidden" name="x_cancel_url_text" value="Cancel">
         <input type="hidden" name="x_cancel_url" tal:attributes="value string:${view/x_cancel_url}"> -->
 
