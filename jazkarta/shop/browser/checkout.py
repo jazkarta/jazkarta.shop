@@ -78,7 +78,10 @@ class CheckoutForm(BrowserView):
 
             # I wasn't able to reproduce this but adding a check if this
             # edge case ever appears again, we can look into it.
-            self.error = ('Internal error: order_id is None')
+            self.error = ('There was an error with your transaction. '
+                          'Your payment has not been processed. '
+                          'Please contact us for assistance. '
+                          '(Internal error: order_id is None)')
             return self.thankyou_template()
 
         url = get_setting('after_checkout_callback_url')
