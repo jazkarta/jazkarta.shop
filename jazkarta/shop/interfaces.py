@@ -238,6 +238,12 @@ class ISettings(model.Schema):
         required=False,
     )
 
+    authorizenet_sim_logo_url = schema.TextLine(
+        title=u'Authorize.Net SIM Logo URL',
+        description=u"Url path to (optional) logo hosted by Authorize.Net.",
+        required=False,
+    )
+
     receipt_subject = schema.TextLine(
         title=u'Subject for Receipt Email',
         default=u'Receipt for your purchase',

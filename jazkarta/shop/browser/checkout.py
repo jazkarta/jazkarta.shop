@@ -255,6 +255,11 @@ class CheckoutFormAuthorizeNetSIM(CheckoutForm, P5Mixin):
         # for optional cancel button on SIM form. Take the user to the homepage
         return self.context.absolute_url()
 
+    @lazy_property
+    def sim_logo_url(self):
+        # for optional logo image hosted by authorize.net servers
+        return get_setting('authorizenet_sim_logo_url')
+
     def handle_submit(self):
         amount = self.amount
         response = self.request['x_response_code']
