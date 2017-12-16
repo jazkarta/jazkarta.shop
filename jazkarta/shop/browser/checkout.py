@@ -66,6 +66,21 @@ class CheckoutForm(BrowserView):
         return self.cart.amount
 
     def thankyou_page(self):
+        if self.order_id == None:
+            # weird edge case I (witekdev) encountered when authorize.net
+            # deemed the transaction as a Suspicious Transaction.
+            # The browser displayed the following:
+            # The reporting of this transaction to the Merchant has timed
+            # out. An e-mail has been sent to the merchant informing them
+            # of the error. The following is the result of the attempt to
+            # charge your credit card.
+            # Your order has been received. Thank you for your business!
+
+            # I wasn't able to reproduce this but adding a check if this
+            # edge case ever appears again, we can look into it.
+            self.error = ('Internal error: order_id is None')
+            return self.thankyou_template()
+
         url = get_setting('after_checkout_callback_url')
         if url:
             order_id = self.order_id
