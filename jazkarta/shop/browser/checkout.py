@@ -70,9 +70,13 @@ class CheckoutForm(BrowserView):
         if url:
             order_id = self.order_id
             url = url + "?order_id=%s" % order_id
+            if self.mail_not_sent:
+                mail_not_sent = self.mail_not_sent
+                mail_not_sent.replace(" ", "_") # encode error message
+                url = url + "&mail_not_sent=%s" % mail_not_sent
             if self.error:
                 error = self.error
-                error.replace(" ", "_")
+                error.replace(" ", "_") # encode error message
                 url = url + "&error=%s" % error
             self.request.response.redirect(url)
         else:
