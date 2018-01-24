@@ -1,5 +1,7 @@
 Changelog
 
+- Wrap scripts in a div with id="stripe" to facilitate moving it with Diazo.
+
 - Get browser id manager directly to avoid breaking when using
   BeakerSessionDataManager.
 
