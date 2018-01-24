@@ -212,6 +212,9 @@ class Cart(object):
     def __getitem__(self, cart_id):
         return LineItem(self, cart_id, self._items[cart_id])
 
+    def __delitem__(self, cart_id):
+        del self._items[cart_id]
+
     @property
     def items(self):
         return [LineItem(self, k, v) for k, v in self._items.items()]

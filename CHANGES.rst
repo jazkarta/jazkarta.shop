@@ -1,5 +1,7 @@
 Changelog
 
+- Cart now implements `__del__` for removing items.
+
 - Avoid breaking if a cart item is missing its price.
 
 - Default to looking up product using resolve_uid
