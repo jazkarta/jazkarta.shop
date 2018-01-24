@@ -136,7 +136,7 @@ class CheckoutFormAuthorizeNetSIM(CheckoutForm, P5Mixin):
         if taxable_subtotal != 0:
             try:
                 self.cart.calculate_taxes()
-            except TaxRateException, e:
+            except TaxRateException as e:
                 # The sales tax could not be calculated as some of the
                 # required information was missing. (can be triggered by anon
                 # users, hitting the checkout url directly)
@@ -423,7 +423,7 @@ class CheckoutFormStripe(CheckoutForm, P5Mixin):
         if taxable_subtotal != 0:
             try:
                 self.cart.calculate_taxes()
-            except TaxRateException, e:
+            except TaxRateException as e:
                 # The sales tax could not be calculated as some of the
                 # required information was missing. (can be triggered by anon
                 # users, hitting the checkout url directly)
@@ -599,8 +599,7 @@ class CheckoutFormStripe(CheckoutForm, P5Mixin):
             # assume here that email was sent since stripe does email address
             # validation in the checkout form but this var is needed by
             # the thankyouform due to auth.net requiring it
-            self.mail_not_sent == False
-
+            self.mail_not_sent = False
 
     @run_in_transaction(retries=5)
     def clear_cart(self):
