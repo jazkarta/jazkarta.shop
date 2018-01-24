@@ -12,10 +12,12 @@ from ZODB.POSException import ConflictError
 from zope.browserpage import ViewPageTemplateFile
 from zope.cachedescriptors.property import Lazy as lazy_property
 from zope.interface import implementer
+from zope.event import notify
 from zExceptions import Forbidden
 from jazkarta.shop import config
 from jazkarta.shop import storage
 from ..cart import Cart
+from ..interfaces import CheckoutComplete
 from ..interfaces import IPurchaseHandler
 from ..interfaces import IStripeEnabledView
 from ..interfaces import PaymentProcessingException
@@ -508,6 +510,7 @@ class CheckoutFormStripe(CheckoutForm, P5Mixin):
         if not self.error:
             try:
                 self.store_order(method, charge_result, userid, contact_info)
+                self.notify_purchased()
                 self.clear_cart()
             except ConflictError:
                     self.error = ('Failed to store results of payment after '
@@ -610,3 +613,16 @@ class CheckoutFormStripe(CheckoutForm, P5Mixin):
 
     def receipt_intro(self):
         return get_setting('receipt_intro')
+
+    def notify_purchased(self):
+        """Notify the CheckedOut event
+
+        This runs after the order has been stored in its own transaction,
+        and is the best place to do actions that should only happen once
+        and don't have potential for a ConflictError,
+        like communication to a non-transactional external service.
+
+        Note: Exceptions here will only abort the final transaction,
+        not payment processing or recording of the order.
+        """
+        notify(CheckoutComplete(self.old_cart))

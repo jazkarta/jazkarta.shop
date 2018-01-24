@@ -4,11 +4,13 @@ from decimal import Decimal
 from hashlib import sha1
 from persistent.mapping import PersistentMapping
 from zope.component import queryUtility
+from zope.interface import implementer
 import copy
 import json
 
 from jazkarta.shop import logger
 from jazkarta.shop import storage
+from .interfaces import ICart
 from .interfaces import IPurchaseHandler
 from .interfaces import ITaxHandler
 from .interfaces import OutOfStock
@@ -132,6 +134,7 @@ class LineItem(object):
         return bool(self._item.get('weight'))
 
 
+@implementer(ICart)
 class Cart(object):
 
     @classmethod

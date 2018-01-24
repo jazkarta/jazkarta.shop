@@ -7,6 +7,7 @@ from plone.autoform.interfaces import IFormFieldProvider
 from plone.supermodel import model
 from z3c.currency.field import Currency
 from z3c.form.browser.checkbox import CheckBoxWidget
+from zope.component.interfaces import ObjectEvent
 from zope.interface import alsoProvides
 from zope.interface import Attribute
 from zope.interface import Interface
@@ -91,6 +92,10 @@ class IPurchaseHandler(Interface):
 
     def get_obj_href(uid):
         """ Provide a hook by which the link to an item can be customized. """
+
+
+class ICart(Interface):
+    """Marker interface for the cart."""
 
 
 class ITaxHandler(Interface):
@@ -465,3 +470,9 @@ class TaxRateException(Exception):
 class IDontShowJazkartaShopPortlets(Interface):
     """marker for views that need not display jazkarta.shop related portlets
     """
+
+
+# Events
+
+class CheckoutComplete(ObjectEvent):
+    """Checkout is complete"""
