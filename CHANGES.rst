@@ -1,5 +1,8 @@
 Changelog
 
+- Cart now implements `add_item` for adding an item
+  that isn't based on a content item.
+
 - Cart now implements `__del__` for removing items.
 
 - Avoid breaking if a cart item is missing its price.

@@ -349,6 +349,36 @@ class Cart(object):
         self.save()
         return needs_checkout
 
+    def add_item(self, item):
+        """Add an item to the cart.
+
+        If the item is already in the cart, it is replaced.
+
+        This method is useful for adding a line item
+        programmatically even if it's not based on a content item
+        that can be adapted to IPurchaseHandler.
+        """
+
+        userid = get_current_userid()
+        uid = item.get('uid')
+        cart_id = item.get('cart_id')
+
+        for k in ('price', 'quantity'):
+            if k not in item:
+                raise ValueError('Missing item field: {}'.format(k))
+
+        if uid is None and cart_id is None:
+            raise ValueError('Item must specify uid or cart_id')
+        if cart_id is None:
+            cart_id = '{}_{}'.format(uid, userid or '')
+
+        item['user'] = userid
+        if cart_id in self._items:
+            del self[cart_id]
+        self._items[cart_id] = item
+
+        self.save()
+
     def thankyou_message(self):
         # @@@ get from setting
         thankyou_message_path = 'shop/thank-you'
