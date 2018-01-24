@@ -151,8 +151,7 @@ class Cart(object):
         if user_id is None:
             user_id = get_current_userid()
         if browser_id is None:
-            bm = get_site().session_data_manager.getBrowserIdManager()
-            browser_id = bm.getBrowserId()
+            browser_id = get_site().browser_id_manager.getBrowserId()
 
         if user_id is not None:  # logged in
             storage_id = user_id

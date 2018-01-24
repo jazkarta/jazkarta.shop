@@ -230,8 +230,7 @@ class CheckoutFormAuthorizeNetSIM(CheckoutForm, P5Mixin):
 
     @lazy_property
     def browser_id(self):
-        session_dm = self.context.session_data_manager
-        return session_dm.getBrowserIdManager().getBrowserId()
+        return self.context.browser_id_manager.getBrowserId()
 
     @lazy_property
     def user_id(self):
