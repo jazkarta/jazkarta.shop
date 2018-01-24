@@ -71,7 +71,7 @@ class LineItem(object):
     def orig_price(self):
         price = self._item.get('orig_price')
         if price is None:
-            price = self._item['price']
+            price = self._item.get('price')
         return Decimal(price or 0)
 
     @property

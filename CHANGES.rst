@@ -1,5 +1,7 @@
 Changelog
 
+- Avoid breaking if a cart item is missing its price.
+
 - Default to looking up product using resolve_uid
   if purchase handler doesn't implement get_obj_href.
 
