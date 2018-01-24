@@ -33,7 +33,12 @@ class LineItem(object):
         if 'href' in self._item:
             return self._item['href']
         else:
-            return IPurchaseHandler(self.product).get_obj_href(self.uid)
+            product = self.product
+            if product is not None:
+                handler = IPurchaseHandler(self.product, default=None)
+                if handler is not None and hasattr(handler, 'get_obj_href'):
+                    return handler.get_obj_href(self.uid)
+                return product.absolute_url()
 
     @property
     def product(self):
