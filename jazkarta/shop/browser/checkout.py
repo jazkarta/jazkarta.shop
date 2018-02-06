@@ -353,6 +353,7 @@ class CheckoutFormAuthorizeNetSIM(CheckoutForm, P5Mixin):
 
         # Keep cart as old_cart (for the thank you page) before clearing it
         self.old_cart = self.cart.clone()
+        self.cart_is_editable = False
 
         # Queue receipt email (email is actually sent at transaction commit)
         if self.receipt_email:

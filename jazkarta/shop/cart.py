@@ -35,7 +35,7 @@ class LineItem(object):
         else:
             product = self.product
             if product is not None:
-                handler = IPurchaseHandler(self.product, default=None)
+                handler = IPurchaseHandler(self.product, None)
                 if handler is not None and hasattr(handler, 'get_obj_href'):
                     return handler.get_obj_href(self.uid)
                 return product.absolute_url()
@@ -225,7 +225,8 @@ class Cart(object):
         This is necessary since OrderedDict isn't persistence-aware.
         """
         self.data['items'] = self._items
-        storage.set_shop_data([self.storage_id, 'cart'], self.data)
+        if self.storage_id:
+            storage.set_shop_data([self.storage_id, 'cart'], self.data)
 
     def clear(self):
         items = self._items
