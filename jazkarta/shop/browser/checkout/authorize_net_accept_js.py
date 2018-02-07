@@ -10,6 +10,7 @@ from . import CheckoutFormBase
 from ...interfaces import IPurchaseHandler
 from ...interfaces import PaymentProcessingException
 from ...authnet import createTransactionRequest
+from ...authnet import ARBCreateSubscriptionRequest
 from ...utils import get_current_userid
 from ...utils import get_setting
 from ...utils import resolve_uid
@@ -45,7 +46,14 @@ class CheckoutFormAuthorizeNetAcceptJs(CheckoutFormBase):
     def refId(self):
         return str(time.time())
 
+    capture_payment = True
+    is_recurring = False
+    recurring_months = None
+
     def handle_submit(self):
+        if not len(self.cart.items):
+            self.error = 'There is nothing in your cart.'
+            return
         amount = self.amount
 
         try:
@@ -63,9 +71,10 @@ class CheckoutFormAuthorizeNetAcceptJs(CheckoutFormBase):
 
         userid = get_current_userid()
         contact_info = PersistentMapping()
-        for f in ('name_on_card', 'email', 'phone', 'address',
-                  'city', 'state', 'zip', 'country'):
-            contact_info[f] = self.request.form[f]
+        for f in ('first_name', 'last_name', 'name_on_card', 'email',
+                  'phone', 'address', 'city', 'state', 'zip', 'country'):
+            if f in self.request.form:
+                contact_info[f] = self.request.form[f]
 
         method = 'Online Payment'
         if self.is_superuser():
@@ -88,8 +97,18 @@ class CheckoutFormAuthorizeNetAcceptJs(CheckoutFormBase):
             }
 
             try:
-                response = createTransactionRequest(
-                    self.cart, self.refId, opaque_data, contact_info)
+                if self.is_recurring:
+                    response = ARBCreateSubscriptionRequest(
+                        self.cart, self.refId, opaque_data, contact_info,
+                        months=self.recurring_months)
+                else:
+                    transactionType = (
+                        'authCaptureTransaction' if self.capture_payment
+                        else 'authOnlyTransaction'
+                    )
+                    response = createTransactionRequest(
+                        self.cart, self.refId, opaque_data, contact_info,
+                        transactionType=transactionType)
             except PaymentProcessingException as e:
                 self.error = e.message
 
@@ -120,9 +139,12 @@ class CheckoutFormAuthorizeNetAcceptJs(CheckoutFormBase):
         order['bill_to'] = contact_info
         order['notes'] = self.request.form.get('notes')
         if response is not None:
-            order['authorizenet_transaction_id'] = str(response.transactionResponse.transId)
-            order['card_last4'] = response.transactionResponse.accountNumber[-4:]
-            order['card_type'] = response.transactionResponse.accountType
+            if self.is_recurring:
+                order['authorizenet_transaction_id'] = str(response.subscriptionId)
+            else:
+                order['authorizenet_transaction_id'] = str(response.transactionResponse.transId)
+                order['card_last4'] = response.transactionResponse.accountNumber[-4:]
+                order['card_type'] = response.transactionResponse.accountType
 
         if self.is_superuser():
             order['proxy_userid'] = getSecurityManager().getUser().getId()
