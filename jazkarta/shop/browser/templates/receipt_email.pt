@@ -10,19 +10,25 @@
 	<tr>
 		<td tal:define="bill_to order/bill_to|nothing" tal:condition="bill_to" style="vertical-align: top; padding-right: 20px;">
 			<strong>Billed to:</strong><br />
-            <span tal:content="string:${bill_to/first_name}"></span> <span tal:content="string:${bill_to/last_name}"></span><br />
-            <span tal:content="string:${bill_to/address}"></span><br />
-            <span tal:content="string:${bill_to/city}"></span>, <span tal:content="string:${bill_to/state}"></span> <span tal:content="string:${bill_to/zip}"></span><br />
-            <span tal:content="string:${bill_to/country}"></span><br />
-            <span tal:content="string:${bill_to/email}"></span><br />
-            <span tal:content="string:${bill_to/phone}"></span>
+      <span tal:condition="bill_to/name_on_card|nothing">
+        <span tal:content="string:${bill_to/name_on_card"></span>
+        <br />
+      </span>
+      <span tal:condition="bill_to/first_name|nothing">
+        <span tal:content="string:${bill_to/first_name}"></span> <span tal:content="string:${bill_to/last_name}"></span><br />
+      </span>
+      <span tal:content="string:${bill_to/address}"></span><br />
+      <span tal:content="string:${bill_to/city}"></span>, <span tal:content="string:${bill_to/state}"></span> <span tal:content="string:${bill_to/zip}"></span><br />
+      <span tal:content="string:${bill_to/country}"></span><br />
+      <span tal:content="string:${bill_to/email}"></span><br />
+      <span tal:content="string:${bill_to/phone}"></span>
 		</td>
 		<td tal:define="ship_to order/ship_to|nothing" tal:condition="ship_to" style="vertical-align: top;">
 			<strong>Shipped to:</strong><br />
-            <span tal:content="string:${ship_to/first_name}"></span> <span tal:content="string:${ship_to/last_name}"></span><br />
-            <span tal:content="string:${ship_to/street}"></span><br />
-            <span tal:content="string:${ship_to/city}"></span>, <span tal:content="string:${ship_to/state}"></span> <span tal:content="string:${ship_to/postal_code}"></span><br />
-            <span tal:content="string:${ship_to/country}"></span>
+      <span tal:content="string:${ship_to/first_name}"></span> <span tal:content="string:${ship_to/last_name}"></span><br />
+      <span tal:content="string:${ship_to/street}"></span><br />
+      <span tal:content="string:${ship_to/city}"></span>, <span tal:content="string:${ship_to/state}"></span> <span tal:content="string:${ship_to/postal_code}"></span><br />
+      <span tal:content="string:${ship_to/country}"></span>
 		</td>
 	</tr>
 </table>

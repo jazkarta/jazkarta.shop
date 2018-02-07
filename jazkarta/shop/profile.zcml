@@ -133,4 +133,13 @@
       import_steps="plone.app.registry"
       />
 
+  <genericsetup:upgradeDepends
+      profile="jazkarta.shop:default"
+      source="11"
+      destination="12"
+      title="Add Authorize.Net Client Key to shop settings"
+      description=""
+      import_steps="plone.app.registry"
+      />
+
 </configure>

@@ -1,0 +1,274 @@
+<tal:block tal:define="dummy python:request.set('disable_border', True)"/><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="context/main_template/macros/master"
+      i18n:domain="plone">
+<head>
+  <metal:js fill-slot="javascript_head_slot">
+  <script
+    type="text/javascript" tal:condition="not:view/authorizenet_production"
+    src="https://jstest.authorize.net/v1/Accept.js"
+    charset="utf-8"></script>
+  <script
+    type="text/javascript" tal:condition="view/authorizenet_production"
+    src="https://js.authorize.net/v1/Accept.js"
+    charset="utf-8"></script>
+  <script type="text/javascript" tal:condition="view/amount">
+    var responseHandler = function(status, response) {
+      var $form = $('#checkout-form');
+
+      if (response.messages.resultCode === 'Ok') {
+        // Insert the token into the form so it gets submitted to the server
+        $form.append($('<input type="hidden" name="dataDescriptor" />').val(response.opaqueData.dataDescriptor));
+        $form.append($('<input type="hidden" name="dataValue" />').val(response.opaqueData.dataValue));
+        // and re-submit
+        $form.get(0).submit();
+      } else {
+        var message = '';
+        var i = 0;
+        while (i < response.messages.message.length) {
+          message = message + response.messages.message[i].text + ' ';
+          console.log(
+              response.messages.message[i].code + ": " +
+              response.messages.message[i].text
+          );
+          i = i + 1;
+        }
+
+        // Show the errors on the form
+        $form.find('.checkout-error-wrapper').show();
+        $form.find('.checkout-error').text(message);
+        // Re-enable submit button
+        $form.find('input[type="submit"]').prop('disabled', false);
+      }
+    };
+
+    jQuery(function($) {
+      var $method = $('input[name="method"]');
+      var $cc_field = $('.field-credit-card');
+      var $cc_exp_field = $('.field-expiration');
+      var $number_field = $('.field-number');
+      var $number_label = $('label', $number_field);
+      var updateForm = function() {
+        var method = $method.filter(':checked').val() || 'Online Payment';
+        if (method == 'Online Payment') {
+          $cc_field.show(); $cc_exp_field.show(); $number_field.hide();
+          $('input', $cc_field).prop('required', true);
+          $('select', $cc_exp_field).prop('required', true);
+        } else if (method == 'Check') {
+          $cc_field.hide(); $cc_exp_field.hide(); $number_field.show();
+          $number_label.html('Check #');
+          $('input', $cc_field).prop('required', false);
+          $('select', $cc_exp_field).prop('required', false);
+        } else {
+          $cc_field.hide(); $cc_exp_field.hide(); $number_field.show();
+          $number_label.html('Receipt #');
+          $('input', $cc_field).prop('required', false);
+          $('select', $cc_exp_field).prop('required', false);
+        }
+      };
+      updateForm();
+      $method.click(updateForm);
+
+      $('#checkout-form').submit(function(e) {
+        // don't submit to processor if entering check or cash
+        var method = $method.filter(':checked').val() || 'Online Payment';
+        if (method != 'Online Payment') return true;
+
+        var $form = $(this);
+
+        // Disable the submit button to prevent repeated clicks
+        $form.find('input[type="submit"]').prop('disabled', true);
+
+        var authData = {
+          clientKey: '${view/authorizenet_client_key}',
+          apiLoginID: '${view/authorizenet_api_login_id}',
+        };
+        var cardData = {};
+        $('[data-authnet]').each(function() {
+          var name = $(this).data('authnet');
+          cardData[name] = $(this).val();
+        });
+
+        // Send to Authorize.net
+        Accept.dispatchData({ authData: authData, cardData: cardData }, responseHandler);
+
+        // Prevent the form from submitting with the default action
+        return false;
+      });
+    });
+  </script>
+  </metal:js>
+</head>
+
+<body>
+
+<metal:main fill-slot="main">
+    <h1 class="documentFirstHeading">Check out</h1>
+
+    <tal:block tal:replace="structure view/cart_template" />
+
+    <p class="subtotal">
+      <big>
+        Your purchases total:
+        <strong tal:content="python:'${:,.2f}'.format(view.amount)"></strong>
+      </big>
+    </p>
+
+    <form method="post" tal:attributes="action string:${portal_state/navigation_root_url}/checkout" id="checkout-form" class="jaz-shop-checkout-form">
+      <input type="hidden" name="amount" tal:attributes="value view/amount" />
+      <input type="hidden" name="submitted" value="1"/>
+
+      <tal:using_p5 tal:condition="view/using_plone5">
+          <div class="portalMessage error checkout-error-wrapper"
+               tal:attributes="style python:'display: none;;' if not view.error else ''">
+            <strong>Error</strong>
+            <span class="checkout-error" tal:content="view/error"></span>
+          </div>
+      </tal:using_p5>
+      <tal:using_p4 tal:condition="not:view/using_plone5">
+          <div class="jaz-shop-message error checkout-error-wrapper"
+               tal:attributes="style python:'display: none;;' if not view.error else ''">
+            <strong>Error</strong>
+            <span class="checkout-error" tal:content="view/error"></span>
+          </div>
+      </tal:using_p4>
+
+      <fieldset class="fieldset-contact-info jaz-shop-half-form">
+        <legend><span class="step">1.</span> Billing Address</legend>
+
+        <div class="field field-address">
+          <div class="field-inputs">
+            <div class="field subfield-name-on-card">
+              <label>Name on Card</label>
+              <input type="text" name="name_on_card" required="required" tal:attributes="value python:view.request.form.get('name_on_card', None)" data-authnet="fullName" />
+            </div>
+            <div class="field subfield-address">
+              <label>Address</label>
+              <input type="text" name="address" required="required" tal:attributes="value python: view.request.form.get('address', None)" />
+            </div>
+            <div class="field subfield-city">
+              <label>City</label>
+              <input type="text" name="city" required="required" tal:attributes="value python: view.request.form.get('city', None)" />
+            </div>
+            <div class="field subfield-state">
+              <label>State</label>
+              <input type="text" name="state" required="required" tal:attributes="value python: view.request.form.get('state', None)"/>
+            </div>
+            <div class="field subfield-zip">
+              <label>Postal code</label>
+              <input type="text" name="zip" required="required" tal:attributes="value python: view.request.form.get('zip', None)" data-authnet="zip" />
+            </div>
+            <div class="field subfield-country"
+                 tal:define="value request/country|string:United States">
+              <label>Country</label>
+              <select name="country" required="required" class="pat-select2">
+                <option tal:repeat="country view/countries"
+                        tal:content="country"
+                        tal:attributes="value country; selected python:'selected' if country == value else None">United States</option>
+              </select>
+            </div>
+            <div class="field subfield-email">
+              <label>Email</label>
+              <input type="email" name="email" required="required" tal:attributes="value python:request.form.get('email', '')" />
+            </div>
+            <div class="field subfield-phone">
+              <label>Phone</label>
+              <input type="text" name="phone" tal:attributes="value python:request.form.get('phone', '')"/>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="fieldset-payment-info jaz-shop-half-form" tal:condition="view/amount">
+        <legend>
+          <span class="step">2.</span> Payment Information
+        </legend>
+
+        <div class="field"
+             tal:define="value python:request.form.get('method', 'Online Payment')"
+             tal:condition="view/is_superuser">
+          <div class="field-inputs">
+            <label>Payment Method</label>
+            &nbsp;<label><input type="radio" name="method" value="Online Payment" tal:attributes="checked python:'checked' if value == 'Online Payment' else None" /> Card</label>
+            &nbsp;<label><input type="radio" name="method" value="Check" tal:attributes="checked python:'checked' if value == 'Check' else None" /> Check</label>
+            &nbsp;<label><input type="radio" name="method" value="Cash" tal:attributes="checked python:'checked' if value == 'Cash' else None" /> Cash</label>
+          </div>
+        </div>
+
+        <div class="field field-credit-card">
+          <div class="field-inputs">
+            <div class="subfield subfield-card-number" style="float: left;">
+              <label>Credit Card Number<br/>
+              <input type="text" required="required" data-authnet="cardNumber" size="20"/>&nbsp;<img src="++resource++jazkarta.shop/credit-cards.png" title="Accepted cards: Visa, Mastercard" />&nbsp;
+              </label>
+            </div>
+            <div class="subfield subfield-card-cvc">
+              <label>CVC<br/>
+                <input type="text" required="required" data-authnet="cardCode" size="3" />
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="field field-expiration">
+          <div class="field-inputs">
+            <label class="expiration-date">Expires</label>
+            <div class="subfield subfield-expiration">
+              <select class="card-expiration-month" required="true" data-authnet="month">
+                <option value="">- Month -</option>
+                <option value="01">January</option>
+                <option value="02">February</option>
+                <option value="03">March</option>
+                <option value="04">April</option>
+                <option value="05">May</option>
+                <option value="06">June</option>
+                <option value="07">July</option>
+                <option value="08">August</option>
+                <option value="09">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+              </select>
+              <select class="card-expiration-year" required="required" data-authnet="year">
+                <option value="">- Year -</option>
+                <option tal:repeat="year view/years"
+                        tal:attributes="value string:${year}" tal:content="string:${year}"></option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="field field-number" tal:condition="view/is_superuser">
+          <div class="field-inputs">
+            <label>Check #</label>
+            <input type="text" name="number" tal:attributes="value python:request.form.get('number', '')" />
+          </div>
+        </div>
+
+        <div class="field subfield-notes">
+          <br />
+          <label>Additional Notes</label>
+          <textarea rows="3" name="notes" tal:content="python:request.form.get('notes', '')" />
+        </div>
+
+      </fieldset>
+
+      <div class="jaz-shop-half-form">
+        <div class="jaz-shop-message error checkout-error-wrapper"
+             tal:attributes="style python:'display: none;;' if not view.error else ''">
+          <strong>Error</strong>
+          <span class="checkout-error" tal:content="view/error"></span>
+        </div>
+        <div class="jaz-shop-buttons">
+          <input type="submit" value="Complete Purchase" class="allowMultiSubmit context"
+                 tal:attributes="disabled python:'disabled' if (not view.cart.items and not view.cart.amount) else None" />
+        </div>
+      </div>
+
+    </form>
+</metal:main>
+</body>
+</html>

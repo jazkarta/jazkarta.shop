@@ -78,7 +78,7 @@
   <browser:page
     name="checkout_authorizenet_sim"
     for="plone.app.layout.navigation.interfaces.INavigationRoot"
-    class=".checkout.CheckoutFormAuthorizeNetSIM"
+    class=".checkout.authorize_net_sim.CheckoutFormAuthorizeNetSIM"
     permission="zope2.View"
     layer="..interfaces.IBrowserLayer"
     />
@@ -86,7 +86,7 @@
   <browser:page
     name="checkout_stripe"
     for="plone.app.layout.navigation.interfaces.INavigationRoot"
-    class=".checkout.CheckoutFormStripe"
+    class=".checkout.stripe.CheckoutFormStripe"
     permission="zope2.View"
     layer="..interfaces.IBrowserLayer"
     />

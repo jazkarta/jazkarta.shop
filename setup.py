@@ -25,6 +25,7 @@ setup(
     zip_safe=False,
     install_requires=[
         'setuptools',
+        'authorizenet',
         'collective.z3cform.datagridfield',
         'stripe',
         'premailer',
