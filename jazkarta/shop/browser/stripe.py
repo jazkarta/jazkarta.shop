@@ -5,6 +5,7 @@ from ..utils import get_setting
 
 
 STRIPE_JS_HTML = """
+<div id="stripe">
     <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
     <script type="text/javascript">
         (function ($) {
@@ -13,6 +14,7 @@ STRIPE_JS_HTML = """
             });
         })(jQuery);
     </script>
+</div>
 """
 
 

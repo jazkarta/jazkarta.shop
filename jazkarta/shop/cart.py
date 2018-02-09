@@ -4,11 +4,13 @@ from decimal import Decimal
 from hashlib import sha1
 from persistent.mapping import PersistentMapping
 from zope.component import queryUtility
+from zope.interface import implementer
 import copy
 import json
 
 from jazkarta.shop import logger
 from jazkarta.shop import storage
+from .interfaces import ICart
 from .interfaces import IPurchaseHandler
 from .interfaces import ITaxHandler
 from .interfaces import OutOfStock
@@ -31,7 +33,12 @@ class LineItem(object):
         if 'href' in self._item:
             return self._item['href']
         else:
-            return IPurchaseHandler(self.product).get_obj_href(self.uid)
+            product = self.product
+            if product is not None:
+                handler = IPurchaseHandler(self.product, None)
+                if handler is not None and hasattr(handler, 'get_obj_href'):
+                    return handler.get_obj_href(self.uid)
+                return product.absolute_url()
 
     @property
     def product(self):
@@ -64,7 +71,7 @@ class LineItem(object):
     def orig_price(self):
         price = self._item.get('orig_price')
         if price is None:
-            price = self._item['price']
+            price = self._item.get('price')
         return Decimal(price or 0)
 
     @property
@@ -132,6 +139,7 @@ class LineItem(object):
         return bool(self._item.get('weight'))
 
 
+@implementer(ICart)
 class Cart(object):
 
     @classmethod
@@ -148,8 +156,7 @@ class Cart(object):
         if user_id is None:
             user_id = get_current_userid()
         if browser_id is None:
-            bm = get_site().session_data_manager.getBrowserIdManager()
-            browser_id = bm.getBrowserId()
+            browser_id = get_site().browser_id_manager.getBrowserId()
 
         if user_id is not None:  # logged in
             storage_id = user_id
@@ -205,6 +212,9 @@ class Cart(object):
     def __getitem__(self, cart_id):
         return LineItem(self, cart_id, self._items[cart_id])
 
+    def __delitem__(self, cart_id):
+        del self._items[cart_id]
+
     @property
     def items(self):
         return [LineItem(self, k, v) for k, v in self._items.items()]
@@ -215,7 +225,8 @@ class Cart(object):
         This is necessary since OrderedDict isn't persistence-aware.
         """
         self.data['items'] = self._items
-        storage.set_shop_data([self.storage_id, 'cart'], self.data)
+        if self.storage_id:
+            storage.set_shop_data([self.storage_id, 'cart'], self.data)
 
     def clear(self):
         items = self._items
@@ -338,6 +349,36 @@ class Cart(object):
         # Make sure changes are persisted
         self.save()
         return needs_checkout
+
+    def add_item(self, item):
+        """Add an item to the cart.
+
+        If the item is already in the cart, it is replaced.
+
+        This method is useful for adding a line item
+        programmatically even if it's not based on a content item
+        that can be adapted to IPurchaseHandler.
+        """
+
+        userid = get_current_userid()
+        uid = item.get('uid')
+        cart_id = item.get('cart_id')
+
+        for k in ('price', 'quantity'):
+            if k not in item:
+                raise ValueError('Missing item field: {}'.format(k))
+
+        if uid is None and cart_id is None:
+            raise ValueError('Item must specify uid or cart_id')
+        if cart_id is None:
+            cart_id = '{}_{}'.format(uid, userid or '')
+
+        item['user'] = userid
+        if cart_id in self._items:
+            del self[cart_id]
+        self._items[cart_id] = item
+
+        self.save()
 
     def thankyou_message(self):
         # @@@ get from setting

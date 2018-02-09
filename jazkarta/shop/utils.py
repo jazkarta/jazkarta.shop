@@ -10,7 +10,6 @@ from Products.CMFCore.interfaces import ISiteRoot
 from Products.CMFCore.utils import getToolByName
 from zope.component import getUtility
 from zope.component.hooks import getSite
-from zope.globalrequest import getRequest
 from ZODB.POSException import ConflictError
 from jazkarta.shop import config
 from .interfaces import ISettings
