@@ -11,7 +11,7 @@
 		<td tal:define="bill_to order/bill_to|nothing" tal:condition="bill_to" style="vertical-align: top; padding-right: 20px;">
 			<strong>Billed to:</strong><br />
       <span tal:condition="bill_to/name_on_card|nothing">
-        <span tal:content="string:${bill_to/name_on_card"></span>
+        <span tal:content="string:${bill_to/name_on_card}"></span>
         <br />
       </span>
       <span tal:condition="bill_to/first_name|nothing">
