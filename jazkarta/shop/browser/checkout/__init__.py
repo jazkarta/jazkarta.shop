@@ -16,6 +16,7 @@ from ...utils import run_in_transaction
 from ...utils import send_mail
 from ...utils import PLONE_VERSION
 from ...vocabs import country_names
+import logging
 
 
 class P5Mixin():
@@ -184,7 +185,11 @@ class CheckoutFormBase(P5Mixin):
                     css_parsed.append(x)
             cssp = "".join(css_parsed)
             # x--------------------------
-            msg = Premailer(unstyled_msg, css_text=cssp).transform()
+            msg = Premailer(
+                unstyled_msg,
+                css_text=cssp,
+                cssutils_logging_level=logging.CRITICAL,
+            ).transform()
             mto = self.request['email']
             send_mail(subject, msg, mto=mto)
             # assume here that email was sent since stripe does email address
