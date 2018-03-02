@@ -78,7 +78,7 @@ class CheckoutFormAuthorizeNetAcceptJs(CheckoutFormBase):
                 contact_info[f] = self.request.form[f]
         if 'name_on_card' in contact_info:
             names = contact_info['name_on_card'].split()
-            contact_info['first_name'] = names[:-1]
+            contact_info['first_name'] = u' '.join(names[:-1])
             contact_info['last_name'] = names[-1]
 
         method = 'Online Payment'
