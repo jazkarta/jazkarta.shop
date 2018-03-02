@@ -2,7 +2,8 @@
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       xmlns:i18n="http://xml.zope.org/namespaces/i18n">
 <body tal:define="cart view/old_cart;
-	              order cart/data">
+	                order cart/data;
+                  bill_to order/bill_to|nothing">
 
 <p tal:content="string:${view/receipt_intro}"></p>
 

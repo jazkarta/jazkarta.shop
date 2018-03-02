@@ -71,10 +71,15 @@ class CheckoutFormAuthorizeNetAcceptJs(CheckoutFormBase):
 
         userid = get_current_userid()
         contact_info = PersistentMapping()
-        for f in ('first_name', 'last_name', 'name_on_card', 'email',
-                  'phone', 'address', 'city', 'state', 'zip', 'country'):
+        for f in (
+                'name_on_card', 'email', 'phone', 'address', 'city', 'state',
+                'zip', 'country'):
             if f in self.request.form:
                 contact_info[f] = self.request.form[f]
+        if 'name_on_card' in contact_info:
+            names = contact_info['name_on_card'].split()
+            contact_info['first_name'] = names[:-1]
+            contact_info['last_name'] = names[-1]
 
         method = 'Online Payment'
         if self.is_superuser():
