@@ -1,7 +1,7 @@
 <div class="jaz-shop-cart-wrapper">
-  <a href="#" class="jaz-shop-cart-trigger"
+  <a href="#" class="jaz-shop-cart-trigger" title="My Cart"
      data-toggle="collapse" data-target=".jaz-shop-cart">
-    My Cart
+    <span class="jaz-shop-cart-trigger-label">My Cart</span>
     <div class="items"
          tal:define="itemcount view/cart/itemcount"
          tal:condition="itemcount">
