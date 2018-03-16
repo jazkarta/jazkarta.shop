@@ -53,7 +53,7 @@
 
     </form>
     <p class="subtotal">
-        <big>Note: You have 15 minutes to complete the Authorize.Net payment process.</big>
+        <big>Note: When you click "Complete Purchase" you will have 15 minutes to complete the payment process on the next page. Be sure to enter the email address where you would like your payment receipt to be sent.</big>
     </p>
 
 </metal:main>
