@@ -377,7 +377,8 @@ class CheckoutFormAuthorizeNetSIM(CheckoutForm, P5Mixin):
                     is_email(self.request.form['x_email'])
                 except Exception as e:
                     self.mail_not_sent = ('Receipt email was not sent as the '
-                                        'email address entered was not valid.')
+                                          'email address entered on the payment '
+                                          'form was not valid.')
                 if not self.mail_not_sent:
                     mto = self.request['x_email']
                     send_mail(subject, msg, mto=mto)
