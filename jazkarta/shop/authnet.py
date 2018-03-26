@@ -1,5 +1,5 @@
 from authorizenet import apicontractsv1
-from authorizenet import constants
+from authorizenet.constants import constants
 from authorizenet.apicontrollers import createTransactionController
 from authorizenet.apicontrollers import ARBCreateSubscriptionController
 from datetime import date
