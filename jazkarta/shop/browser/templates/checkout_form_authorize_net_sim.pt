@@ -47,13 +47,13 @@
         <input type="hidden" name="x_cancel_url" tal:attributes="value string:${view/x_cancel_url}"> -->
 
         <div class="jaz-shop-buttons">
-          <input type="submit" value="Complete Purchase with Authorize.Net" class="allowMultiSubmit context"
+          <input type="submit" value="Complete Purchase" class="allowMultiSubmit context"
                  tal:attributes="disabled python:'disabled' if (not view.cart.items and not view.cart.amount) else None" />
         </div>
 
     </form>
     <p class="subtotal">
-        <big>Note: You have 15 minutes to complete the Authorize.Net payment process.</big>
+        <big>Note: You now have 15 minutes to complete the payment process. When you click "Complete Purchase" you will be taken to a secure payment page. Please be sure to enter the email address on the payment form, where you would like your payment receipt to be sent.</big>
     </p>
 
 </metal:main>

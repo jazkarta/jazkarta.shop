@@ -20,14 +20,12 @@
   <tal:cart tal:define="cart view/old_cart|nothing">
     <tal:using_p5 tal:condition="view/using_plone5">
         <div class="portalMessage error" tal:condition="view/mail_not_sent">
-          <strong>There was a problem with your order</strong>
-          <p tal:content="view/mail_not_sent">Error</p>
+          <p tal:content="string:NOTE: ${view/mail_not_sent}">Error</p>
         </div>
     </tal:using_p5>
     <tal:using_p4 tal:condition="not:view/using_plone5">
         <div class="jaz-shop-message error" tal:condition="view/mail_not_sent">
-          <strong>There was a problem with your order</strong>
-          <p tal:content="view/mail_not_sent">Error</p>
+          <p tal:content="string:NOTE: ${view/mail_not_sent}">Error</p>
         </div>
     </tal:using_p4>
     <tal:no-error tal:condition="not:view/error">

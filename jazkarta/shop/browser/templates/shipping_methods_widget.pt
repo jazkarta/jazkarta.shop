@@ -20,8 +20,7 @@
 
     <tal:using_p5 tal:condition="view/using_plone5">
 	    <div class="portalMessage warning" tal:condition="python:status=='error'">
-	      <strong>No shipping available.</strong>
-	      Please enter a shipping address so we can check what shipping methods are available.
+	      Please enter a complete shipping address.
 	    </div>
 
 	    <div class="portalMessage warning" tal:condition="python:status=='ok' and methods==[]">
@@ -31,8 +30,7 @@
     </tal:using_p5>
     <tal:using_p4 tal:condition="not:view/using_plone5">
 	    <div class="jaz-shop-message warning" tal:condition="python:status=='error'">
-	      <strong>No shipping available.</strong>
-	      Please enter a shipping address so we can check what shipping methods are available.
+	      Please enter a complete shipping address.
 	    </div>
 
 	    <div class="jaz-shop-message warning" tal:condition="python:status=='ok' and methods==[]">
