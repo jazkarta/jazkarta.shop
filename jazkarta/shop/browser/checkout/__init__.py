@@ -49,7 +49,7 @@ class CheckoutForm(BrowserView):
                     'No valid payment processor has been specified.')
 
 
-class CheckoutFormBase(P5Mixin):
+class CheckoutFormBase(BrowserView, P5Mixin):
     cart_template = ViewPageTemplateFile('../templates/checkout_cart.pt')
     thankyou_template = ViewPageTemplateFile(
         '../templates/checkout_thankyou.pt')
