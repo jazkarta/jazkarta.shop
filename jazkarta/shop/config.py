@@ -273,5 +273,6 @@ SHIPPING_COUNTRIES = (
 
 PAYMENT_PROCESSORS = [
     u'Authorize.Net SIM',
+    u'Authorize.Net Accept.js',
     u'Stripe',
 ]

@@ -1,5 +1,9 @@
 Changelog
 
+- Refactored checkout forms into separate modules
+
+- Added support for checkout using Authorize.net Accept.js
+
 - Cart now implements `add_item` for adding an item
   that isn't based on a content item.
 

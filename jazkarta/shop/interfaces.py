@@ -249,6 +249,18 @@ class ISettings(model.Schema):
         required=False,
     )
 
+    authorizenet_client_key_dev = schema.TextLine(
+        title=u'Authorize.Net Client Key (Sandbox)',
+        required=False,
+    )
+
+    authorizenet_client_key_production = schema.TextLine(
+        title=u'Authorize.Net Client Key (Production)',
+        description=u"This key will be used when the JAZKARTA_SHOP_ENV "
+                    u"environment variable equals 'production'.",
+        required=False,
+    )
+
     receipt_subject = schema.TextLine(
         title=u'Subject for Receipt Email',
         default=u'Receipt for your purchase',
