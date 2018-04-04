@@ -1,0 +1,49 @@
+<div id="cartFormWrapper"
+     tal:define="cart view/order|view/cart"> 
+
+<table class="listing cart-listing">
+  <tr>
+    <th>Purchases</th>
+    <th style="width: 90px;">Price</th>
+    <th style="width: 90px;">Quantity</th>
+    <th style="width: 90px;">Amount</th>
+  </tr>
+  <tal:items repeat="item python:cart['items'].values()">
+    <tr class="item">
+      <td tal:content="item/name">
+      </td>
+      <td class="item-price"
+          tal:content="python:'${:,.2f}'.format(item['price'])">Price
+      </td>
+      <td>
+        <span tal:replace="item/quantity">Quantity</span>
+      </td>
+      <td tal:content="python:'${:,.2f}'.format(item['price'] * item['quantity'])">Amount
+      </td>
+    </tr>
+  </tal:items>
+</table>
+<br />
+<p tal:condition="view/order_taxes|nothing">
+  <strong>Taxes: </strong>
+  <span tal:content="python:'${:,.2f}'.format(view.order_taxes)">
+   Total taxes
+   </span>
+</p>
+<p tal:condition="cart/ship_charge|nothing">
+<strong>Shipping charge: </strong><span tal:content="python:'${:,.2f}'.format(cart['ship_charge'])">Payment method</span>
+</p>
+<p>
+  <strong>Total order amount: </strong>
+  <span tal:content="python:'${:,.2f}'.format(view.order_amount)">
+   Total amount
+   </span>
+</p>
+<p tal:condition="cart/payment_method|nothing">
+  <strong>Payment method: </strong><span tal:content="cart/payment_method">Payment method</span>
+</p>
+<p tal:condition="cart/ship_method|nothing">
+  <strong>Shipping method: </strong><span tal:content="cart/ship_method">Payment method</span>
+</p>
+<br />
+</div>

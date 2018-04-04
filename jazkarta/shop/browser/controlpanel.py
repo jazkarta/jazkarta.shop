@@ -8,11 +8,14 @@ from plone.batching import Batch
 from plone.z3cform import layout
 from zope.interface import implementer
 from z3c.form import form
+from zope.browserpage import ViewPageTemplateFile
 from ..interfaces import ISettings
 from ..interfaces import IDontShowJazkartaShopPortlets
 from ..utils import resolve_uid
+from ..api import get_order_from_id
 from .. import storage
 from .. import _
+from .checkout import P5Mixin
 
 
 class SettingsControlPanelForm(RegistryEditForm):
@@ -37,12 +40,16 @@ def _fetch_orders(part, key=()):
     else:
         if 'orders' in key:
             data = copy.deepcopy(part)
-            if len(key) == 3:
-                data['userid'] = key[0]
             raw_date = key[-1]
             data['date'] = raw_date.strftime('%Y-%m-%d %I:%M %p') if hasattr(raw_date, 'strftime') else raw_date
             items = data.get('items', {}).values()
             data['date_sort'] = raw_date.isoformat() if hasattr(raw_date, 'isoformat') else ''
+            if len(key) == 3:
+                data['userid'] = key[0]
+                data['orderid'] = '{}|{}'.format(key[0], data['date_sort'])
+            else:
+                data['userid'] = 'Anonymous'
+                data['orderid'] = '_orders_|{}'.format(data['date_sort'])
             data['taxes'] = sum(item.get('tax', 0) for item in data.get('taxes', ()))
             data['total'] = (sum((i.get('price', 0.0) * i.get('quantity', 1)) for i in items) +
                              data['taxes'] + data.get('ship_charge', 0))
@@ -81,6 +88,7 @@ class OrderControlPanelForm(form.Form):
     id = "JazkartaShopOrders"
     label = _(u"Jazkarta Shop Orders")
 
+
 @implementer(IDontShowJazkartaShopPortlets)
 class OrderControlPanelView(ControlPanelFormWrapper):
     label = _(u"Jazkarta Shop Orders")
@@ -94,3 +102,24 @@ class OrderControlPanelView(ControlPanelFormWrapper):
         start = int(self.request.get('b_start', 0))
         self.batch = Batch(orders, size=50, start=start)
         super(OrderControlPanelView, self).update()
+
+
+@implementer(IDontShowJazkartaShopPortlets)
+class OrderDetailsControlPanelView(ControlPanelFormWrapper):
+    label = _(u"Jazkarta Shop Order Details")
+    form = OrderControlPanelForm
+    order_template = ViewPageTemplateFile('templates/checkout_order.pt')
+
+    def update(self):
+        order_id = self.request.get('order_id')
+        self.order = get_order_from_id(order_id)
+        self.order_amount = sum([item['price'] for item in self.order['items'].values()])
+        if 'ship_charge' in self.order:
+            self.order_amount += self.order['ship_charge']
+        if 'taxes' in self.order:
+            taxes = Decimal(0)
+            for entry in self.order['taxes']:
+                taxes += entry['tax']
+            self.order_amount += taxes
+            self.order_taxes = taxes
+        super(OrderDetailsControlPanelView, self).update()
