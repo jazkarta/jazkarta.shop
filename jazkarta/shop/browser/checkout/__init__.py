@@ -146,9 +146,7 @@ class CheckoutFormBase(BrowserView, P5Mixin):
             # I wasn't able to reproduce this but adding a check if this
             # edge case ever appears again, we can look into it.
             self.error = ('There was an error with your transaction. '
-                          'Your payment has not been processed. '
-                          'Please contact us for assistance. '
-                          '(Internal error: order_id is None)')
+                          'Your payment has not been processed.')
             return self.thankyou_template()
 
         url = get_setting('after_checkout_callback_url')
