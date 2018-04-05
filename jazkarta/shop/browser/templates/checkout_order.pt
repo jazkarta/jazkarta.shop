@@ -1,5 +1,5 @@
 <div id="cartFormWrapper"
-     tal:define="cart view/order|view/cart"> 
+     tal:define="cart view/order|view/cart/data"> 
 
 <table class="listing cart-listing">
   <tr>
@@ -35,7 +35,7 @@
 </p>
 <p>
   <strong>Total order amount: </strong>
-  <span tal:content="python:'${:,.2f}'.format(view.order_amount)">
+  <span tal:content="python:'${:,.2f}'.format(view.amount)">
    Total amount
    </span>
 </p>
@@ -45,5 +45,28 @@
 <p tal:condition="cart/ship_method|nothing">
   <strong>Shipping method: </strong><span tal:content="cart/ship_method">Payment method</span>
 </p>
+<br />
+<div tal:define="address cart/ship_to|nothing"
+     tal:condition="cart/ship_to|nothing">
+  <h3>Ship to</h3>
+  <div>
+    <strong tal:content="string:${address/last_name}, ${address/first_name}">Name</strong>
+  </div>
+  <div tal:content="string:${address/address}. ${address/city}, ${address/state}. ${address/zip}. ${address/country}.">Address</div>
+</div>
+<div tal:define="address cart/bill_to|nothing"
+     tal:condition="cart/bill_to|nothing">
+  <h3>Bill to</h3>
+  <div>
+    <strong tal:content="string:${address/last_name}, ${address/first_name}">Name</strong>
+  </div>
+  <div tal:content="string:${address/address}. ${address/city}, ${address/state}. ${address/zip}. ${address/country}.">Address</div>
+</div>
+<div tal:condition="cart/notes|nothing">
+  <h3>Notes</h3>
+  <p tal:content="cart/notes">Notes</p>
+</div>
+<div tal:condition="cart/order_details|nothing"
+     tal:content="structure cart/order_details"></div>
 <br />
 </div>

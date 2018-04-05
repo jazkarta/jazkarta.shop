@@ -9,31 +9,9 @@
 <body>
 
 <metal:main fill-slot="main">
-  <div tal:define="order view/order">
+  <div>
     <h1 class="documentFirstHeading">Order Detail</h1>
     <div tal:replace="structure view/order_template" />
-    <div tal:define="address order/ship_to|nothing"
-         tal:condition="order/ship_to|nothing">
-      <h3>Ship to</h3>
-      <div>
-        <strong tal:content="string:${address/last_name}, ${address/first_name}">Name</strong>
-      </div>
-      <div tal:content="string:${address/address}. ${address/city}, ${address/state}. ${address/zip}. ${address/country}.">Address</div>
-    </div>
-    <div tal:define="address order/bill_to|nothing"
-         tal:condition="order/bill_to|nothing">
-      <h3>Bill to</h3>
-      <div>
-        <strong tal:content="string:${address/last_name}, ${address/first_name}">Name</strong>
-      </div>
-      <div tal:content="string:${address/address}. ${address/city}, ${address/state}. ${address/zip}. ${address/country}.">Address</div>
-    </div>
-    <div tal:condition="order/notes|nothing">
-      <h3>Notes</h3>
-      <p tal:content="order/notes">Notes</p>
-    </div>
-    <div tal:condition="order/order_details|nothing"
-         tal:content="structure order/order_details"></div>
   </div>
 </metal:main>
 </body>

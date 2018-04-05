@@ -113,13 +113,13 @@ class OrderDetailsControlPanelView(ControlPanelFormWrapper):
     def update(self):
         order_id = self.request.get('order_id')
         self.order = get_order_from_id(order_id)
-        self.order_amount = sum([item['price'] for item in self.order['items'].values()])
+        self.amount = sum([item['price'] * item['quantity'] for item in self.order['items'].values()])
         if 'ship_charge' in self.order:
-            self.order_amount += self.order['ship_charge']
+            self.amount += self.order['ship_charge']
         if 'taxes' in self.order:
             taxes = Decimal(0)
             for entry in self.order['taxes']:
                 taxes += entry['tax']
-            self.order_amount += taxes
+            self.amount += taxes
             self.order_taxes = taxes
         super(OrderDetailsControlPanelView, self).update()

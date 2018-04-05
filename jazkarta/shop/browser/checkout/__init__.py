@@ -51,6 +51,7 @@ class CheckoutForm(BrowserView):
 
 class CheckoutFormBase(BrowserView, P5Mixin):
     cart_template = ViewPageTemplateFile('../templates/checkout_cart.pt')
+    order_template = ViewPageTemplateFile('../templates/checkout_order.pt')
     thankyou_template = ViewPageTemplateFile(
         '../templates/checkout_thankyou.pt')
     receipt_email = ViewPageTemplateFile('../templates/receipt_email.pt')
