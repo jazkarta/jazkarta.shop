@@ -17,6 +17,7 @@ from ...utils import get_setting
 from ...utils import resolve_uid
 from ...utils import run_in_transaction
 from ...utils import send_mail
+from ...config import EMAIL_CSS
 from ...validators import is_email
 
 
@@ -252,17 +253,7 @@ class CheckoutFormAuthorizeNetSIM(CheckoutFormBase):
         if self.receipt_email:
             subject = get_setting('receipt_subject')
             unstyled_msg = self.receipt_email()
-            css = self.context.unrestrictedTraverse('plone.css')()
-            # remove specific lines of css that were causing premailer to fail
-            # due to:'unicodeescape' codec can't decode byte 0x5c in position 26
-            # x--------------------------
-            css_parsed = []
-            for x in css.split("\n"):
-                if '\.' not in x:
-                    css_parsed.append(x)
-            cssp = "".join(css_parsed)
-            # x--------------------------
-            msg = Premailer(unstyled_msg, css_text=cssp).transform()
+            msg = Premailer(unstyled_msg, css_text=EMAIL_CSS).transform()
             # only send email if the email field was entered in the SIM billing
             # address section and if the email address is a valid email format
             if 'x_email' in self.request.form:

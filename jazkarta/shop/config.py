@@ -1,8 +1,8 @@
 import os
 
-# note: if the JAZKARTA_SHOP_PRODUCTION exists in the environment 
-# the system considers itself to be in PRODUCTION mode, setting 
-# JAZKARTA_SHOP_PRODUCTION=False does not mean that one is now in DEVELOPMENT 
+# note: if the JAZKARTA_SHOP_PRODUCTION exists in the environment
+# the system considers itself to be in PRODUCTION mode, setting
+# JAZKARTA_SHOP_PRODUCTION=False does not mean that one is now in DEVELOPMENT
 # mode, one is still in PRODUCTION - instead unset the JAZKARTA_SHOP_PRODUCTION
 # variable to return to DEVELOPMENT mode
 IN_PRODUCTION = os.environ.get('JAZKARTA_SHOP_PRODUCTION', False)
@@ -276,3 +276,13 @@ PAYMENT_PROCESSORS = [
     u'Authorize.Net Accept.js',
     u'Stripe',
 ]
+
+EMAIL_CSS = """#cartFormWrapper { margin-left: 28px; }
+    table { border-left: 1px solid #ddd; border-bottom: 1px solid #ddd; }
+    th { color: #666; border: 0.1em solid #fff; border-style: solid solid none none; background: #ddd; padding: 0.5em 1em; }
+    td { border-right: 1px solid #ddd; padding: 0.5em 1em; }
+    h3 { color: #7a756e; font-size: 14px; font-weight: bold; text-transform: uppercase; }
+    dl { color: #1b1a1a; font-size: 12px; padding: 5px 0px 5px; }
+    dt { color: #1b1a1a; font-weight: bold; }
+    dd { padding-bottom: 10px; }
+"""
