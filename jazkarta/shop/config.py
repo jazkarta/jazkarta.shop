@@ -284,5 +284,5 @@ EMAIL_CSS = """#cartFormWrapper { margin-left: 28px; }
     h3 { color: #7a756e; font-size: 14px; font-weight: bold; text-transform: uppercase; }
     dl { color: #1b1a1a; font-size: 12px; padding: 5px 0px 5px; }
     dt { color: #1b1a1a; font-weight: bold; }
-    dd { padding-bottom: 10px; }
+    dd { margin-left: 0; padding-bottom: 10px; }
 """
