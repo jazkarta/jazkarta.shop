@@ -49,18 +49,18 @@
 <div tal:define="address cart/ship_to|nothing"
      tal:condition="cart/ship_to|nothing">
   <h3>Ship to</h3>
-  <div>
-    <strong tal:content="string:${address/last_name}, ${address/first_name}">Name</strong>
-  </div>
-  <div tal:content="string:${address/address}. ${address/city}, ${address/state}. ${address/zip}. ${address/country}.">Address</div>
+  <dl>
+    <dt tal:content="string:${address/last_name}, ${address/first_name}">Name</dt>
+    <dd><span tal:condition="address/address" tal:content="string:${address/address}." /> <span tal:condition="address/city" tal:content="string:${address/city}," /> <span tal:condition="address/state" tal:content="string:${address/state}." /> <span tal:condition="address/zip" tal:content="string:${address/zip}." /> <span tal:condition="address/country" tal:content="string:${address/country}." /></dd>
+  </dl>
 </div>
 <div tal:define="address cart/bill_to|nothing"
      tal:condition="cart/bill_to|nothing">
   <h3>Bill to</h3>
-  <div>
-    <strong tal:content="string:${address/last_name}, ${address/first_name}">Name</strong>
-  </div>
-  <div tal:content="string:${address/address}. ${address/city}, ${address/state}. ${address/zip}. ${address/country}.">Address</div>
+  <dl>
+    <dt tal:content="string:${address/last_name}, ${address/first_name}">Name</dt>
+    <dd><span tal:condition="address/address" tal:content="string:${address/address}." /> <span tal:condition="address/city" tal:content="string:${address/city}," /> <span tal:condition="address/state" tal:content="string:${address/state}." /> <span tal:condition="address/zip" tal:content="string:${address/zip}." /> <span tal:condition="address/country" tal:content="string:${address/country}." /></dd>
+  </dl>
 </div>
 <div tal:condition="cart/notes|nothing">
   <h3>Notes</h3>
