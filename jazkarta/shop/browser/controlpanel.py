@@ -40,7 +40,7 @@ def _fetch_orders(part, key=(), csv=False):
             if k in ['cart', 'coupon', 'shipping_methods']:
                 continue
             key = key + (k,)
-            for data in _fetch_orders(part[k], key):
+            for data in _fetch_orders(part[k], key, csv):
                 yield data
     else:
         if 'orders' in key:
@@ -58,7 +58,10 @@ def _fetch_orders(part, key=(), csv=False):
             data['taxes'] = sum(item.get('tax', 0) for item in data.get('taxes', ()))
             data['total'] = (sum((i.get('price', 0.0) * i.get('quantity', 1)) for i in items) +
                              data['taxes'] + data.get('ship_charge', 0))
+
             item_str = '<ul>'
+            if csv:
+                item_str = ''
             for i in items:
                 uid = i.get('uid', None)
                 if uid:
@@ -74,25 +77,43 @@ def _fetch_orders(part, key=(), csv=False):
 
                 if csv:
                     # special parsing of items for csv export
+                    item_str += '{} x {} @ ${}'.format(
+                         title, i.get('quantity', 1), i.get('price', 0.0)
+                    )
+                    # add new line character to all but last item
+                    if i != items[len(items)-1]:
+                        item_str += '\n'
+                else:
                     item_str += '<li><a href="{}">{}</a> x {} @ ${}</li>'.format(
                         href, title, i.get('quantity', 1), i.get('price', 0.0)
                     )
-                else:
-                    item_str += '• {} x {} @ ${} \n'.format(
-                         title, i.get('quantity', 1), i.get('price', 0.0)
-                    )
-
             data['items'] = item_str + '</ul>'
+            if csv:
+                data['items'] = item_str
             address = data.get('ship_to', {})
-            data['ship_to'] = u'<p>{} {}</p><p>{}</p><p>{}, {} {}</p><p>{}</p>'.format(
-                escape(address.get('first_name', '')),
-                escape(address.get('last_name', '')),
-                escape(address.get('street', '')),
-                escape(address.get('city', '')),
-                escape(address.get('state', '')),
-                escape(address.get('postal_code', '')),
-                escape(address.get('country', '')),
-            )
+            if csv:
+                data['ship_to'] = u'{} {}, {}, {}, {} {}, {}'.format(
+                    escape(address.get('first_name', '')),
+                    escape(address.get('last_name', '')),
+                    escape(address.get('street', '')),
+                    escape(address.get('city', '')),
+                    escape(address.get('state', '')),
+                    escape(address.get('postal_code', '')),
+                    escape(address.get('country', '')),
+                )
+                # check if shipping address has been entered
+                if data['ship_to'].replace(',','').replace(' ','') == '':
+                    data['ship_to'] = u''
+            else:
+                data['ship_to'] = u'<p>{} {}</p><p>{}</p><p>{}, {} {}</p><p>{}</p>'.format(
+                    escape(address.get('first_name', '')),
+                    escape(address.get('last_name', '')),
+                    escape(address.get('street', '')),
+                    escape(address.get('city', '')),
+                    escape(address.get('state', '')),
+                    escape(address.get('postal_code', '')),
+                    escape(address.get('country', '')),
+                )
             yield data
 
 
@@ -109,7 +130,7 @@ class OrderControlPanelView(ControlPanelFormWrapper):
     keys = ORDER_KEYS
 
     def update(self):
-        orders = list(_fetch_orders(storage.get_storage(), False))
+        orders = list(_fetch_orders(storage.get_storage(), (), False))
         orders.sort(key=lambda o: o.get('date_sort', ''), reverse=True)
         start = int(self.request.get('b_start', 0))
         self.batch = Batch(orders, size=50, start=start)
@@ -131,7 +152,6 @@ class OrderControlPanelView(ControlPanelFormWrapper):
         end_date_day = self.request.get('End-Date_day')
         end_date_month = self.request.get('End-Date_month')
         end_date_year = self.request.get('End-Date_year')
-
         if end_date_day is not None:
             end_date = datetime.date(int(end_date_year),
                                      int(end_date_month),
@@ -147,14 +167,12 @@ class OrderControlPanelView(ControlPanelFormWrapper):
         start_date_day = self.request.get('Start-Date_day')
         start_date_month = self.request.get('Start-Date_month')
         start_date_year = self.request.get('Start-Date_year')
-
         if start_date_day is not None:
             start_date = datetime.date(int(start_date_year),
                                        int(start_date_month),
                                        int(start_date_day))
         else:
             start_date = datetime.datetime.today() - datetime.timedelta(365)
-
         return start_date.strftime(u'%Y-%m-%d')
 
 
@@ -166,7 +184,7 @@ class ExportShopOrders(BrowserView):
     def __call__(self):
         csv_content = None
         # get shop order entries
-        orders = list(_fetch_orders(storage.get_storage(), True))
+        orders = list(_fetch_orders(storage.get_storage(), (), True))
         orders.sort(key=lambda o: o.get('date_sort', ''), reverse=True)
         orders_csv = StringIO()
 
@@ -196,16 +214,11 @@ class ExportShopOrders(BrowserView):
                 ship_charge = ""
                 if 'ship_charge' in order:
                     ship_charge = order['ship_charge']
-                ship_to = ""
-                if 'ship_to' in order:
-                    ship_to = order['ship_to']
-                    ship_to = ship_to.replace('</p>', ', ').replace('<p>', '')
-                    ship_to = ship_to.rstrip(',')
 
                 ldict={'userid': order['userid'],
                        'date': order['date'],
                        'items': order['items'],
-                       'ship_to': ship_to,
+                       'ship_to': order['ship_to'],
                        'taxes': order['taxes'],
                        'ship_charge': ship_charge,
                        'total': order['total'],
