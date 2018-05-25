@@ -12,6 +12,53 @@
   <div tal:define="batch view/batch">
     <h1 class="documentFirstHeading">Shop Orders</h1>
 
+    <div>
+         <table>
+             <tbody>
+                <tr>
+                    <th class="datelabel">Start Date</th>
+                    <th class="datelabel">End Date</th>
+                </tr>
+                <tr>
+                    <td>
+                        <tal:define define="show_hm python:False;
+                                            show_ymd python:True;
+                                            starting_year python:2016;
+                                            ending_year python:None;
+                                            future_years python:0;
+                                            formname string:ShopOrders;
+                                            inputvalue view/startDateString;
+                                            inputname string:Start-Date">
+                        <metal:box use-macro="here/calendar_macros/macros/calendarDatePickerBox|default">
+                        </metal:box>
+                        </tal:define>
+                    </td>
+                    <td>
+                        <tal:define define="show_hm python:False;
+                                            show_ymd python:True;
+                                            starting_year python:2016;
+                                            ending_year python:None;
+                                            future_years python:0;
+                                            formname string:ShopOrders;
+                                            inputvalue view/endDateString;
+                                            inputname string:End-Date">
+                        <metal:box use-macro="here/calendar_macros/macros/calendarDatePickerBox|default">
+                        </metal:box>
+                        </tal:define>
+                    </td>
+                    <td>
+                        <input type="submit" name="submitted" value="Update Dates">
+                    </td>
+                    <td>
+                        <input type="submit" name="export_csv" value="Export CSV">
+                    </td>
+                </tr>
+             </tbody>
+         </table>
+    </div>
+    <div>&nbsp;</div>
+    <div>&nbsp;</div>
+
     <table class="listing">
       <thead>
         <tr>

@@ -100,6 +100,14 @@
     layer="..interfaces.IBrowserLayer"
     />
 
+  <browser:page
+    name="export_shop_orders_csv"
+    for="plone.app.layout.navigation.interfaces.INavigationRoot"
+    class=".controlpanel.ExportShopOrders"
+    permission="zope2.View"
+    layer="..interfaces.IBrowserLayer"
+    />
+
   <browser:viewlet
     name="jazkarta.shop.stripe_js"
     view="jazkarta.shop.interfaces.IStripeEnabledView"
