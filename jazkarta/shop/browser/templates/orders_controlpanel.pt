@@ -12,6 +12,8 @@
   <div tal:define="batch view/batch">
     <h1 class="documentFirstHeading">Shop Orders</h1>
 
+<tal:using_p4 tal:condition="not:view/using_plone5">
+
     <div>
          <table>
              <tbody>
@@ -20,6 +22,8 @@
                     <th class="datelabel">End Date</th>
                 </tr>
                 <tr>
+                    <form id="export_csv" name="export-csv" method="post"
+                          tal:attributes="action string:${view/__name__}">
                     <td>
                         <tal:define define="show_hm python:False;
                                             show_ymd python:True;
@@ -47,17 +51,23 @@
                         </tal:define>
                     </td>
                     <td>
-                        <input type="submit" name="submitted" value="Update Dates">
+                        <input type="submit" name="submitted" value="Update Selection">
                     </td>
-                    <td>
-                        <input type="submit" name="export_csv" value="Export CSV">
-                    </td>
+                    </form>
+                    <form id="export_csv2" name="export-csv2" method="post" class="allowMultiSubmit"
+                          tal:attributes="action string:${context/absolute_url}/@@export_shop_orders_csv?first_order=${view/first_order}&last_order=${view/last_order}">
+                        <td>
+                            <input type="submit" name="export_csv" value="Export CSV">
+                        </td>
+                    </form>
                 </tr>
              </tbody>
          </table>
     </div>
+
     <div>&nbsp;</div>
     <div>&nbsp;</div>
+</tal:using_p4>
 
     <table class="listing">
       <thead>

@@ -121,20 +121,13 @@ class OrderControlPanelForm(form.Form):
     id = "JazkartaShopOrders"
     label = _(u"Jazkarta Shop Orders")
 
+class DateMixin:
+    """ Mixin class that provides datepicker methods.
+    """
 
-@implementer(IDontShowJazkartaShopPortlets)
-class OrderControlPanelView(ControlPanelFormWrapper):
-    label = _(u"Jazkarta Shop Orders")
-    form = OrderControlPanelForm
-    orders = ()
-    keys = ORDER_KEYS
-
-    def update(self):
-        orders = list(_fetch_orders(storage.get_storage(), (), False))
-        orders.sort(key=lambda o: o.get('date_sort', ''), reverse=True)
-        start = int(self.request.get('b_start', 0))
-        self.batch = Batch(orders, size=50, start=start)
-        super(OrderControlPanelView, self).update()
+    # defaults
+    first_order_date = datetime.datetime.today() - datetime.timedelta(365)
+    last_order_date = datetime.datetime.today()
 
     def check_date_integrity(self):
         """ returns False if start_date specified is later than the end_date
@@ -153,13 +146,13 @@ class OrderControlPanelView(ControlPanelFormWrapper):
         end_date_month = self.request.get('End-Date_month')
         end_date_year = self.request.get('End-Date_year')
         if end_date_day is not None:
-            end_date = datetime.date(int(end_date_year),
-                                     int(end_date_month),
-                                     int(end_date_day))
+            ed = datetime.date(int(end_date_year),
+                               int(end_date_month),
+                               int(end_date_day))
         else:
-            end_date = datetime.datetime.today()
-
-        return end_date.strftime(u'%Y-%m-%d')
+            ed = datetime.datetime.strptime(self.last_order_date,
+                '%Y-%m-%d %I:%M %p')
+        return ed.strftime(u'%Y-%m-%d')
 
     def startDateString(self):
         """ return datestring for start date - date picker
@@ -168,15 +161,40 @@ class OrderControlPanelView(ControlPanelFormWrapper):
         start_date_month = self.request.get('Start-Date_month')
         start_date_year = self.request.get('Start-Date_year')
         if start_date_day is not None:
-            start_date = datetime.date(int(start_date_year),
-                                       int(start_date_month),
-                                       int(start_date_day))
+            sd = datetime.date(int(start_date_year),
+                               int(start_date_month),
+                               int(start_date_day))
         else:
-            start_date = datetime.datetime.today() - datetime.timedelta(365)
-        return start_date.strftime(u'%Y-%m-%d')
+            sd = datetime.datetime.strptime(self.first_order_date,
+                '%Y-%m-%d %I:%M %p')
+        return sd.strftime(u'%Y-%m-%d')
 
 
-class ExportShopOrders(BrowserView):
+@implementer(IDontShowJazkartaShopPortlets)
+class OrderControlPanelView(ControlPanelFormWrapper, DateMixin, P5Mixin):
+    label = _(u"Jazkarta Shop Orders")
+    form = OrderControlPanelForm
+    orders = ()
+    keys = ORDER_KEYS
+    first_order = 0
+    last_order = 0
+
+    def update(self):
+        orders = list(_fetch_orders(storage.get_storage(), (), False))
+        orders.sort(key=lambda o: o.get('date_sort', ''), reverse=True)
+        start = int(self.request.get('b_start', 0))
+        self.first_order_date = orders[0]['date']
+        self.last_order_date = orders[len(orders)-1]['date']
+        self.first_order = 0
+        self.last_order = len(orders)-1 
+        if not self.using_plone5(): # only P4 has date selection at the moment
+            pass
+
+        self.batch = Batch(orders, size=50, start=start)
+        super(OrderControlPanelView, self).update()
+
+
+class ExportShopOrders(BrowserView, DateMixin):
     """ Export selected date range of shop orders into a CSV file, do nothing
         if no orders exist.
     """
@@ -187,6 +205,16 @@ class ExportShopOrders(BrowserView):
         orders = list(_fetch_orders(storage.get_storage(), (), True))
         orders.sort(key=lambda o: o.get('date_sort', ''), reverse=True)
         orders_csv = StringIO()
+
+        first_order = self.request.get('first_order')
+        last_order = self.request.get('last_order')
+        if first_order and last_order:
+            try:
+                if int(last_order) <= len(orders)-1 and int(first_order) >= 0:
+                    # trim selection
+                    orders = orders[int(first_order):int(last_order)]
+            except:
+                pass
 
         if orders is not None and len(orders) > 0:
             writer = csv.DictWriter(orders_csv,
