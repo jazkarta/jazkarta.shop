@@ -75,7 +75,6 @@
             <tal:heading tal:repeat="key view/keys">
                 <th tal:content="python:key.replace('_', ' ').title()">Heading</th>
             </tal:heading>
-            <!-- th>Order Status</th -->
             <th>Order Details</th>
         </tr>
       </thead>
@@ -84,13 +83,6 @@
             <tal:value repeat="key view/keys">
                 <td tal:content="structure python:entry.get(key, '')">Value</td>
             </tal:value>
-            <!-- td>
-                <select name="${entry/userid|string:}:${entry/date/isoformat}" tal:attributes="value entry.get('order_status', 'New')">
-                    <option>New</option>
-                    <option>Shipped</option>
-                    <option>Returned</option>
-                </select>
-            </td -->
             <td>
               <a tal:attributes="href string:@@jazkarta-shop-order-details?order_id=${entry/orderid}">Show Details</a>
           </tr>
