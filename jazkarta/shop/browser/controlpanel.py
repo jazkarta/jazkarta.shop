@@ -294,7 +294,7 @@ class ExportShopOrders(BrowserView, DateMixin):
             end_str = end.strftime(u'%m%d%Y')
             start_str = start.strftime(u'%m%d%Y')
 
-            nice_filename = '%s_%s_%s' % ('shop_orders', start_str, end_str))
+            nice_filename = '%s_%s_%s' % ('shop_orders', start_str, end_str)
 
             self.request.response.setHeader("Content-Disposition",
                                             "attachment; filename=%s.csv" %
