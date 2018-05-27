@@ -287,8 +287,14 @@ class ExportShopOrders(BrowserView, DateMixin):
             csv_content = orders_csv.getvalue()
             orders_csv.close()
 
-            now = DateTime()
-            nice_filename = '%s_%s' % ('shop-orders_', now.strftime('%Y%m%d'))
+            # filename generation with date range included
+            end = self.to_datetime(orders[0]['date'],'%Y-%m-%d %I:%M %p')
+            start = self.to_datetime(orders[len(orders)-1]['date'],
+                '%Y-%m-%d %I:%M %p')
+            end_str = end.strftime(u'%m%d%Y')
+            start_str = start.strftime(u'%m%d%Y')
+
+            nice_filename = '%s_%s_%s' % ('shop_orders', start_str, end_str))
 
             self.request.response.setHeader("Content-Disposition",
                                             "attachment; filename=%s.csv" %
