@@ -93,22 +93,16 @@ jaz-shop-message.error {
     margin: 0em 0em 0em 2em;
 }
 
+/* shop orders date range selection - p4 only for now */
 #export_csv_button {
     width: 100px;
 }
-
-.order-date-picker-box {
-
-}
-
 #shop-order-date-selection-table img {
     display: none;
 }
-
 #shop-order-date-selection-table .order-date-picker-box {
     padding-right: 20px;
 }
-
 #content #shop-order-date-selection-table {
     margin-left: 0px !important;
 }
