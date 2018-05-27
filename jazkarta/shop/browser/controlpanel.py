@@ -130,7 +130,7 @@ class DateMixin:
     last_order_date = datetime.datetime.today()
 
     def check_date_integrity(self):
-        """ returns False if start_date specified is before than the end_date
+        """ returns False if start_date specified is later than the end_date
         """
         start_date = datetime.datetime.strptime(self.startDateString(),
                                                 u'%Y-%m-%d')
@@ -186,6 +186,7 @@ class OrderControlPanelView(ControlPanelFormWrapper, DateMixin, P5Mixin):
         orders = list(_fetch_orders(storage.get_storage(), (), False))
         orders.sort(key=lambda o: o.get('date_sort', ''), reverse=True)
         start = int(self.request.get('b_start', 0))
+
         if not self.using_plone5(): # only P4 has date selection at the moment
             self.most_recent_order_date = orders[0]['date']
             self.first_order_date = orders[len(orders)-1]['date']
@@ -235,6 +236,7 @@ class ExportShopOrders(BrowserView, DateMixin):
         orders.sort(key=lambda o: o.get('date_sort', ''), reverse=True)
         orders_csv = StringIO()
 
+        # get indexes of selected orders dates if supplied
         first_order = self.request.get('first_order')
         last_order = self.request.get('last_order')
         if first_order and last_order:
@@ -298,9 +300,6 @@ class ExportShopOrders(BrowserView, DateMixin):
             self.request.response.setHeader("Cache-Control", "no-store")
             self.request.response.setHeader("Pragma", "no-cache")
             self.request.response.write(csv_content)
-
-#        self.request.response.redirect(
-#                '/'.join(self.context.getPhysicalPath()))
 
         return csv_content
 

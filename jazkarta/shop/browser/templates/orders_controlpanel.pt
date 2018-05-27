@@ -13,63 +13,70 @@
     <h1 class="documentFirstHeading">Shop Orders</h1>
 
     <tal:using_p4 tal:condition="not:view/using_plone5">
-    <div>
-         <table>
-             <tbody>
-                <tr>
-                    <th class="datelabel">Start Date</th>
-                    <th class="datelabel">End Date</th>
-                </tr>
-                <tr>
-                    <form id="export_csv" name="export-csv" method="post"
-                          tal:attributes="action string:${view/__name__}">
-                    <td>
-                        <tal:define define="show_hm python:False;
-                                            show_ymd python:True;
-                                            starting_year python:2016;
-                                            ending_year python:None;
-                                            future_years python:0;
-                                            formname string:ShopOrders;
-                                            inputvalue view/startDateString;
-                                            inputname string:Start-Date">
-                        <metal:box use-macro="here/calendar_macros/macros/calendarDatePickerBox|default">
-                        </metal:box>
-                        </tal:define>
-                    </td>
-                    <td>
-                        <tal:define define="show_hm python:False;
-                                            show_ymd python:True;
-                                            starting_year python:2016;
-                                            ending_year python:None;
-                                            future_years python:0;
-                                            formname string:ShopOrders;
-                                            inputvalue view/endDateString;
-                                            inputname string:End-Date">
-                        <metal:box use-macro="here/calendar_macros/macros/calendarDatePickerBox|default">
-                        </metal:box>
-                        </tal:define>
-                    </td>
-                    <td>
-                        <input type="submit" name="submitted" value="Update Selection">
-                    </td>
-                    </form>
-                    <form id="export_csv2" name="export-csv2" method="post" class="allowMultiSubmit"
-                          tal:attributes="action string:${context/absolute_url}/@@export_shop_orders_csv?first_order=${view/end_index}&last_order=${view/start_index}">
-                        <td>
-                            <input type="submit" name="export_csv" value="Export CSV">
+    <form id="update-order-selection" name="update-order-selection" method="post"
+              tal:attributes="action string:${view/__name__}">
+        <div>
+             <table id="shop-order-date-selection-table">
+                 <tbody>
+                    <tr>
+                        <th><h5>Start Date</h5></th>
+                        <th><h5>End Date</h5></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                         <td class="order-date-picker-box">
+                            <tal:define define="show_hm python:False;
+                                                show_ymd python:True;
+                                                starting_year python:2016;
+                                                ending_year python:None;
+                                                future_years python:0;
+                                                formname string:ShopOrders;
+                                                inputvalue view/startDateString;
+                                                inputname string:Start-Date">
+                            <metal:box use-macro="here/calendar_macros/macros/calendarDatePickerBox|default">
+                            </metal:box>
+                            </tal:define>
                         </td>
-                    </form>
-                </tr>
-             </tbody>
-         </table>
-    </div>
+                        <td class="order-date-picker-box">
+                            <tal:define define="show_hm python:False;
+                                                show_ymd python:True;
+                                                starting_year python:2016;
+                                                ending_year python:None;
+                                                future_years python:0;
+                                                formname string:ShopOrders;
+                                                inputvalue view/endDateString;
+                                                inputname string:End-Date">
+                            <metal:box use-macro="here/calendar_macros/macros/calendarDatePickerBox|default">
+                            </metal:box>
+                            </tal:define>
+                        </td>
 
-    <div>&nbsp;</div>
-    <div>&nbsp;</div>
-
+                    </tr>
+                 </tbody>
+             </table>
+        </div>
+        <div>&nbsp;</div>
+        <div>
+            <input type="submit" name="submitted" value="Update Selection">
+        </div>
+        <div>&nbsp;</div>
+    </form>
     <tal:batch tal:condition="not:view/batch">
             <h2>No orders found in date range selected.</h2>
     </tal:batch>
+    <tal:bad_dates tal:condition="not:view/check_date_integrity">
+            <h2>Selected date range incorrect, displaying all orders.</h2>
+    </tal:bad_dates>
+    <div>
+        <form id="export_csv" name="export-csv2" method="post"
+              tal:attributes="action string:${context/absolute_url}/@@export_shop_orders_csv?first_order=${view/end_index}&last_order=${view/start_index}">
+            <button id="export_csv_button" type="submit" name="export_csv">Export CSV</button>
+        </form>
+    </div>
+
+    <div>&nbsp;</div>
+
     </tal:using_p4>
 
     <table class="listing" tal:condition="view/batch">
