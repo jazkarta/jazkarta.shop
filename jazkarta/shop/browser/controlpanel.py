@@ -130,7 +130,7 @@ class DateMixin:
     last_order_date = datetime.datetime.today()
 
     def check_date_integrity(self):
-        """ returns False if start_date specified is later than the end_date
+        """ returns False if start_date specified is before than the end_date
         """
         start_date = datetime.datetime.strptime(self.startDateString(),
                                                 u'%Y-%m-%d')
@@ -150,7 +150,7 @@ class DateMixin:
                                int(end_date_month),
                                int(end_date_day))
         else:
-            ed = datetime.datetime.strptime(self.last_order_date,
+            ed = self.to_datetime(self.most_recent_order_date,
                 '%Y-%m-%d %I:%M %p')
         return ed.strftime(u'%Y-%m-%d')
 
@@ -165,9 +165,12 @@ class DateMixin:
                                int(start_date_month),
                                int(start_date_day))
         else:
-            sd = datetime.datetime.strptime(self.first_order_date,
+            sd = self.to_datetime(self.first_order_date, 
                 '%Y-%m-%d %I:%M %p')
         return sd.strftime(u'%Y-%m-%d')
+
+    def to_datetime(self, date, date_format):
+        return datetime.datetime.strptime(date, date_format)
 
 
 @implementer(IDontShowJazkartaShopPortlets)
@@ -176,19 +179,45 @@ class OrderControlPanelView(ControlPanelFormWrapper, DateMixin, P5Mixin):
     form = OrderControlPanelForm
     orders = ()
     keys = ORDER_KEYS
-    first_order = 0
-    last_order = 0
+    end_index = 0
+    start_index = 0
 
     def update(self):
         orders = list(_fetch_orders(storage.get_storage(), (), False))
         orders.sort(key=lambda o: o.get('date_sort', ''), reverse=True)
         start = int(self.request.get('b_start', 0))
-        self.first_order_date = orders[0]['date']
-        self.last_order_date = orders[len(orders)-1]['date']
-        self.first_order = 0
-        self.last_order = len(orders)-1 
         if not self.using_plone5(): # only P4 has date selection at the moment
-            pass
+            self.most_recent_order_date = orders[0]['date']
+            self.first_order_date = orders[len(orders)-1]['date']
+
+            # default in case date selection integrity check fails
+            # this could happen if end date < start date
+            self.end_index = 0 
+            self.start_index = len(orders)-1
+
+            selected_start = self.to_datetime(self.startDateString(),'%Y-%m-%d')
+            selected_end = self.to_datetime(self.endDateString(),'%Y-%m-%d')
+
+            if self.check_date_integrity():
+                # generate list of dates in selected date range
+                count = selected_start
+                date_range = []
+                while count <= selected_end:        
+                    date_range.append(count)
+                    count += datetime.timedelta(days=1)
+
+                # find orders indexes that are in selected range
+                indexes = [ orders.index(x) for x in orders if \
+                    self.to_datetime(x['date'], \
+                    '%Y-%m-%d %I:%M %p').replace(hour=0, minute=0) in date_range]
+                if len(indexes) > 0:
+                    self.end_index = indexes[0] # newest 
+                    self.start_index = indexes[len(indexes)-1] # oldest
+                    # trim orders based on selected start and end 
+                    orders = orders[self.end_index:self.start_index]
+                else:
+                    # no orders in selected date range
+                    orders = []
 
         self.batch = Batch(orders, size=50, start=start)
         super(OrderControlPanelView, self).update()

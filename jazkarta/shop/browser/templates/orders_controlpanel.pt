@@ -12,8 +12,7 @@
   <div tal:define="batch view/batch">
     <h1 class="documentFirstHeading">Shop Orders</h1>
 
-<tal:using_p4 tal:condition="not:view/using_plone5">
-
+    <tal:using_p4 tal:condition="not:view/using_plone5">
     <div>
          <table>
              <tbody>
@@ -55,7 +54,7 @@
                     </td>
                     </form>
                     <form id="export_csv2" name="export-csv2" method="post" class="allowMultiSubmit"
-                          tal:attributes="action string:${context/absolute_url}/@@export_shop_orders_csv?first_order=${view/first_order}&last_order=${view/last_order}">
+                          tal:attributes="action string:${context/absolute_url}/@@export_shop_orders_csv?first_order=${view/end_index}&last_order=${view/start_index}">
                         <td>
                             <input type="submit" name="export_csv" value="Export CSV">
                         </td>
@@ -67,9 +66,13 @@
 
     <div>&nbsp;</div>
     <div>&nbsp;</div>
-</tal:using_p4>
 
-    <table class="listing">
+    <tal:batch tal:condition="not:view/batch">
+            <h2>No orders found in date range selected.</h2>
+    </tal:batch>
+    </tal:using_p4>
+
+    <table class="listing" tal:condition="view/batch">
       <thead>
         <tr>
             <tal:heading tal:repeat="key view/keys">
