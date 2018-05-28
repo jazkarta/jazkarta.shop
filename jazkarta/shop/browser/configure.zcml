@@ -141,4 +141,11 @@
     directory="static"
     />
 
+  <browser:page
+    for="*"
+    name="jazkarta.shop.calendar_macros"
+    template="templates/calendar_macros.pt"
+    permission="zope.Public"
+  />
+
 </configure>

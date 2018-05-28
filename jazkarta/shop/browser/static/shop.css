@@ -93,7 +93,7 @@ jaz-shop-message.error {
     margin: 0em 0em 0em 2em;
 }
 
-/* shop orders date range selection - p4 only for now */
+/* shop orders date range selection */
 #export_csv_button {
     width: 100px;
 }
@@ -105,4 +105,15 @@ jaz-shop-message.error {
 }
 #content #shop-order-date-selection-table {
     margin-left: 0px !important;
+}
+
+/* P5 fixes for shop orders date range selection */
+#shop-order-date-selection-table {
+    background-color: inherit;
+}
+#shop-order-date-selection-table,
+#shop-order-date-selection-table > tbody > tr,
+#shop-order-date-selection-table > tbody > tr > td,
+#shop-order-date-selection-table > tbody > tr > th {
+    border: none;
 }

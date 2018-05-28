@@ -20,7 +20,6 @@ from ..utils import resolve_uid
 from ..api import get_order_from_id
 from .. import storage
 from .. import _
-from .checkout import P5Mixin
 
 
 class SettingsControlPanelForm(RegistryEditForm):
@@ -150,8 +149,11 @@ class DateMixin:
                                int(end_date_month),
                                int(end_date_day))
         else:
-            ed = self.to_datetime(self.most_recent_order_date,
-                '%Y-%m-%d %I:%M %p')
+            if self.orders_exist:
+                ed = self.to_datetime(self.most_recent_order_date,
+                    '%Y-%m-%d %I:%M %p')
+            else:
+                ed = datetime.datetime.today()
         return ed.strftime(u'%Y-%m-%d')
 
     def startDateString(self):
@@ -165,8 +167,11 @@ class DateMixin:
                                int(start_date_month),
                                int(start_date_day))
         else:
-            sd = self.to_datetime(self.first_order_date, 
-                '%Y-%m-%d %I:%M %p')
+            if self.orders_exist:
+                sd = self.to_datetime(self.first_order_date, 
+                    '%Y-%m-%d %I:%M %p')
+            else:
+                sd = datetime.datetime.today()
         return sd.strftime(u'%Y-%m-%d')
 
     def to_datetime(self, date, date_format):
@@ -174,20 +179,23 @@ class DateMixin:
 
 
 @implementer(IDontShowJazkartaShopPortlets)
-class OrderControlPanelView(ControlPanelFormWrapper, DateMixin, P5Mixin):
+class OrderControlPanelView(ControlPanelFormWrapper, DateMixin):
     label = _(u"Jazkarta Shop Orders")
     form = OrderControlPanelForm
     orders = ()
     keys = ORDER_KEYS
     end_index = 0
     start_index = 0
+    orders_exist = False
 
     def update(self):
         orders = list(_fetch_orders(storage.get_storage(), (), False))
         orders.sort(key=lambda o: o.get('date_sort', ''), reverse=True)
         start = int(self.request.get('b_start', 0))
 
-        if not self.using_plone5(): # only P4 has date selection at the moment
+        if len(orders) > 0:
+            orders_exist = True
+
             self.most_recent_order_date = orders[0]['date']
             self.first_order_date = orders[len(orders)-1]['date']
 
