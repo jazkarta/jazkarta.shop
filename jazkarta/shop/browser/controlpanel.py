@@ -194,7 +194,7 @@ class OrderControlPanelView(ControlPanelFormWrapper, DateMixin):
         start = int(self.request.get('b_start', 0))
 
         if len(orders) > 0:
-            orders_exist = True
+            self.orders_exist = True
 
             self.most_recent_order_date = orders[0]['date']
             self.first_order_date = orders[len(orders)-1]['date']
