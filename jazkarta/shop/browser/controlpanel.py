@@ -120,6 +120,7 @@ class OrderControlPanelForm(form.Form):
     id = "JazkartaShopOrders"
     label = _(u"Jazkarta Shop Orders")
 
+
 class DateMixin:
     """ Mixin class that provides datepicker methods.
     """
@@ -131,15 +132,12 @@ class DateMixin:
     def check_date_integrity(self):
         """ returns False if start_date specified is later than the end_date
         """
-        start_date = datetime.datetime.strptime(self.startDateString(),
-                                                u'%Y-%m-%d')
-        end_date = datetime.datetime.strptime(self.endDateString(), u'%Y-%m-%d')
-        if start_date > end_date:
+        if self.startDate() > self.endDate():
             return False
         return True
 
-    def endDateString(self):
-        """ return datestring for end date - date picker
+    def endDate(self):
+        """ return end date - date picker
         """
         end_date_day = self.request.get('End-Date_day')
         end_date_month = self.request.get('End-Date_month')
@@ -151,13 +149,13 @@ class DateMixin:
         else:
             if self.orders_exist:
                 ed = self.to_datetime(self.most_recent_order_date,
-                    '%Y-%m-%d %I:%M %p')
+                    '%Y-%m-%d %I:%M %p').date()
             else:
-                ed = datetime.datetime.today()
-        return ed.strftime(u'%Y-%m-%d')
+                ed = datetime.datetime.today().date()
+        return ed
 
-    def startDateString(self):
-        """ return datestring for start date - date picker
+    def startDate(self):
+        """ return start date - date picker
         """
         start_date_day = self.request.get('Start-Date_day')
         start_date_month = self.request.get('Start-Date_month')
@@ -169,12 +167,14 @@ class DateMixin:
         else:
             if self.orders_exist:
                 sd = self.to_datetime(self.first_order_date, 
-                    '%Y-%m-%d %I:%M %p')
+                    '%Y-%m-%d %I:%M %p').date()
             else:
-                sd = datetime.datetime.today()
-        return sd.strftime(u'%Y-%m-%d')
+                sd = datetime.datetime.today().date()
+        return sd
 
     def to_datetime(self, date, date_format):
+        """ convert to datetime format helper method
+        """
         return datetime.datetime.strptime(date, date_format)
 
 
@@ -189,7 +189,7 @@ class OrderControlPanelView(ControlPanelFormWrapper, DateMixin):
     orders_exist = False
 
     def update(self):
-        orders = list(_fetch_orders(storage.get_storage(), (), False))
+        orders = list(_fetch_orders(storage.get_storage(), key=(), csv=False))
         orders.sort(key=lambda o: o.get('date_sort', ''), reverse=True)
         start = int(self.request.get('b_start', 0))
 
@@ -204,8 +204,8 @@ class OrderControlPanelView(ControlPanelFormWrapper, DateMixin):
             self.end_index = 0 
             self.start_index = len(orders)-1
 
-            selected_start = self.to_datetime(self.startDateString(),'%Y-%m-%d')
-            selected_end = self.to_datetime(self.endDateString(),'%Y-%m-%d')
+            selected_start = self.startDate()
+            selected_end = self.endDate()
 
             if self.check_date_integrity():
                 # generate list of dates in selected date range
@@ -216,9 +216,9 @@ class OrderControlPanelView(ControlPanelFormWrapper, DateMixin):
                     count += datetime.timedelta(days=1)
 
                 # find orders indexes that are in selected range
-                indexes = [ orders.index(x) for x in orders if \
-                    self.to_datetime(x['date'], \
-                    '%Y-%m-%d %I:%M %p').replace(hour=0, minute=0) in date_range]
+                indexes = [ orders.index(x) for x in orders if
+                    self.to_datetime(x['date'],
+                    '%Y-%m-%d %I:%M %p').date() in date_range]
                 if len(indexes) > 0:
                     self.end_index = indexes[0] # newest 
                     self.start_index = indexes[len(indexes)-1] # oldest
@@ -240,7 +240,7 @@ class ExportShopOrders(BrowserView, DateMixin):
     def __call__(self):
         csv_content = None
         # get shop order entries
-        orders = list(_fetch_orders(storage.get_storage(), (), True))
+        orders = list(_fetch_orders(storage.get_storage(), key=(), csv=True))
         orders.sort(key=lambda o: o.get('date_sort', ''), reverse=True)
         orders_csv = StringIO()
 
@@ -252,19 +252,20 @@ class ExportShopOrders(BrowserView, DateMixin):
                 if int(last_order) <= len(orders)-1 and int(first_order) >= 0:
                     # trim selection
                     orders = orders[int(first_order):int(last_order)]
-            except:
+            except ValueError:
                 pass
 
-        if orders is not None and len(orders) > 0:
-            writer = csv.DictWriter(orders_csv,
-                                fieldnames=['userid', 'date', 'items',
-                                            'ship_to', 'taxes', 'ship_charge',
-                                            'total'],
-                                restval='',
-                                extrasaction='ignore',
-                                dialect='excel',
-                                quoting=csv.QUOTE_ALL
-                               )
+        if orders and len(orders) > 0:
+            writer = csv.DictWriter(
+                orders_csv,
+                fieldnames=['userid', 'date', 'items',
+                            'ship_to', 'taxes', 'ship_charge',
+                            'total'],
+                restval='',
+                extrasaction='ignore',
+                dialect='excel',
+                quoting=csv.QUOTE_ALL
+           )
 
             # Column titles
             ldict={'userid': "User ID",
@@ -278,9 +279,7 @@ class ExportShopOrders(BrowserView, DateMixin):
             writer.writerow(ldict)
 
             for order in orders:
-                ship_charge = ""
-                if 'ship_charge' in order:
-                    ship_charge = order['ship_charge']
+                ship_charge = order.get('ship_charge', '')
 
                 ldict={'userid': order['userid'],
                        'date': order['date'],

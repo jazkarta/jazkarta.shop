@@ -31,7 +31,7 @@
                                                 ending_year python:None;
                                                 future_years python:0;
                                                 formname string:ShopOrders;
-                                                inputvalue view/startDateString;
+                                                inputvalue python:view.startDate().strftime(u'%Y-%m-%d');
                                                 inputname string:Start-Date">
                             <metal:box use-macro="here/jazkarta.shop.calendar_macros/macros/JazkartaShopCalendarDatePickerBox|default">
                             </metal:box>
@@ -44,7 +44,7 @@
                                                 ending_year python:None;
                                                 future_years python:0;
                                                 formname string:ShopOrders;
-                                                inputvalue view/endDateString;
+                                                inputvalue python:view.endDate().strftime(u'%Y-%m-%d');
                                                 inputname string:End-Date">
                             <metal:box use-macro="here/jazkarta.shop.calendar_macros/macros/JazkartaShopCalendarDatePickerBox|default">
                             </metal:box>
@@ -71,7 +71,7 @@
             </tal:bad_dates>
         <div>
             <form id="export_csv" name="export-csv2" method="post"
-                tal:attributes="action string:${context/absolute_url}/@@export_shop_orders_csv?first_order=${view/end_index}&last_order=${view/start_index}">
+                tal:attributes="action string:${context/absolute_url}/@@export-shop-orders-csv?first_order=${view/end_index}&last_order=${view/start_index}">
                 <button id="export_csv_button" type="submit" name="export_csv">Export CSV</button>
             </form>
         </div>
