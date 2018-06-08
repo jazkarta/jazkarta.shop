@@ -45,6 +45,7 @@ def _fetch_orders(part, key=(), csv=False):
         if 'orders' in key:
             data = copy.deepcopy(part)
             raw_date = key[-1]
+            data['datetime'] = raw_date
             data['date'] = raw_date.strftime('%Y-%m-%d %I:%M %p') if hasattr(raw_date, 'strftime') else raw_date
             items = data.get('items', {}).values()
             data['date_sort'] = raw_date.isoformat() if hasattr(raw_date, 'isoformat') else ''
@@ -126,8 +127,8 @@ class DateMixin:
     """
 
     # defaults
-    first_order_date = datetime.datetime.today() - datetime.timedelta(365)
-    last_order_date = datetime.datetime.today()
+    first_order_date = datetime.date.today() - datetime.timedelta(365)
+    last_order_date = datetime.date.today()
 
     def check_date_integrity(self):
         """ returns False if start_date specified is later than the end_date
@@ -151,7 +152,7 @@ class DateMixin:
                 ed = self.to_datetime(self.most_recent_order_date,
                     '%Y-%m-%d %I:%M %p').date()
             else:
-                ed = datetime.datetime.today().date()
+                ed = datetime.date.today()
         return ed
 
     def startDate(self):
@@ -169,7 +170,7 @@ class DateMixin:
                 sd = self.to_datetime(self.first_order_date, 
                     '%Y-%m-%d %I:%M %p').date()
             else:
-                sd = datetime.datetime.today().date()
+                sd = datetime.date.today()
         return sd
 
     def to_datetime(self, date, date_format):
@@ -208,25 +209,14 @@ class OrderControlPanelView(ControlPanelFormWrapper, DateMixin):
             selected_end = self.endDate()
 
             if self.check_date_integrity():
-                # generate list of dates in selected date range
-                count = selected_start
-                date_range = []
-                while count <= selected_end:        
-                    date_range.append(count)
-                    count += datetime.timedelta(days=1)
-
-                # find orders indexes that are in selected range
-                indexes = [ orders.index(x) for x in orders if
-                    self.to_datetime(x['date'],
-                    '%Y-%m-%d %I:%M %p').date() in date_range]
-                if len(indexes) > 0:
-                    self.end_index = indexes[0] # newest 
-                    self.start_index = indexes[len(indexes)-1] # oldest
-                    # trim orders based on selected start and end 
-                    orders = orders[self.end_index:self.start_index]
-                else:
-                    # no orders in selected date range
-                    orders = []
+                filtered_orders = []
+                for order in orders:
+                    if order['datetime'].date() > selected_end:
+                        continue
+                    if order['datetime'].date() < selected_start:
+                        break
+                    filtered_orders.append(order)
+                orders = filtered_orders
 
         self.batch = Batch(orders, size=50, start=start)
         super(OrderControlPanelView, self).update()
