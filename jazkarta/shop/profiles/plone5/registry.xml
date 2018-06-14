@@ -6,7 +6,7 @@
 	         interface='Products.CMFPlone.interfaces.IResourceRegistry'>
 		<value key="js">++resource++jazkarta.shop/shop.js</value>
 	    <value key="css">
-	      <element>++resource++jazkarta.shop/shop.css</element>
+	      <element>++resource++jazkarta.shop/shop.less</element>
 	    </value>
 	</records>
 
