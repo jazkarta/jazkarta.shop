@@ -488,3 +488,7 @@ class IDontShowJazkartaShopPortlets(Interface):
 
 class CheckoutComplete(ObjectEvent):
     """Checkout is complete"""
+
+
+class ItemRemoved(ObjectEvent):
+    """Item removed from cart"""
