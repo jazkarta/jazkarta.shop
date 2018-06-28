@@ -170,7 +170,14 @@ class Cart(object):
                 data = storage.get_shop_data([browser_id, 'cart'])
                 if data is not None:
                     for item in data['items']:
-                        item['user'] = user_id
+                        try:
+                            item['user'] = user_id
+                        except TypeError:
+                            # we had at least one case in
+                            # production of a corrupted cart
+                            # just create a new one if it happens
+                            data = PersistentMapping()
+                            break
                     storage.del_shop_data([browser_id])
                 else:
                     # create a new cart
