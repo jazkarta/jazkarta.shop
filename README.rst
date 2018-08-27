@@ -1,10 +1,12 @@
 A shopping cart and checkout for Plone.
 
-Compatible with Plone4 and Plone5
+Compatible with
+* Plone4
+* Plone5
 
-Supports:
-- Stripe
-- Authorize.net SIM (legacy)
-- Authorize.net Accept.js
+Supports:  
+* Stripe
+* Authorize.net SIM (legacy)
+* Authorize.net Accept.js
 
 Built by Jazkarta.
