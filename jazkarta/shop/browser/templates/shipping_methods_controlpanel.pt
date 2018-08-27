@@ -9,6 +9,9 @@
 <body>
 
 <metal:main fill-slot="main">
+    <a tal:attributes="href view/plone_control_panel" id="setup-link">
+        Site Setup
+    </a>
   <div data-pat-plone-modal='{"actionOptions": {"displayInModal": false}}'>
     <h1 class="documentFirstHeading">Shipping Methods</h1>
 

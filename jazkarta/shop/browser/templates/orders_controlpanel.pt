@@ -10,6 +10,9 @@
 
 <metal:main fill-slot="main">
   <div tal:define="batch view/batch">
+    <a tal:attributes="href view/plone_control_panel" id="setup-link">
+        Site Setup
+    </a>
     <h1 class="documentFirstHeading">Shop Orders</h1>
 
     <form id="update-order-selection" name="update-order-selection" method="post"

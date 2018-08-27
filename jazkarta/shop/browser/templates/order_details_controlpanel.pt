@@ -10,6 +10,9 @@
 
 <metal:main fill-slot="main">
   <div>
+    <a tal:attributes="href view/plone_control_panel" id="setup-link">
+        Site Setup
+    </a>
     <h1 class="documentFirstHeading">Order Detail</h1>
     <div tal:replace="structure view/order_template" />
   </div>

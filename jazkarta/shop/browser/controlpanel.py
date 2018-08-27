@@ -11,6 +11,7 @@ from plone.app.registry.browser.controlpanel import ControlPanelFormWrapper
 from plone.batching import Batch
 from plone.z3cform import layout
 from Products.Five import BrowserView
+from zope.component.hooks import getSite
 from zope.interface import implementer
 from z3c.form import form
 from zope.browserpage import ViewPageTemplateFile
@@ -122,6 +123,13 @@ class OrderControlPanelForm(form.Form):
     label = _(u"Jazkarta Shop Orders")
 
 
+class SiteSetupLinkMixin:
+    """ Mixin class that provides site setup url for certain views.
+    """
+
+    def plone_control_panel(self):
+        return getSite().absolute_url() + '/plone_control_panel'
+
 class DateMixin:
     """ Mixin class that provides datepicker methods.
     """
@@ -180,7 +188,7 @@ class DateMixin:
 
 
 @implementer(IDontShowJazkartaShopPortlets)
-class OrderControlPanelView(ControlPanelFormWrapper, DateMixin):
+class OrderControlPanelView(ControlPanelFormWrapper, DateMixin, SiteSetupLinkMixin):
     label = _(u"Jazkarta Shop Orders")
     form = OrderControlPanelForm
     orders = ()
@@ -310,7 +318,7 @@ class ExportShopOrders(BrowserView, DateMixin):
 
 
 @implementer(IDontShowJazkartaShopPortlets)
-class OrderDetailsControlPanelView(ControlPanelFormWrapper):
+class OrderDetailsControlPanelView(ControlPanelFormWrapper, SiteSetupLinkMixin):
     label = _(u"Jazkarta Shop Order Details")
     form = OrderControlPanelForm
     order_template = ViewPageTemplateFile('templates/checkout_order.pt')
