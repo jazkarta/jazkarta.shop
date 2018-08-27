@@ -128,7 +128,7 @@ class SiteSetupLinkMixin:
     """
 
     def plone_control_panel(self):
-        return getSite().absolute_url() + '/plone_control_panel'
+        return getSite().absolute_url() + '/@@overview-controlpanel'
 
 class DateMixin:
     """ Mixin class that provides datepicker methods.
