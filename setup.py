@@ -29,7 +29,7 @@ setup(
         'stripe',
         'premailer',
         'python-ups',
-        'requests',
+        'requests[security]',
         'z3c.currency',
         'plone.protect>=3.0.19', # Plone 4.3.11 ships with 2.0.3. Version 3.0.9+
                                  # required for plone.protect.utils.safeWrite
