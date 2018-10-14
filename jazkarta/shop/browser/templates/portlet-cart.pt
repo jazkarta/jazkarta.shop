@@ -14,12 +14,7 @@
       </dt>
 
       <dd class="portletItem">
-          <span i18n:translate="text_contains_items">Contains <span class="jazkarta-shop-portlet-cartsize" tal:content="string:${view/size}" i18n:name="size"> 5 </span> Items</span>
-      </dd>
-
-      <dd class="portletFooter">
-         <a href="#" class="jaz-shop-cart-portlet-trigger"
-            data-toggle="collapse" data-target=".jaz-shop-cart-portlet">My Cart</a>
+          <span>Contains </span><span class="jazkarta-shop-portlet-cartsize" tal:content="string:${view/size}"> 5 </span><span><tal:item tal:condition="python:view.size == 1"> Item</tal:item><tal:items tal:condition="python:view.size != 1"> Items</tal:items></span>
       </dd>
 
       <div class="jaz-shop-cart-portlet-wrapper">
@@ -40,6 +35,11 @@
             </tal:block>
           </div>
       </div>
+
+      <dd class="portletFooter">
+         <a href="#" class="jaz-shop-cart-portlet-trigger"
+            data-toggle="collapse" data-target=".jaz-shop-cart-portlet">My Cart</a>
+      </dd>
 
       <dd class="portletFooter">
           <a href="" tal:attributes="href string:${context/portal_url}/review-cart"> Review Cart</a>

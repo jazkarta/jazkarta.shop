@@ -16,6 +16,10 @@
 .portlet .jaz-shop-cart-portlet {
 	width: 400px;
 }
+.jaz-shop-cart-portlet-wrapper {
+    position: relative;
+    right: 130px;
+}
 .collapse[aria-expanded="true"] {
 	display: block;
 }
