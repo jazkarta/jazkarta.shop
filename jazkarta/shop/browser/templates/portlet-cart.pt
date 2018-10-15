@@ -14,7 +14,7 @@
       </dt>
 
       <dd class="portletItem">
-          <span>Contains </span><span class="jazkarta-shop-portlet-cartsize" tal:content="string:${view/size}"> 5 </span> <span class="jazkarta-shop-portlet-items"> Items</span>
+          <span>Contains </span><span class="jazkarta-shop-portlet-cartsize" tal:content="string:${view/size}"> 5 </span> <span class="jazkarta-shop-portlet-items"> items</span>
       </dd>
 
       <div class="jaz-shop-cart-portlet-wrapper">
