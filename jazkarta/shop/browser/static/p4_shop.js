@@ -63,6 +63,11 @@ jQuery(function($){
             }
         }, 'html');
 
+        // update "Item"/"Items" via ajax to avoid potential caching issues for anon users
+        $.get(portal_url + '/@@jazkarta_shop_portletdata?query=cart_items', function (data) {
+                $('.jazkarta-shop-portlet-items').replaceWith(data);
+        }, 'html');
+
     });
 
 });
