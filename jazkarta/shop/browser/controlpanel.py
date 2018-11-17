@@ -175,7 +175,7 @@ class DateMixin:
                                int(start_date_day))
         else:
             if self.orders_exist:
-                sd = self.to_datetime(self.first_order_date, 
+                sd = self.to_datetime(self.first_order_date,
                     '%Y-%m-%d %I:%M %p').date()
             else:
                 sd = datetime.date.today()
@@ -210,7 +210,7 @@ class OrderControlPanelView(ControlPanelFormWrapper, DateMixin, SiteSetupLinkMix
 
             # default in case date selection integrity check fails
             # this could happen if end date < start date
-            self.end_index = 0 
+            self.end_index = 0
             self.start_index = len(orders)-1
 
             selected_start = self.startDate()
@@ -282,7 +282,7 @@ class ExportShopOrders(BrowserView, DateMixin):
                 ldict={'userid': order['userid'],
                        'date': order['date'],
                        'items': order['items'],
-                       'ship_to': order['ship_to'],
+                       'ship_to': order['ship_to'].encode('utf8'),
                        'taxes': order['taxes'],
                        'ship_charge': ship_charge,
                        'total': order['total'],
