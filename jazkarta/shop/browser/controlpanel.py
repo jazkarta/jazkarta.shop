@@ -218,12 +218,22 @@ class OrderControlPanelView(ControlPanelFormWrapper, DateMixin, SiteSetupLinkMix
 
             if self.check_date_integrity():
                 filtered_orders = []
+                index_list = []
+                count = -1
                 for order in orders:
+                    count += 1
                     if order['datetime'].date() > selected_end:
                         continue
                     if order['datetime'].date() < selected_start:
                         break
                     filtered_orders.append(order)
+                    index_list.append(count)
+
+                if len(index_list) > 0: # it is possible no orders are found
+                                        # even if the date range is correct
+                    self.end_index = min(index_list)
+                    self.start_index = max(index_list)
+
                 orders = filtered_orders
 
         self.batch = Batch(orders, size=50, start=start)
@@ -243,13 +253,13 @@ class ExportShopOrders(BrowserView, DateMixin):
         orders_csv = StringIO()
 
         # get indexes of selected orders dates if supplied
-        first_order = self.request.get('first_order')
-        last_order = self.request.get('last_order')
+        first_order = self.request.get('first_order') # most recent order in selection
+        last_order = self.request.get('last_order') # oldest order in selection
         if first_order and last_order:
             try:
                 if int(last_order) <= len(orders)-1 and int(first_order) >= 0:
                     # trim selection
-                    orders = orders[int(first_order):int(last_order)]
+                    orders = orders[int(first_order):int(last_order)+1]
             except ValueError:
                 pass
 
