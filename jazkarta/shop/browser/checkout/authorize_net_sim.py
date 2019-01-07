@@ -26,9 +26,6 @@ class CheckoutFormAuthorizeNetSIM(CheckoutFormBase):
     index = ViewPageTemplateFile(
         '../templates/checkout_form_authorize_net_sim.pt')
 
-    # Note: Customer only has 15min to complete the checkout process as per:
-    # https://support.authorize.net/authkb/index?page=content&id=A592&actp=LIST
-
     def __call__(self):
         if 'x_response_code' in self.request.form:
             # recreate the cart from storage (by user_id or browser_id)
@@ -82,9 +79,7 @@ class CheckoutFormAuthorizeNetSIM(CheckoutFormBase):
         Currency code, if submitted (x_currency_code)
         Field values are concatenated and separated by a caret (^).
 
-        Also as per:
-        https://support.authorize.net/authkb/index?page=content&id=A569
-        trailing ^ is required!!
+        NB: trailing ^ is required!!
         APIl0gin1D^Sequence123^1457632735^19.99^
         """
         values = (str(self.x_login), self.x_fp_sequence,
@@ -141,9 +136,6 @@ class CheckoutFormAuthorizeNetSIM(CheckoutFormBase):
         # and to prevent this error:
         # (14) The referrer, relay response or receipt link URL is invalid.
         # return "http://developer.authorize.net/bin/developer/paramdump"
-        # also useful:
-        # https://support.authorize.net/authkb/index?page=content&id=A663&pmv=
-        # print&impressions=false
 
     @lazy_property
     def x_cancel_url(self):
