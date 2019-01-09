@@ -93,6 +93,14 @@
     />
 
   <browser:page
+    name="update-fp-fields"
+    for="plone.app.layout.navigation.interfaces.INavigationRoot"
+    class=".checkout.authorize_net_sim.UpdateFpFields"
+    permission="zope2.View"
+    layer="..interfaces.IBrowserLayer"
+    />
+
+  <browser:page
     name="checkout-stripe"
     for="plone.app.layout.navigation.interfaces.INavigationRoot"
     class=".checkout.stripe.CheckoutFormStripe"
