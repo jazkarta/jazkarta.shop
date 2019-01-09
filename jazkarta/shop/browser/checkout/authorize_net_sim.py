@@ -1,4 +1,5 @@
 import hmac
+import json
 import time
 import random
 from hashlib import md5
@@ -7,6 +8,7 @@ from premailer import Premailer
 from ZODB.POSException import ConflictError
 from zope.browserpage import ViewPageTemplateFile
 from zope.cachedescriptors.property import Lazy as lazy_property
+from Products.Five import BrowserView
 from jazkarta.shop import config
 from jazkarta.shop import storage
 from . import CheckoutFormBase
@@ -21,28 +23,7 @@ from ...config import EMAIL_CSS
 from ...validators import is_email
 
 
-class CheckoutFormAuthorizeNetSIM(CheckoutFormBase):
-    """ Renders a checkout form with button to submit to Authorize.Net SIM """
-    index = ViewPageTemplateFile(
-        '../templates/checkout_form_authorize_net_sim.pt')
-
-    def __call__(self):
-        if 'x_response_code' in self.request.form:
-            # recreate the cart from storage (by user_id or browser_id)
-            user_id = self.request.form.get('user_id', None)
-            browser_id = self.request.form.get('browser_id', None)
-            self.cart = Cart.from_request(
-                self.request, user_id=user_id, browser_id=browser_id)
-        self.update()
-        if 'x_response_code' in self.request.form:
-            self.handle_submit()
-        return self.render()
-
-    def render(self):
-        if 'x_response_code' in self.request.form:
-            return self.thankyou_page()
-        else:
-            return self.index()
+class SIMPropertyFields(CheckoutFormBase):
 
     @lazy_property
     def post_url(self):
@@ -64,6 +45,36 @@ class CheckoutFormAuthorizeNetSIM(CheckoutFormBase):
             return get_setting('authorizenet_transaction_key_production')
         else:
             return get_setting('authorizenet_transaction_key_dev')
+
+    @lazy_property
+    def browser_id(self):
+        return self.context.browser_id_manager.getBrowserId()
+
+    @lazy_property
+    def user_id(self):
+        userid = get_current_userid()
+        if userid is not None:
+            return userid
+        return None
+
+    @lazy_property
+    def x_relay_url(self):
+        return self.context.absolute_url() + '/checkout'
+
+        # to debug use http://developer.authorize.net/bin/developer/paramdump
+        # and to prevent this error:
+        # (14) The referrer, relay response or receipt link URL is invalid.
+        # return "http://developer.authorize.net/bin/developer/paramdump"
+
+    @lazy_property
+    def x_cancel_url(self):
+        # for optional cancel button on SIM form. Take the user to the homepage
+        return self.context.absolute_url()
+
+    @lazy_property
+    def sim_logo_url(self):
+        # for optional logo image hosted by authorize.net servers
+        return get_setting('authorizenet_sim_logo_url')
 
     @lazy_property
     def x_fp_hash(self):
@@ -117,35 +128,38 @@ class CheckoutFormAuthorizeNetSIM(CheckoutFormBase):
         """
         return str(int(time.time()))
 
-    @lazy_property
-    def browser_id(self):
-        return self.context.browser_id_manager.getBrowserId()
 
-    @lazy_property
-    def user_id(self):
-        userid = get_current_userid()
-        if userid is not None:
-            return userid
-        return None
+class UpdateFpFields(SIMPropertyFields):
+    """ Return most up to date authorize.net fp hash, sequence and timestamp
+    """
+    def __call__(self):
+        return json.dumps({'x_fp_hash'      : self.x_fp_hash,
+                           'x_fp_sequence'  : self.x_fp_sequence,
+                           'x_fp_timestamp' : self.x_fp_timestamp})
 
-    @lazy_property
-    def x_relay_url(self):
-        return self.context.absolute_url() + '/checkout'
 
-        # to debug use http://developer.authorize.net/bin/developer/paramdump
-        # and to prevent this error:
-        # (14) The referrer, relay response or receipt link URL is invalid.
-        # return "http://developer.authorize.net/bin/developer/paramdump"
+class CheckoutFormAuthorizeNetSIM(SIMPropertyFields):
+    """ Renders a checkout form with button to submit to Authorize.Net SIM """
+    index = ViewPageTemplateFile(
+        '../templates/checkout_form_authorize_net_sim.pt')
 
-    @lazy_property
-    def x_cancel_url(self):
-        # for optional cancel button on SIM form. Take the user to the homepage
-        return self.context.absolute_url()
+    def __call__(self):
+        if 'x_response_code' in self.request.form:
+            # recreate the cart from storage (by user_id or browser_id)
+            user_id = self.request.form.get('user_id', None)
+            browser_id = self.request.form.get('browser_id', None)
+            self.cart = Cart.from_request(
+                self.request, user_id=user_id, browser_id=browser_id)
+        self.update()
+        if 'x_response_code' in self.request.form:
+            self.handle_submit()
+        return self.render()
 
-    @lazy_property
-    def sim_logo_url(self):
-        # for optional logo image hosted by authorize.net servers
-        return get_setting('authorizenet_sim_logo_url')
+    def render(self):
+        if 'x_response_code' in self.request.form:
+            return self.thankyou_page()
+        else:
+            return self.index()
 
     def handle_submit(self):
         amount = self.amount

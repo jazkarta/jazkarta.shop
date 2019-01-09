@@ -11,6 +11,43 @@
 <body>
 
 <metal:main fill-slot="main">
+
+    <script type="text/javascript">
+        function submitform(data) {
+            $('input[name=x_fp_hash]').val(data.x_fp_hash);
+            $('input[name=x_fp_sequence]').val(data.x_fp_sequence);
+            $('input[name=x_fp_timestamp]').val(data.x_fp_timestamp);
+            console.log( $( "#checkout-form" ).serialize() );
+            var form = $("#checkout-form");
+            setTimeout( function () {
+                form.submit();
+            }, 1000);
+        }
+        function displayError() {
+            if ( $('.portalMessage').length == 0 ) {
+                // if there is no portal message div in the template yet
+                $('#content').prepend('<dl class="portalMessage"><dt></dt><dd></dd>'+
+                                     '</dl>');
+            }
+            $('.portalMessage').addClass('error')
+            $('.portalMessage dt').html('Error')
+            $('.portalMessage dd').html('Ajax Error')
+            $('.portalMessage:first-of-type').show() // in case there is more than one portalMessage in template
+        }
+        $(document).ready(function() {
+            $("#complete_purchase").on("click", function (event) {
+                console.log( $( "#checkout-form" ).serialize() );
+                event.preventDefault();
+                $.ajax({
+                    url: '@@update-fp-fields',
+                    dataType: "json",
+                    success: submitform,
+                    error: displayError,
+                });
+            });
+        });
+    </script>
+
     <h1 class="documentFirstHeading">Check out</h1>
 
     <tal:block tal:replace="structure view/cart_template" />
@@ -22,7 +59,7 @@
       </big>
     </p>
 
-    <form method="post" tal:attributes="action view/post_url" id="checkout-form" class="jaz-shop-checkout-form">
+    <form method="post" id="checkout-form" tal:attributes="action view/post_url" class="jaz-shop-checkout-form">
         <input type="hidden" name="x_fp_hash" tal:attributes="value string:${view/x_fp_hash}">
         <input type="hidden" name="x_fp_sequence" tal:attributes="value string:${view/x_fp_sequence}">
         <input type="hidden" name="x_fp_timestamp" tal:attributes="value string:${view/x_fp_timestamp}">
@@ -46,12 +83,12 @@
        <!-- <input type="hidden" name="x_cancel_url_text" value="Cancel">
         <input type="hidden" name="x_cancel_url" tal:attributes="value string:${view/x_cancel_url}"> -->
 
-        <div class="jaz-shop-buttons">
-          <input type="submit" value="Complete Purchase" class="allowMultiSubmit context"
-                 tal:attributes="disabled python:'disabled' if (not view.cart.items and not view.cart.amount) else None" />
-        </div>
-
     </form>
+    <div class="jaz-shop-buttons">
+        <input type="submit" id="complete_purchase" value="Complete Purchase" class="allowMultiSubmit context"
+               tal:attributes="disabled python:'disabled' if (not view.cart.items and not view.cart.amount) else None" />
+    </div>
+
     <p class="subtotal">
         <big>Note: You will have 15 minutes to complete the payment process when you click "Complete Purchase", which will take you to a secure payment page. On this payment form, please be sure to enter an email address where you would like your payment receipt to be sent.</big>
     </p>
