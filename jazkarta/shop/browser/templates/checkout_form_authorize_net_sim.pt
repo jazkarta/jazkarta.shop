@@ -17,7 +17,8 @@
             $('input[name=x_fp_hash]').val(data.x_fp_hash);
             $('input[name=x_fp_sequence]').val(data.x_fp_sequence);
             $('input[name=x_fp_timestamp]').val(data.x_fp_timestamp);
-            console.log( $( "#checkout-form" ).serialize() );
+            //console.log("Form hidden input fields submitted to auth.net");
+            //console.log( $( "#checkout-form" ).serialize() );
             var form = $("#checkout-form");
             setTimeout( function () {
                 form.submit();
@@ -36,7 +37,8 @@
         }
         $(document).ready(function() {
             $("#complete_purchase").on("click", function (event) {
-                console.log( $( "#checkout-form" ).serialize() );
+                //console.log("Form hidden input fields on page load");
+                //console.log( $( "#checkout-form" ).serialize() );
                 event.preventDefault();
                 $.ajax({
                     url: '@@update-fp-fields',
