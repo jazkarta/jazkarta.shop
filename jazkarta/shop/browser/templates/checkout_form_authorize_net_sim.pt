@@ -92,7 +92,7 @@
     </div>
 
     <p class="subtotal">
-        <big>Note: You will have 15 minutes to complete the payment process when you click "Complete Purchase", which will take you to a secure payment page. On this payment form, please be sure to enter an email address where you would like your payment receipt to be sent.</big>
+        <big>Note: You will have 15 minutes to complete the payment process once you click "Complete Purchase", which will take you to a secure payment page. On the payment page, please enter the email address where you would like your payment receipt sent.</big>
     </p>
 
 </metal:main>
