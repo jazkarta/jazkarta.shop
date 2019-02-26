@@ -60,7 +60,7 @@ def _fetch_orders(part, key=()):
                 else:
                     href = title = i.get('href', '')
 
-                item_str += '<li><a href="{}">{}</a> x {} @ ${}</li>'.format(
+                item_str += u'<li><a href="{}">{}</a> x {} @ ${}</li>'.format(
                     href, title, i.get('quantity', 1), i.get('price', 0.0)
                 )
             data['items'] = item_str + '</ul>'
