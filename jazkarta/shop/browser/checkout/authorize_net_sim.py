@@ -2,7 +2,7 @@ import hmac
 import json
 import time
 import random
-from hashlib import md5
+from hashlib import sha512
 from persistent.mapping import PersistentMapping
 from premailer import Premailer
 from ZODB.POSException import ConflictError
@@ -81,13 +81,14 @@ class SIMPropertyFields(CheckoutFormBase):
         """
         x_fp_hash Required.
         Value: The unique transaction fingerprint.
-        Notes: The fingerprint is generated using the HMAC-MD5 hashing algorithm
-        on the following field values:
+        Notes: The fingerprint is generated using the HMAC-SHA512
+               hashing algorithm on the following field values:
+        API login ID (x_login)
         API login ID (x_login)
         The sequence number of the transaction (x_fp_sequence)
         The timestamp of the sequence number creation (x_fp_timestamp)
         Amount (x_amount)
-        Currency code, if submitted (x_currency_code)
+
         Field values are concatenated and separated by a caret (^).
 
         NB: trailing ^ is required!!
@@ -96,7 +97,7 @@ class SIMPropertyFields(CheckoutFormBase):
         values = (str(self.x_login), self.x_fp_sequence,
              self.x_fp_timestamp, str(self.amount))
         source = "^".join(values) + '^'
-        hashed_values = hmac.new(str(self.transaction_key), '', md5)
+        hashed_values = hmac.new(str(self.transaction_key), '', sha512)
         hashed_values.update(source) # add content
         return hashed_values.hexdigest()
 
