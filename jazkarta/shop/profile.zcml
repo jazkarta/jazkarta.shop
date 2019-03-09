@@ -142,4 +142,13 @@
       import_steps="plone.app.registry"
       />
 
+  <genericsetup:upgradeDepends
+      profile="jazkarta.shop:default"
+      source="12"
+      destination="13"
+      title="Add Authorize.Net Signature Key to shop settings"
+      description=""
+      import_steps="plone.app.registry"
+      />
+
 </configure>

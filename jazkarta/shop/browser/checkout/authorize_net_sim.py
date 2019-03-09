@@ -47,6 +47,13 @@ class SIMPropertyFields(CheckoutFormBase):
             return get_setting('authorizenet_transaction_key_dev')
 
     @lazy_property
+    def signature_key(self):
+        if config.IN_PRODUCTION:
+            return get_setting('authorizenet_signature_key_production')
+        else:
+            return get_setting('authorizenet_signature_key_dev')
+
+    @lazy_property
     def browser_id(self):
         return self.context.browser_id_manager.getBrowserId()
 
@@ -93,13 +100,17 @@ class SIMPropertyFields(CheckoutFormBase):
 
         NB: trailing ^ is required!!
         APIl0gin1D^Sequence123^1457632735^19.99^
+        
+        use sha512 as per:
+        https://github.com/AuthorizeNet/sample-code-python/blob/master/
+        sha512/compute-transhash-sha512
         """
         values = (str(self.x_login), self.x_fp_sequence,
              self.x_fp_timestamp, str(self.amount))
         source = "^".join(values) + '^'
-        hashed_values = hmac.new(str(self.transaction_key), '', sha512)
-        hashed_values.update(source) # add content
-        return hashed_values.hexdigest()
+        sig = self.signature_key.decode("hex")
+        hashed_values = hmac.new(sig, source, sha512)
+        return hashed_values.hexdigest().upper()
 
     @lazy_property
     def x_fp_sequence(self):

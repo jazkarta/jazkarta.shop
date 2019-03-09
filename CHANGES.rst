@@ -1,5 +1,9 @@
 Changelog
 
+- Authorize.net SIM is deprecating the use of MD5. 
+  Added support for the the SHA512 that replaces it 
+  (requires the signature key is specified)
+
 - Refactored checkout forms into separate modules
 
 - Added support for checkout using Authorize.net Accept.js
