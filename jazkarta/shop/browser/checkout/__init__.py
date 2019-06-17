@@ -51,8 +51,6 @@ class CheckoutForm(BrowserView):
 
 class CheckoutFormBase(BrowserView, P5Mixin):
     cart_template = ViewPageTemplateFile('../templates/checkout_cart.pt')
-    thankyou_template = ViewPageTemplateFile(
-        '../templates/checkout_thankyou.pt')
     receipt_email = ViewPageTemplateFile('../templates/receipt_email.pt')
 
     order_id = None
@@ -133,6 +131,8 @@ class CheckoutFormBase(BrowserView, P5Mixin):
         self.cart.clear()
 
     def thankyou_page(self):
+        from .thankyou import CheckoutThankYou
+
         if self.order_id is None:
             # weird edge case I (witekdev) encountered when authorize.net
             # deemed the transaction as a Suspicious Transaction.
@@ -149,7 +149,7 @@ class CheckoutFormBase(BrowserView, P5Mixin):
                           'Your payment has not been processed. '
                           'Please contact us for assistance. '
                           '(Internal error: order_id is None)')
-            return self.thankyou_template()
+            return CheckoutThankYou(self.context, self.request)()
 
         url = get_setting('after_checkout_callback_url')
         if url:
@@ -165,7 +165,7 @@ class CheckoutFormBase(BrowserView, P5Mixin):
                 url = url + "&error=%s" % error
             self.request.response.redirect(url)
         else:
-            return self.thankyou_template()
+            return CheckoutThankYou(self.context, self.request)()
 
     def receipt_intro(self):
         return get_setting('receipt_intro')
