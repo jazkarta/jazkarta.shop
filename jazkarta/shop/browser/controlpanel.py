@@ -46,7 +46,7 @@ def _fetch_orders(part, key=()):
             data['taxes'] = sum(item.get('tax', 0) for item in data.get('taxes', ()))
             data['total'] = (sum((i.get('price', 0.0) * i.get('quantity', 1)) for i in items) +
                              data['taxes'] + data.get('ship_charge', 0))
-            item_str = '<ul>'
+            item_str = u'<ul>'
             for i in items:
                 uid = i.get('uid', None)
                 if uid:
@@ -60,10 +60,10 @@ def _fetch_orders(part, key=()):
                 else:
                     href = title = i.get('href', '')
 
-                item_str += '<li><a href="{}">{}</a> x {} @ ${}</li>'.format(
+                item_str += u'<li><a href="{}">{}</a> x {} @ ${}</li>'.format(
                     href, title, i.get('quantity', 1), i.get('price', 0.0)
                 )
-            data['items'] = item_str + '</ul>'
+            data['items'] = item_str + u'</ul>'
             address = data.get('ship_to', {})
             data['ship_to'] = u'<p>{} {}</p><p>{}</p><p>{}, {} {}</p><p>{}</p>'.format(
                 escape(address.get('first_name', '')),
