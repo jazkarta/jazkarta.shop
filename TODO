@@ -1,5 +1,4 @@
 - Add logging.
-- UI for admins to view order history.
 - Fix promo code widgets.
 - Use shipping address as default billing address. (Or provide 'same as shipping' option.)
 - Icons for content types

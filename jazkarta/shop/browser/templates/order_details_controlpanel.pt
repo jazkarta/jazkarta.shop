@@ -1,0 +1,21 @@
+<tal:block tal:define="dummy python:request.set('disable_border', True)"/><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="context/main_template/macros/master"
+      i18n:domain="plone">
+
+<body>
+
+<metal:main fill-slot="main">
+  <div>
+    <a tal:attributes="href view/plone_control_panel" class="link-parent" id="setup-link">
+        Site Setup
+    </a>
+    <h1 class="documentFirstHeading">Order Detail</h1>
+    <div tal:replace="structure view/order_template" />
+  </div>
+</metal:main>
+</body>
+</html>

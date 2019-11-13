@@ -15,6 +15,7 @@ from ...utils import has_permission
 from ...utils import run_in_transaction
 from ...utils import send_mail
 from ...utils import PLONE_VERSION
+from ...config import EMAIL_CSS
 from ...vocabs import country_names
 import logging
 
@@ -51,6 +52,7 @@ class CheckoutForm(BrowserView):
 
 class CheckoutFormBase(BrowserView, P5Mixin):
     cart_template = ViewPageTemplateFile('../templates/checkout_cart.pt')
+    order_template = ViewPageTemplateFile('../templates/checkout_order.pt')
     thankyou_template = ViewPageTemplateFile(
         '../templates/checkout_thankyou.pt')
     receipt_email = ViewPageTemplateFile('../templates/receipt_email.pt')
@@ -146,9 +148,7 @@ class CheckoutFormBase(BrowserView, P5Mixin):
             # I wasn't able to reproduce this but adding a check if this
             # edge case ever appears again, we can look into it.
             self.error = ('There was an error with your transaction. '
-                          'Your payment has not been processed. '
-                          'Please contact us for assistance. '
-                          '(Internal error: order_id is None)')
+                          'Your payment has not been processed.')
             return self.thankyou_template()
 
         url = get_setting('after_checkout_callback_url')
@@ -175,19 +175,9 @@ class CheckoutFormBase(BrowserView, P5Mixin):
         if self.receipt_email:
             subject = get_setting('receipt_subject')
             unstyled_msg = self.receipt_email()
-            css = self.context.unrestrictedTraverse('plone.css')()
-            # remove specific lines of css that were causing premailer to fail
-            # due to:'unicodeescape' codec can't decode byte 0x5c in position 26
-            # x--------------------------
-            css_parsed = []
-            for x in css.split("\n"):
-                if '\.' not in x:
-                    css_parsed.append(x)
-            cssp = "".join(css_parsed)
-            # x--------------------------
             msg = Premailer(
                 unstyled_msg,
-                css_text=cssp,
+                css_text=EMAIL_CSS,
                 cssutils_logging_level=logging.CRITICAL,
             ).transform()
             mto = self.request['email']

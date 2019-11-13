@@ -18,6 +18,7 @@ from jazkarta.shop import storage
 from .. import logger
 from ..cart import Cart
 from .checkout import P5Mixin
+from .controlpanel import SiteSetupLinkMixin
 from ..interfaces import CALCULATION_METHODS
 from ..interfaces import IShippingAddress
 from ..interfaces import IShippingMethod
@@ -74,7 +75,7 @@ def calculate_shipping(cart, method, addr):
 
 
 @implementer(IPublishTraverse)
-class ShippingMethodControlPanel(BrowserView, P5Mixin):
+class ShippingMethodControlPanel(BrowserView, P5Mixin, SiteSetupLinkMixin):
 
     @lazy_property
     def shipping_methods(self):

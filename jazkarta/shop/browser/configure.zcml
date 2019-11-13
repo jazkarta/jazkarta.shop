@@ -33,6 +33,15 @@
     />
 
   <browser:page
+    name="jazkarta-shop-order-details"
+    for="plone.app.layout.navigation.interfaces.INavigationRoot"
+    class=".controlpanel.OrderDetailsControlPanelView"
+    template="templates/order_details_controlpanel.pt"
+    permission="jazkarta.shop.ManageShop"
+    layer="..interfaces.IBrowserLayer"
+    />
+
+  <browser:page
     name="shopping-cart"
     for="*"
     class=".viewlets.CartView"
@@ -76,7 +85,7 @@
     />
 
   <browser:page
-    name="checkout_authorizenet_sim"
+    name="checkout-authorizenet-sim"
     for="plone.app.layout.navigation.interfaces.INavigationRoot"
     class=".checkout.authorize_net_sim.CheckoutFormAuthorizeNetSIM"
     permission="zope2.View"
@@ -84,10 +93,26 @@
     />
 
   <browser:page
-    name="checkout_stripe"
+    name="update-fp-fields"
+    for="plone.app.layout.navigation.interfaces.INavigationRoot"
+    class=".checkout.authorize_net_sim.UpdateFpFields"
+    permission="zope2.View"
+    layer="..interfaces.IBrowserLayer"
+    />
+
+  <browser:page
+    name="checkout-stripe"
     for="plone.app.layout.navigation.interfaces.INavigationRoot"
     class=".checkout.stripe.CheckoutFormStripe"
     permission="zope2.View"
+    layer="..interfaces.IBrowserLayer"
+    />
+
+  <browser:page
+    name="export-shop-orders-csv"
+    for="*"
+    class=".controlpanel.ExportShopOrders"
+    permission="cmf.ManagePortal"
     layer="..interfaces.IBrowserLayer"
     />
 
@@ -123,5 +148,12 @@
     name="jazkarta.shop"
     directory="static"
     />
+
+  <browser:page
+    for="*"
+    name="jazkarta.shop.calendar_macros"
+    template="templates/calendar_macros.pt"
+    permission="zope.Public"
+  />
 
 </configure>
