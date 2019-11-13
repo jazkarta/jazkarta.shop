@@ -6,6 +6,9 @@ from datetime import date
 from . import config
 from .interfaces import PaymentProcessingException
 from .utils import get_setting
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def _getMerchantAuth():
@@ -110,13 +113,18 @@ def createTransactionRequest(
     createtransactioncontroller.execute()
 
     response = createtransactioncontroller.getresponse()
+    defaultMsg = 'Your card could not be processed.'
+    if createtransactioncontroller._httpResponse:
+        logger.info('Authorize.net response: {}'.format(createtransactioncontroller._httpResponse))
+    else:
+        raise PaymentProcessingException(defaultMsg)
     if response.messages.resultCode == 'Ok':
         if response.transactionResponse.responseCode != 1:  # Approved
-            raise PaymentProcessingException(
-                'Your card could not be processed.')
+            raise PaymentProcessingException(defaultMsg)
         return response
     else:
-        raise PaymentProcessingException(response.messages.message[0].text)
+        raise PaymentProcessingException(
+            response.messages.message[0].text or defaultMsg)
 
 
 def ARBCreateSubscriptionRequest(

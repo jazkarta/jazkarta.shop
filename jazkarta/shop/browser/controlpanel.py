@@ -60,9 +60,9 @@ def _fetch_orders(part, key=(), csv=False):
             data['total'] = (sum((i.get('price', 0.0) * i.get('quantity', 1)) for i in items) +
                              data['taxes'] + data.get('ship_charge', 0))
 
-            item_str = '<ul>'
+            item_str = u'<ul>'
             if csv:
-                item_str = ''
+                item_str = u''
             for i in items:
                 uid = i.get('uid', None)
                 if uid:
@@ -75,20 +75,20 @@ def _fetch_orders(part, key=(), csv=False):
                         href = '';
                 else:
                     href = title = i.get('href', '')
-
+                    
                 if csv:
                     # special parsing of items for csv export
-                    item_str += '{} x {} @ ${}'.format(
+                    item_str += u'{} x {} @ ${}'.format(
                          title, i.get('quantity', 1), i.get('price', 0.0)
                     )
                     # add new line character to all but last item
                     if i != items[len(items)-1]:
-                        item_str += '\n'
+                        item_str += u'\n'
                 else:
-                    item_str += '<li><a href="{}">{}</a> x {} @ ${}</li>'.format(
+                    item_str += u'<li><a href="{}">{}</a> x {} @ ${}</li>'.format(
                         href, title, i.get('quantity', 1), i.get('price', 0.0)
                     )
-            data['items'] = item_str + '</ul>'
+            data['items'] = item_str + u'</ul>'
             if csv:
                 data['items'] = item_str
             address = data.get('ship_to', {})
