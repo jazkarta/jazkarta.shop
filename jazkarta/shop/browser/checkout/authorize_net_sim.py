@@ -1,12 +1,14 @@
 import hmac
+import json
 import time
 import random
-from hashlib import md5
+from hashlib import sha512
 from persistent.mapping import PersistentMapping
 from premailer import Premailer
 from ZODB.POSException import ConflictError
 from zope.browserpage import ViewPageTemplateFile
 from zope.cachedescriptors.property import Lazy as lazy_property
+from Products.Five import BrowserView
 from jazkarta.shop import config
 from jazkarta.shop import storage
 from . import CheckoutFormBase
@@ -17,34 +19,11 @@ from ...utils import get_setting
 from ...utils import resolve_uid
 from ...utils import run_in_transaction
 from ...utils import send_mail
+from ...config import EMAIL_CSS
 from ...validators import is_email
 
 
-class CheckoutFormAuthorizeNetSIM(CheckoutFormBase):
-    """ Renders a checkout form with button to submit to Authorize.Net SIM """
-    index = ViewPageTemplateFile(
-        '../templates/checkout_form_authorize_net_sim.pt')
-
-    # Note: Customer only has 15min to complete the checkout process as per:
-    # https://support.authorize.net/authkb/index?page=content&id=A592&actp=LIST
-
-    def __call__(self):
-        if 'x_response_code' in self.request.form:
-            # recreate the cart from storage (by user_id or browser_id)
-            user_id = self.request.form.get('user_id', None)
-            browser_id = self.request.form.get('browser_id', None)
-            self.cart = Cart.from_request(
-                self.request, user_id=user_id, browser_id=browser_id)
-        self.update()
-        if 'x_response_code' in self.request.form:
-            self.handle_submit()
-        return self.render()
-
-    def render(self):
-        if 'x_response_code' in self.request.form:
-            return self.thankyou_page()
-        else:
-            return self.index()
+class SIMPropertyFields(CheckoutFormBase):
 
     @lazy_property
     def post_url(self):
@@ -68,30 +47,70 @@ class CheckoutFormAuthorizeNetSIM(CheckoutFormBase):
             return get_setting('authorizenet_transaction_key_dev')
 
     @lazy_property
+    def signature_key(self):
+        if config.IN_PRODUCTION:
+            return get_setting('authorizenet_signature_key_production')
+        else:
+            return get_setting('authorizenet_signature_key_dev')
+
+    @lazy_property
+    def browser_id(self):
+        return self.context.browser_id_manager.getBrowserId()
+
+    @lazy_property
+    def user_id(self):
+        userid = get_current_userid()
+        if userid is not None:
+            return userid
+        return None
+
+    @lazy_property
+    def x_relay_url(self):
+        return self.context.absolute_url() + '/checkout'
+
+        # to debug use http://developer.authorize.net/bin/developer/paramdump
+        # and to prevent this error:
+        # (14) The referrer, relay response or receipt link URL is invalid.
+        # return "http://developer.authorize.net/bin/developer/paramdump"
+
+    @lazy_property
+    def x_cancel_url(self):
+        # for optional cancel button on SIM form. Take the user to the homepage
+        return self.context.absolute_url()
+
+    @lazy_property
+    def sim_logo_url(self):
+        # for optional logo image hosted by authorize.net servers
+        return get_setting('authorizenet_sim_logo_url')
+
+    @lazy_property
     def x_fp_hash(self):
         """
         x_fp_hash Required.
         Value: The unique transaction fingerprint.
-        Notes: The fingerprint is generated using the HMAC-MD5 hashing algorithm
-        on the following field values:
+        Notes: The fingerprint is generated using the HMAC-SHA512
+               hashing algorithm on the following field values:
+        API login ID (x_login)
         API login ID (x_login)
         The sequence number of the transaction (x_fp_sequence)
         The timestamp of the sequence number creation (x_fp_timestamp)
         Amount (x_amount)
-        Currency code, if submitted (x_currency_code)
+
         Field values are concatenated and separated by a caret (^).
 
-        Also as per:
-        https://support.authorize.net/authkb/index?page=content&id=A569
-        trailing ^ is required!!
+        NB: trailing ^ is required!!
         APIl0gin1D^Sequence123^1457632735^19.99^
+        
+        use sha512 as per:
+        https://github.com/AuthorizeNet/sample-code-python/blob/master/
+        sha512/compute-transhash-sha512
         """
         values = (str(self.x_login), self.x_fp_sequence,
              self.x_fp_timestamp, str(self.amount))
         source = "^".join(values) + '^'
-        hashed_values = hmac.new(str(self.transaction_key), '', md5)
-        hashed_values.update(source) # add content
-        return hashed_values.hexdigest()
+        sig = self.signature_key.decode("hex")
+        hashed_values = hmac.new(sig, source, sha512)
+        return hashed_values.hexdigest().upper()
 
     @lazy_property
     def x_fp_sequence(self):
@@ -121,38 +140,38 @@ class CheckoutFormAuthorizeNetSIM(CheckoutFormBase):
         """
         return str(int(time.time()))
 
-    @lazy_property
-    def browser_id(self):
-        return self.context.browser_id_manager.getBrowserId()
 
-    @lazy_property
-    def user_id(self):
-        userid = get_current_userid()
-        if userid is not None:
-            return userid
-        return None
+class UpdateFpFields(SIMPropertyFields):
+    """ Return most up to date authorize.net fp hash, sequence and timestamp
+    """
+    def __call__(self):
+        return json.dumps({'x_fp_hash'      : self.x_fp_hash,
+                           'x_fp_sequence'  : self.x_fp_sequence,
+                           'x_fp_timestamp' : self.x_fp_timestamp})
 
-    @lazy_property
-    def x_relay_url(self):
-        return self.context.absolute_url() + '/checkout'
 
-        # to debug use http://developer.authorize.net/bin/developer/paramdump
-        # and to prevent this error:
-        # (14) The referrer, relay response or receipt link URL is invalid.
-        # return "http://developer.authorize.net/bin/developer/paramdump"
-        # also useful:
-        # https://support.authorize.net/authkb/index?page=content&id=A663&pmv=
-        # print&impressions=false
+class CheckoutFormAuthorizeNetSIM(SIMPropertyFields):
+    """ Renders a checkout form with button to submit to Authorize.Net SIM """
+    index = ViewPageTemplateFile(
+        '../templates/checkout_form_authorize_net_sim.pt')
 
-    @lazy_property
-    def x_cancel_url(self):
-        # for optional cancel button on SIM form. Take the user to the homepage
-        return self.context.absolute_url()
+    def __call__(self):
+        if 'x_response_code' in self.request.form:
+            # recreate the cart from storage (by user_id or browser_id)
+            user_id = self.request.form.get('user_id', None)
+            browser_id = self.request.form.get('browser_id', None)
+            self.cart = Cart.from_request(
+                self.request, user_id=user_id, browser_id=browser_id)
+        self.update()
+        if 'x_response_code' in self.request.form:
+            self.handle_submit()
+        return self.render()
 
-    @lazy_property
-    def sim_logo_url(self):
-        # for optional logo image hosted by authorize.net servers
-        return get_setting('authorizenet_sim_logo_url')
+    def render(self):
+        if 'x_response_code' in self.request.form:
+            return self.thankyou_page()
+        else:
+            return self.index()
 
     def handle_submit(self):
         amount = self.amount
@@ -252,17 +271,7 @@ class CheckoutFormAuthorizeNetSIM(CheckoutFormBase):
         if self.receipt_email:
             subject = get_setting('receipt_subject')
             unstyled_msg = self.receipt_email()
-            css = self.context.unrestrictedTraverse('plone.css')()
-            # remove specific lines of css that were causing premailer to fail
-            # due to:'unicodeescape' codec can't decode byte 0x5c in position 26
-            # x--------------------------
-            css_parsed = []
-            for x in css.split("\n"):
-                if '\.' not in x:
-                    css_parsed.append(x)
-            cssp = "".join(css_parsed)
-            # x--------------------------
-            msg = Premailer(unstyled_msg, css_text=cssp).transform()
+            msg = Premailer(unstyled_msg, css_text=EMAIL_CSS).transform()
             # only send email if the email field was entered in the SIM billing
             # address section and if the email address is a valid email format
             if 'x_email' in self.request.form:

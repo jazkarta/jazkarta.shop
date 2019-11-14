@@ -208,12 +208,17 @@ class ISettings(model.Schema):
     )
 
     authorizenet_api_login_id_dev = schema.TextLine(
-        title=u'Authorize.Net API Login ID (Sandbox account)',
+        title=u'Authorize.Net API Login ID (Sandbox)',
         required=False,
     )
 
     authorizenet_transaction_key_dev = schema.TextLine(
-        title=u'Authorize.Net Transaction Key (Sandbox account)',
+        title=u'Authorize.Net Transaction Key (Sandbox)',
+        required=False,
+    )
+
+    authorizenet_signature_key_dev = schema.TextLine(
+        title=u'Authorize.Net Signature Key (Sandbox)',
         required=False,
     )
 
@@ -226,6 +231,13 @@ class ISettings(model.Schema):
 
     authorizenet_transaction_key_production = schema.TextLine(
         title=u'Authorize.Net Transaction Key (Production)',
+        description=u"This key will be used when the JAZKARTA_SHOP_ENV "
+                    u"environment variable equals 'production'.",
+        required=False,
+    )
+
+    authorizenet_signature_key_production = schema.TextLine(
+        title=u'Authorize.Net Signature Key (Production)',
         description=u"This key will be used when the JAZKARTA_SHOP_ENV "
                     u"environment variable equals 'production'.",
         required=False,
@@ -492,3 +504,7 @@ class IDontShowJazkartaShopPortlets(Interface):
 
 class CheckoutComplete(ObjectEvent):
     """Checkout is complete"""
+
+
+class ItemRemoved(ObjectEvent):
+    """Item removed from cart"""

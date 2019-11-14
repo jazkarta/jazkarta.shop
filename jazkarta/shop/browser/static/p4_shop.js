@@ -33,6 +33,16 @@ jQuery(function($){
             $('.jaz-shop-cart').toggle();
         });
 
+        // hide portlet cart contents by clicking anywhere on page except my cart button
+        $(document).mouseup(function (e){
+	        var container = $(".jaz-shop-cart-portlet"); // contents
+            var button = $('.jaz-shop-cart-portlet-trigger');
+	        if ( !button.is(e.target) && (!container.is(e.target) && container.has(e.target).length === 0)) {
+		        container.hide();
+	        }
+        });
+
+        // click on my cart button
         $(document).on('click', '.jaz-shop-cart-portlet-trigger', function(e) {
             e.preventDefault();
             // Plone5 uses data-attributes which Plone4 does not recognize
@@ -51,6 +61,11 @@ jQuery(function($){
                 $('.jazkarta-cart-portlet').show();
                 $('.jazkarta-shop-portlet-cartsize').replaceWith(data);
             }
+        }, 'html');
+
+        // update "Item"/"Items" via ajax to avoid potential caching issues for anon users
+        $.get(portal_url + '/@@jazkarta_shop_portletdata?query=cart_items', function (data) {
+                $('.jazkarta-shop-portlet-items').replaceWith(data);
         }, 'html');
 
     });

@@ -10,15 +10,85 @@
 
 <metal:main fill-slot="main">
   <div tal:define="batch view/batch">
+    <a tal:attributes="href view/plone_control_panel" class="link-parent" id="setup-link">
+        Site Setup
+    </a>
     <h1 class="documentFirstHeading">Shop Orders</h1>
 
-    <table class="listing">
+    <form id="update-order-selection" name="update-order-selection" method="post"
+              tal:attributes="action string:${view/__name__}">
+        <div>
+             <table id="shop-order-date-selection-table">
+                 <tbody>
+                    <tr>
+                        <th><h5>Start Date</h5></th>
+                        <th><h5>End Date</h5></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                         <td class="order-date-picker-box">
+                            <tal:define define="show_hm python:False;
+                                                show_ymd python:True;
+                                                starting_year python:2016;
+                                                ending_year python:None;
+                                                future_years python:0;
+                                                formname string:ShopOrders;
+                                                inputvalue python:view.startDate().strftime(u'%Y-%m-%d');
+                                                inputname string:Start-Date">
+                            <metal:box use-macro="here/jazkarta.shop.calendar_macros/macros/JazkartaShopCalendarDatePickerBox|default">
+                            </metal:box>
+                            </tal:define>
+                        </td>
+                        <td class="order-date-picker-box">
+                            <tal:define define="show_hm python:False;
+                                                show_ymd python:True;
+                                                starting_year python:2016;
+                                                ending_year python:None;
+                                                future_years python:0;
+                                                formname string:ShopOrders;
+                                                inputvalue python:view.endDate().strftime(u'%Y-%m-%d');
+                                                inputname string:End-Date">
+                            <metal:box use-macro="here/jazkarta.shop.calendar_macros/macros/JazkartaShopCalendarDatePickerBox|default">
+                            </metal:box>
+                            </tal:define>
+                        </td>
+
+                    </tr>
+                 </tbody>
+             </table>
+        </div>
+        <div>&nbsp;</div>
+        <div>
+            <input type="submit" name="submitted" value="Update Selection">
+        </div>
+        <div>&nbsp;</div>
+    </form>
+
+    <tal:nobatch tal:condition="not:view/batch">
+        <h2>No orders found in date range selected.</h2>
+    </tal:nobatch>
+    <tal:batch tal:condition="view/batch">
+            <tal:bad_dates tal:condition="not:view/check_date_integrity">
+                    <h2>Selected date range incorrect, displaying all orders.</h2>
+            </tal:bad_dates>
+        <div>
+            <form id="export_csv" name="export-csv2" method="post"
+                tal:attributes="action string:${context/absolute_url}/@@export-shop-orders-csv?first_order=${view/end_index}&last_order=${view/start_index}">
+                <button id="export_csv_button" type="submit" name="export_csv">Export CSV</button>
+            </form>
+        </div>
+
+        <div>&nbsp;</div>
+    </tal:batch>
+
+    <table class="listing" tal:condition="view/batch">
       <thead>
         <tr>
             <tal:heading tal:repeat="key view/keys">
                 <th tal:content="python:key.replace('_', ' ').title()">Heading</th>
             </tal:heading>
-            <!-- th>Order Status</th -->
+            <th>Order Details</th>
         </tr>
       </thead>
       <tbody>
@@ -26,13 +96,8 @@
             <tal:value repeat="key view/keys">
                 <td tal:content="structure python:entry.get(key, '')">Value</td>
             </tal:value>
-            <!-- td>
-                <select name="${entry/userid|string:}:${entry/date/isoformat}" tal:attributes="value entry.get('order_status', 'New')">
-                    <option>New</option>
-                    <option>Shipped</option>
-                    <option>Returned</option>
-                </select>
-            </td -->
+            <td>
+              <a tal:attributes="href string:@@jazkarta-shop-order-details?order_id=${entry/orderid}">Show Details</a>
           </tr>
       </tbody>
     </table>

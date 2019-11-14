@@ -99,7 +99,7 @@
     <p class="subtotal">
       <big>
         Your purchases subtotal:
-        <strong id="subtotal-amount" tal:content="python:'${:,.2f}'.format(view.cart.orig_subtotal)"></strong>
+        <strong>$<span id="subtotal-amount" tal:content="python:'{:,.2f}'.format(view.cart.orig_subtotal)"></span></strong>
       </big>
     </p>
 

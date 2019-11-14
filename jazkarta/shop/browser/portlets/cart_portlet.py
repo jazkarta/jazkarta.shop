@@ -72,6 +72,8 @@ class PortletData(BrowserView, JazkartaCartPortletMixin):
             query = self.request['query']
             if query == 'cart_size':
                 return str(self.size)
+            elif query == 'cart_items':
+                return "item" if self.size == 1 else "items"
             else:
                 return "BAD PORTLET QUERY REQUEST"
 

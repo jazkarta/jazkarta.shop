@@ -1,0 +1,72 @@
+<div id="cartFormWrapper"
+     tal:define="cart view/order|view/cart/data"> 
+
+<table class="listing cart-listing">
+  <tr>
+    <th>Purchases</th>
+    <th style="width: 90px;">Price</th>
+    <th style="width: 90px;">Quantity</th>
+    <th style="width: 90px;">Amount</th>
+  </tr>
+  <tal:items repeat="item python:cart['items'].values()">
+    <tr class="item">
+      <td tal:content="item/name">
+      </td>
+      <td class="item-price"
+          tal:content="python:'${:,.2f}'.format(item['price'])">Price
+      </td>
+      <td>
+        <span tal:replace="item/quantity">Quantity</span>
+      </td>
+      <td tal:content="python:'${:,.2f}'.format(item['price'] * item['quantity'])">Amount
+      </td>
+    </tr>
+  </tal:items>
+</table>
+<br />
+<p tal:condition="view/order_taxes|nothing">
+  <strong>Taxes: </strong>
+  <span tal:content="python:'${:,.2f}'.format(view.order_taxes)">
+   Total taxes
+   </span>
+</p>
+<p tal:condition="cart/ship_charge|nothing">
+<strong>Shipping charge: </strong><span tal:content="python:'${:,.2f}'.format(cart['ship_charge'])">Payment method</span>
+</p>
+<p>
+  <strong>Total order amount: </strong>
+  <span tal:content="python:'${:,.2f}'.format(view.amount)">
+   Total amount
+   </span>
+</p>
+<p tal:condition="cart/payment_method|nothing">
+  <strong>Payment method: </strong><span tal:content="cart/payment_method">Payment method</span>
+</p>
+<p tal:condition="cart/ship_method|nothing">
+  <strong>Shipping method: </strong><span tal:content="cart/ship_method">Payment method</span>
+</p>
+<br />
+<div tal:define="address cart/ship_to|nothing"
+     tal:condition="cart/ship_to|nothing">
+  <h3>Ship to</h3>
+  <dl>
+    <dt tal:content="string:${address/last_name}, ${address/first_name}">Name</dt>
+    <dd><span tal:condition="address/address|address/street|nothing" tal:content="string:${address/address|address/street}." /> <span tal:condition="address/city|nothing" tal:content="string:${address/city}," /> <span tal:condition="address/state|nothing" tal:content="string:${address/state}." /> <span tal:condition="address/zip|nothing" tal:content="string:${address/zip}." /> <span tal:condition="address/country|nothing" tal:content="string:${address/country}." /></dd>
+  </dl>
+</div>
+<div tal:define="address cart/bill_to|nothing"
+     tal:condition="cart/bill_to|nothing">
+  <h3>Bill to</h3>
+  <dl>
+    <dt tal:content="string:${address/last_name}, ${address/first_name}">Name</dt>
+    <dd><span tal:condition="address/address|address/street|nothing" tal:content="string:${address/address|address/street}." /> <span tal:condition="address/city|nothing" tal:content="string:${address/city}," /> <span tal:condition="address/state|nothing" tal:content="string:${address/state}." /> <span tal:condition="address/zip|nothing" tal:content="string:${address/zip}." /> <span tal:condition="address/country|nothing" tal:content="string:${address/country}." /></dd>
+  </dl>
+</div>
+<div tal:condition="cart/notes|nothing">
+  <h3>Notes</h3>
+  <p tal:content="cart/notes">Notes</p>
+</div>
+<div tal:condition="cart/order_details|nothing"
+     tal:content="structure cart/order_details"></div>
+<br />
+</div>

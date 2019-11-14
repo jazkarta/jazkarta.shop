@@ -4,6 +4,7 @@ from decimal import Decimal
 from hashlib import sha1
 from persistent.mapping import PersistentMapping
 from zope.component import queryUtility
+from zope.event import notify
 from zope.interface import implementer
 import copy
 import json
@@ -14,6 +15,7 @@ from .interfaces import ICart
 from .interfaces import IPurchaseHandler
 from .interfaces import ITaxHandler
 from .interfaces import OutOfStock
+from .interfaces import ItemRemoved
 from .utils import get_current_userid
 from .utils import get_setting
 from .utils import get_site
@@ -63,6 +65,7 @@ class LineItem(object):
 
         if value == 0:
             del self.cart._items[self.cart_id]
+            notify(ItemRemoved(self.cart))
 
         self.cart.data['ship_charge'] = Decimal(0)
         self.cart.save()
@@ -167,7 +170,14 @@ class Cart(object):
                 data = storage.get_shop_data([browser_id, 'cart'])
                 if data is not None:
                     for item in data['items']:
-                        item['user'] = user_id
+                        try:
+                            item['user'] = user_id
+                        except TypeError:
+                            # we had at least one case in
+                            # production of a corrupted cart
+                            # just create a new one if it happens
+                            data = PersistentMapping()
+                            break
                     storage.del_shop_data([browser_id])
                 else:
                     # create a new cart
@@ -214,6 +224,7 @@ class Cart(object):
 
     def __delitem__(self, cart_id):
         del self._items[cart_id]
+        notify(ItemRemoved(self))
 
     @property
     def items(self):
