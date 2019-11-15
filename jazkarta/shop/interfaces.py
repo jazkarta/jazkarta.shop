@@ -477,6 +477,10 @@ class IStripeEnabledView(Interface):
     """Marker for views that should load the Stripe js"""
 
 
+class IThankYouView(Interface):
+    """Marker for the thank you page view"""
+
+
 # Exceptions
 
 class PaymentProcessingException(Exception):
