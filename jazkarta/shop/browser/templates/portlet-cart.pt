@@ -37,7 +37,7 @@
       </div>
 
       <dd class="portletFooter">
-         <a href="#" class="jaz-shop-cart-portlet-trigger"
+         <a class="jaz-shop-cart-portlet-trigger"
             data-toggle="collapse" data-target=".jaz-shop-cart-portlet">My Cart</a>
       </dd>
 
