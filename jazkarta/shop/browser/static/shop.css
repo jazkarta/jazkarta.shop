@@ -20,6 +20,9 @@
     position: relative;
     right: 130px;
 }
+.jaz-shop-cart-portlet-trigger:hover {
+    cursor: pointer;
+}
 .collapse[aria-expanded="true"] {
 	display: block;
 }
