@@ -303,7 +303,7 @@ define('mockup-utils',[
   };
 
   var parseBodyTag = function(txt) {
-    return $((/<body[^>]*>((.|[\n\r])*)<\/body>/im).exec(txt)[0]
+    return $((/<body[^>]*>[^]*<\/body>/im).exec(txt)[0]
       .replace('<body', '<div').replace('</body>', '</div>')).eq(0).html();
   };
 
@@ -335,7 +335,23 @@ define('mockup-utils',[
   };
 
   var removeHTML = function(val) {
-    return val.replace(/<[^>]+>/ig, "");
+    return val.replace(/<[^>]+>/ig, '');
+  };
+
+  var storage = {
+    // Simple local storage wrapper, which doesn't break down if it's not available.
+    get: function (name) {
+        if (window.localStorage) {
+          var val = window.localStorage[name];
+          return typeof(val) === 'string' ? JSON.parse(val) : undefined;
+      }
+    },
+
+    set: function (name, val) {
+      if (window.localStorage) {
+        window.localStorage[name] = JSON.stringify(val);
+      }
+    }
   };
 
   return {
@@ -350,7 +366,8 @@ define('mockup-utils',[
     loading: new Loading(),  // provide default loader
     parseBodyTag: parseBodyTag,
     QueryHelper: QueryHelper,
-    setId: setId
+    setId: setId,
+    storage: storage
   };
 });
 
@@ -359,6 +376,8 @@ require(['jquery', 'mockup-utils'], function($, utils) {
     $(document).ready(function () {
         var portal_url = $('body').attr('data-portal-url');
 
+        // update the cart details in the viewlet to avoid potential caching
+        // issues for anon users
         $.get(portal_url + '/shopping-cart', function (data) {
             $('.jaz-shop-cart-wrapper').replaceWith(data);
         }, 'html');
@@ -374,9 +393,28 @@ require(['jquery', 'mockup-utils'], function($, utils) {
             }, 'html');
         });
 
+        // update the cart details in the portlet via ajax to avoid potential
+        // caching issues for anon users
+        $.get(portal_url + '/@@jazkarta_shop_portletdata', function (data) {
+            $('.jaz-shop-cart-portlet-wrapper').replaceWith(data);
+        }, 'html');
+
+        // update the number of items in the portlet via ajax to avoid potential
+        // caching issues for anon users
+        // also hide the entire portlet if it contains no items
+        $.get(portal_url + '/@@jazkarta_shop_portletdata?query=cart_size', function (data) {
+            if (data == '0') {
+                $('.jazkarta-cart-portlet').hide();
+            }
+            else {
+                $('.jazkarta-cart-portlet').show();
+                $('.jazkarta-shop-portlet-cartsize').replaceWith(data);
+            }
+        }, 'html');
+
     });
 
 });
 
-define("/Users/davisagli/Work/jazkarta.com/src/jazkarta.shop/jazkarta/shop/browser/static/shop.js", function(){});
+define("/home/plone/Plone/zinstance/src/jazkarta.shop/jazkarta/shop/browser/static/shop.js", function(){});
 
