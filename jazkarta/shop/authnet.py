@@ -116,8 +116,6 @@ def createTransactionRequest(
     defaultMsg = 'Your card could not be processed.'
     if createtransactioncontroller._httpResponse:
         logger.info('Authorize.net response: {}'.format(createtransactioncontroller._httpResponse))
-    else:
-        raise PaymentProcessingException(defaultMsg)
     if response.messages.resultCode == 'Ok':
         if response.transactionResponse.responseCode != 1:  # Approved
             raise PaymentProcessingException(defaultMsg)
