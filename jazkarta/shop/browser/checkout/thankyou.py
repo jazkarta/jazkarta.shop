@@ -1,7 +1,6 @@
 from nci.content.browser.donation import DonationForm
 from zope.browserpage import ViewPageTemplateFile
 from zope.interface import implementer
-from . import CheckoutFormBase
 from ...interfaces import IThankYouView
 
 
