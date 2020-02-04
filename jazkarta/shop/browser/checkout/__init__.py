@@ -5,6 +5,7 @@ from Products.Five import BrowserView
 from zope.browserpage import ViewPageTemplateFile
 from zope.cachedescriptors.property import Lazy as lazy_property
 from zope.event import notify
+from zope.component import getMultiAdapter
 from zope.interface import implementer
 from ...cart import Cart
 from ...interfaces import CheckoutComplete
@@ -133,8 +134,6 @@ class CheckoutFormBase(BrowserView, P5Mixin):
         self.cart.clear()
 
     def thankyou_page(self):
-        from .thankyou import CheckoutThankYou
-
         if self.order_id is None:
             # weird edge case I (witekdev) encountered when authorize.net
             # deemed the transaction as a Suspicious Transaction.
@@ -151,7 +150,8 @@ class CheckoutFormBase(BrowserView, P5Mixin):
                           'Your payment has not been processed. '
                           'Please contact us for assistance. '
                           '(Internal error: order_id is None)')
-            return CheckoutThankYou(self.context, self.request)()
+            return getMultiAdapter((self.context, self.request),
+                                   name="jazkarta.shop.checkout.thank-you")()
 
         url = get_setting('after_checkout_callback_url')
         if url:
@@ -167,7 +167,8 @@ class CheckoutFormBase(BrowserView, P5Mixin):
                 url = url + "&error=%s" % error
             self.request.response.redirect(url)
         else:
-            return CheckoutThankYou(self.context, self.request)()
+            return getMultiAdapter((self.context, self.request),
+                                   name="jazkarta.shop.checkout.thank-you")()
 
     def receipt_intro(self):
         return get_setting('receipt_intro')
