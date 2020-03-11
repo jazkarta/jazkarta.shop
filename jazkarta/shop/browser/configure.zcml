@@ -1,6 +1,7 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
     xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:cache="http://namespaces.zope.org/cache"
     xmlns:plone="http://namespaces.plone.org/plone"
     i18n_domain="jazkarta.shop">
 
@@ -164,5 +165,15 @@
     layer="..interfaces.IBrowserLayer"
     template="templates/checkout_thankyou.pt"
     /-->
+
+  <cache:rulesetType
+    name="jazkarta.shop.checkout_ruleset"
+    title="Jazkarta Shop Checkout View"
+    />
+
+  <cache:ruleset
+    ruleset="jazkarta.shop.checkout_ruleset"
+    for=".checkout.CheckoutForm"
+    />
 
 </configure>
