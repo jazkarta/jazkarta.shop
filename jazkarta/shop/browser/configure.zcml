@@ -157,14 +157,14 @@
     permission="zope.Public"
   />
 
-  <!--browser:page
+  <browser:page
     for="*"
     name="jazkarta.shop.checkout.thank-you"
     class=".checkout.thankyou.CheckoutThankYou"
     permission="zope2.View"
     layer="..interfaces.IBrowserLayer"
     template="templates/checkout_thankyou.pt"
-    /-->
+    />
 
   <cache:rulesetType
     name="jazkarta.shop.checkout_ruleset"

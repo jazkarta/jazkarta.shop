@@ -24,9 +24,7 @@
         $form.append($('<input type="hidden" name="dataDescriptor" />').val(response.opaqueData.dataDescriptor));
         $form.append($('<input type="hidden" name="dataValue" />').val(response.opaqueData.dataValue));
         // and re-submit
-        setTimeout(function() {
         $form.get(0).submit();
-        }, 1000);
       } else {
         var message = '';
         var i = 0;
