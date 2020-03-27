@@ -5,6 +5,7 @@ from Products.Five import BrowserView
 from zope.browserpage import ViewPageTemplateFile
 from zope.cachedescriptors.property import Lazy as lazy_property
 from zope.event import notify
+from zope.component import getMultiAdapter
 from zope.interface import implementer
 from ...cart import Cart
 from ...interfaces import CheckoutComplete
@@ -32,19 +33,19 @@ class P5Mixin():
 @implementer(IDontShowJazkartaShopPortlets)
 class CheckoutForm(BrowserView):
 
-    def __call__(self):
+    def __call__(self, old_cart=None):
         from .authorize_net_accept_js import CheckoutFormAuthorizeNetAcceptJs
         from .authorize_net_sim import CheckoutFormAuthorizeNetSIM
         from .stripe import CheckoutFormStripe
 
         payment_processor = get_setting('payment_processor')
         if payment_processor == 'Authorize.Net SIM':
-            return CheckoutFormAuthorizeNetSIM(self.context, self.request)()
+            return CheckoutFormAuthorizeNetSIM(self.context, self.request)(old_cart)
         elif payment_processor == 'Authorize.Net Accept.js':
             return CheckoutFormAuthorizeNetAcceptJs(
-                self.context, self.request)()
+                self.context, self.request)(old_cart)
         elif payment_processor == 'Stripe':
-            return CheckoutFormStripe(self.context, self.request)()
+            return CheckoutFormStripe(self.context, self.request)(old_cart)
         else:
             raise Exception(
                     'No valid payment processor has been specified.')
@@ -57,7 +58,8 @@ class CheckoutFormBase(BrowserView, P5Mixin):
 
     order_id = None
 
-    def __call__(self):
+    def __call__(self, old_cart=None):
+        self.old_cart = old_cart
         self.update()
         if 'submitted' in self.request.form:
             self.handle_submit()
@@ -133,8 +135,6 @@ class CheckoutFormBase(BrowserView, P5Mixin):
         self.cart.clear()
 
     def thankyou_page(self):
-        from .thankyou import CheckoutThankYou
-
         if self.order_id is None:
             # weird edge case I (witekdev) encountered when authorize.net
             # deemed the transaction as a Suspicious Transaction.
@@ -151,7 +151,8 @@ class CheckoutFormBase(BrowserView, P5Mixin):
                           'Your payment has not been processed. '
                           'Please contact us for assistance. '
                           '(Internal error: order_id is None)')
-            return CheckoutThankYou(self.context, self.request)()
+            return getMultiAdapter((self.context, self.request),
+                                   name="jazkarta.shop.checkout.thank-you")(self.old_cart)
 
         url = get_setting('after_checkout_callback_url')
         if url:
@@ -167,7 +168,8 @@ class CheckoutFormBase(BrowserView, P5Mixin):
                 url = url + "&error=%s" % error
             self.request.response.redirect(url)
         else:
-            return CheckoutThankYou(self.context, self.request)()
+            return getMultiAdapter((self.context, self.request),
+                                   name="jazkarta.shop.checkout.thank-you")(self.old_cart)
 
     def receipt_intro(self):
         return get_setting('receipt_intro')
