@@ -22,6 +22,7 @@
             <tal:block tal:replace="structure view/widgets/street/@@ploneform-render-widget" />
             <tal:block tal:replace="structure view/widgets/city/@@ploneform-render-widget" />
             <tal:block tal:replace="structure view/widgets/state/@@ploneform-render-widget" />
+            <tal:block tal:replace="structure view/widgets/postal_code/@@ploneform-render-widget" />
             <select id="state-select" class="pat-select2" style="display: none;">
               <option value=""></option>
               <option value="AL">Alabama</option>
@@ -92,7 +93,6 @@
               <option value="NU">Nunavut</option>
               <option value="YT">Yukon</option>
             </select>
-            <tal:block tal:replace="structure view/widgets/postal_code/@@ploneform-render-widget" />
             <!--! country select was not being properly rendered under p4, thats why we need to differentiate here between p4 and p5 -->
             <tal:using_p5 tal:condition="view/using_plone5">
                 <tal:block tal:replace="structure view/widgets/country/@@ploneform-render-widget" />
