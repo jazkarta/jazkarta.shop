@@ -40,7 +40,7 @@ class CheckoutForm(BrowserView):
 
         payment_processor = get_setting('payment_processor')
         if payment_processor == 'Authorize.Net SIM':
-            return CheckoutFormAuthorizeNetSIM(self.context, self.request)(old_cart)
+            return CheckoutFormAuthorizeNetSIM(self.context, self.request)()
         elif payment_processor == 'Authorize.Net Accept.js':
             return CheckoutFormAuthorizeNetAcceptJs(
                 self.context, self.request)(old_cart)

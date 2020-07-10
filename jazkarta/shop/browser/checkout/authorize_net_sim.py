@@ -164,6 +164,7 @@ class CheckoutFormAuthorizeNetSIM(SIMPropertyFields):
                 self.request, user_id=user_id, browser_id=browser_id)
         self.update()
         if 'x_response_code' in self.request.form:
+            self.old_cart = self.cart.clone()
             self.handle_submit()
         return self.render()
 
