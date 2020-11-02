@@ -14,20 +14,20 @@ Installation
 
 Currently, there is no PYPI release, so the git repository has to be added to
 a Plone buildout as a source. The following is a minimal example that will do
-that and leave Plone ready to use jazkarta.shop:
+that and leave Plone ready to use jazkarta.shop.
 
-Create a directory called Plone-5 and enter it:
+Create a directory called Plone-5 and enter it::
 
     mkdir Plone-5
     cd Plone-5
 
-Create a virtual python environment (virtualenv) and install zc.buildout:
+Create a virtual python environment (virtualenv) and install zc.buildout::
 
     virtualenv-2.7 zinstance
     cd zinstance
     bin/pip install zc.buildout
 
-Create a buildout.cfg file with the following contents:
+Create a buildout.cfg file with the following contents::
 
     [buildout]
     extends =
@@ -69,7 +69,7 @@ Create a buildout.cfg file with the following contents:
 Change the `5-latest` version in the `extends` directive above to use a different
 Plone version. This buildout should work on both 5.1 and 5.2 deployments.
 
-Run buildout:
+Run buildout::
 
     ./bin/buildout
 
@@ -77,13 +77,13 @@ This will start a long download and build process.
 
 You can ignore Errors like SyntaxError: ("'return' outside function"...".
 
-After it finished you can start Plone in foreground-mode with:
+After it finished you can start Plone in foreground-mode with::
 
     ./bin/instance fg
 
 You can stop it with ctrl + c.
 
-Start and stop this Plone-instance in production-mode like this;
+Start and stop this Plone-instance in production-mode like this::
 
     ./bin/instance start
 
