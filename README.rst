@@ -48,6 +48,11 @@ Purchasable Content Types
 
 Types can be Dexterity or Archetypes. Make your own content type purchasable using a behavior or schema extender.
 
+Cart Stored in ZODB
+------------------------
+
+Shopping cart data is stored in the ZODB rather than in sessions even for anonymous users. This makes it easier to deploy when running multiple Zope instances.
+
 PloneFormGen Integration
 ------------------------
 
