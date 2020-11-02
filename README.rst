@@ -7,6 +7,16 @@ An e-commerce shopping cart and checkout for `Plone <http://plone.com>`_.
 Features
 ========
 
+Shopping Cart
+-------------
+
+Users can add items to their cart while browsing products on the website. They can then click the cart icon to view and adjust the contents of their shopping cart.
+
+Promo Codes
+-----------
+
+Promotional codes for discounts can be defined and applied to a shopping cart.
+
 Pluggable Payment Processors
 ----------------------------
 
