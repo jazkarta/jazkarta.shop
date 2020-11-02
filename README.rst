@@ -2,16 +2,48 @@
 jazkarta.shop
 =============
 
-A shopping cart and checkout for `Plone <http://plone.com>`_.
+An e-commerce shopping cart and checkout for `Plone <http://plone.com>`_.
 
-Compatible with:    
-  * Plone 4.3
-  * Plone 5.x on Python 2.7
+Features
+========
 
-Supports:  
+Pluggable Payment Processors
+----------------------------
+
   * Stripe
   * Authorize.net SIM (legacy)
   * Authorize.net Accept.js
+
+Pluggable Shipping Providers
+----------------------------
+
+  * USPS 
+  * UPS
+
+Pluggable Tax APIs
+------------------
+
+For calculating US state and local taxes.
+
+  * Washington state handler
+  * Taxjar handler (a commercial service for automated sales tax calculation based on address) 
+  * NoTax handler for disabling sales tax calculation entirely
+
+Purchasable Content Types
+-------------------------
+
+Types can be Dexterity or Archetypes. Make your own content type purchasable using a behavior or schema extender.
+
+PloneFormGen Integration
+------------------------
+
+Provided by jazkarta.pfg.jazshop.
+  
+Compatible With
+---------------
+
+  * Plone 4.3
+  * Plone 5.x on Python 2.7
 
 Installation
 ============
@@ -108,7 +140,21 @@ To make your content types addable to your cart, implementing the IProduct inter
     class Journal(Container):
          implements(IJournal, IProduct)
 
+Customizing
+===========
+
 Credits
 =======
 
 Built by Jazkarta.
+
+Authors
+-------
+
+- David Glick (initial author)
+- Carlos de la Guardia
+- Alec Mitchell
+- Witek
+- Cris Ewing
+- Fulvio Casali
+
