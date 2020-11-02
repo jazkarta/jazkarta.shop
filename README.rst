@@ -10,6 +10,8 @@ Features
 Pluggable Payment Processors
 ----------------------------
 
+Currently available:
+
 - Stripe
 - Authorize.net SIM (legacy)
 - Authorize.net Accept.js
@@ -17,13 +19,15 @@ Pluggable Payment Processors
 Pluggable Shipping Providers
 ----------------------------
 
+Currently available:
+
 - USPS 
 - UPS
 
-Pluggable Tax APIs
-------------------
+Pluggable Sales Tax APIs
+------------------------
 
-For calculating US state and local taxes.
+For calculating US state and local taxes. Currently available:
 
 - Washington state handler
 - Taxjar handler (a commercial service for automated sales tax calculation based on address) 
@@ -140,8 +144,38 @@ To make your content types addable to your cart, implementing the IProduct inter
     class Journal(Container):
          implements(IJournal, IProduct)
 
-Customizing
-===========
+Administration
+==============
+
+Three control panels are provided.
+
+Jazkarta Shop Settings
+----------------------
+
+This control panel allows configuration of:
+
+- Which payment processor to use
+- Payment processor keys or login information for development and production use
+- Subject and introduction for receipt emails
+- Product categories
+- Minimum stock level
+- Shipped from name and address
+- Shipping handler keys or login information
+- Which tax handler to use
+- Optional Taxjar API token
+- Optional after-checkout callback URL
+
+jazkarta.shop requires the environment variable ``JAZKARTA_SHOP_ENV`` to be set to ``production`` when it is running in production mode.
+
+Jazkarta Shop Shipping Methods
+------------------------------
+
+Named shipping methods can be added and edited. Each shipping method specifies the geographical areas it is used for, the shipping fee calculation method, minimum and maximum weights, and optionally a minimum purchase amount.
+
+Jazkarta Shop Orders
+--------------------
+
+This control panel provides a table of order information such as date, items, shipping information and price.
 
 Credits
 =======
@@ -155,6 +189,5 @@ Authors
 - Carlos de la Guardia
 - Alec Mitchell
 - Witek
-- Cris Ewing
 - Fulvio Casali
 
