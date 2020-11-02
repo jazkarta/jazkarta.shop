@@ -93,6 +93,21 @@ Plone will run on port 8080. You can access your install via http://localhost:80
 
 Use login id “admin” and password “admin” for initial login so you can create a site.
 
+
+Integrating jazkarta.shop into your site
+----------------------------------------
+
+The content types that you wish to be able to add to your jazkarta.shop cart need to implement the IProduct interface.
+
+eg:
+```
+from jazkarta.shop.interfaces import IProduct
+
+class Journal(Container):
+    """Dexterity Journal"""
+    implements(IJournal, IProduct)
+```
+
 Credits
 -------
 
