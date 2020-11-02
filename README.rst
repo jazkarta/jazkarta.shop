@@ -1,8 +1,12 @@
-A shopping cart and checkout for Plone.
+=============
+jazkarta.shop
+=============
+
+A shopping cart and checkout for `Plone <http://plone.com>`_.
 
 Compatible with:    
-  * Plone4
-  * Plone5
+  * Plone 4.3
+  * Plone 5.x on Python 2.7
 
 Supports:  
   * Stripe
@@ -10,7 +14,7 @@ Supports:
   * Authorize.net Accept.js
 
 Installation
-------------
+============
 
 Currently, there is no PYPI release, so the git repository has to be added to
 a Plone buildout as a source. The following is a minimal example that will do
@@ -94,8 +98,8 @@ Plone will run on port 8080. You can access your install via http://localhost:80
 Use login id “admin” and password “admin” for initial login so you can create a site.
 
 
-Integrating the package with your content
------------------------------------------
+Integrating the Package with Your Content
+=========================================
 
 To make your content types addable to your cart, implementing the IProduct interface is required::
 
@@ -105,6 +109,6 @@ To make your content types addable to your cart, implementing the IProduct inter
          implements(IJournal, IProduct)
 
 Credits
--------
+=======
 
 Built by Jazkarta.
