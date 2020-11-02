@@ -10,24 +10,24 @@ Features
 Pluggable Payment Processors
 ----------------------------
 
-  * Stripe
-  * Authorize.net SIM (legacy)
-  * Authorize.net Accept.js
+- Stripe
+- Authorize.net SIM (legacy)
+- Authorize.net Accept.js
 
 Pluggable Shipping Providers
 ----------------------------
 
-  * USPS 
-  * UPS
+- USPS 
+- UPS
 
 Pluggable Tax APIs
 ------------------
 
 For calculating US state and local taxes.
 
-  * Washington state handler
-  * Taxjar handler (a commercial service for automated sales tax calculation based on address) 
-  * NoTax handler for disabling sales tax calculation entirely
+- Washington state handler
+- Taxjar handler (a commercial service for automated sales tax calculation based on address) 
+- NoTax handler for disabling sales tax calculation entirely
 
 Purchasable Content Types
 -------------------------
@@ -42,8 +42,8 @@ Provided by jazkarta.pfg.jazshop.
 Compatible With
 ---------------
 
-  * Plone 4.3
-  * Plone 5.x on Python 2.7
+- Plone 4.3
+- Plone 5.x on Python 2.7
 
 Installation
 ============
