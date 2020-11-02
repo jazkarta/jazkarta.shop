@@ -98,15 +98,12 @@ Integrating jazkarta.shop into your site
 ----------------------------------------
 
 The content types that you wish to be able to add to your jazkarta.shop cart need to implement the IProduct interface.
-
 eg:
-```
-from jazkarta.shop.interfaces import IProduct
 
-class Journal(Container):
-    """Dexterity Journal"""
-    implements(IJournal, IProduct)
-```
+    from jazkarta.shop.interfaces import IProduct
+
+    class Journal(Container):
+         implements(IJournal, IProduct)
 
 Credits
 -------
