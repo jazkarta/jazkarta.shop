@@ -78,8 +78,9 @@ Create a directory called Plone-5 and enter it::
 
 Create a virtual python environment (virtualenv) and install zc.buildout::
 
-    virtualenv-2.7 zinstance
+    virtualenv zinstance --python=python2.7
     cd zinstance
+    source bin/activate
     bin/pip install zc.buildout
 
 Create a buildout.cfg file with the following contents::
@@ -108,6 +109,11 @@ Create a buildout.cfg file with the following contents::
     cachetools = 3.1.1
     # Plone 5.1
     requests = 2.24
+    cryptography=3.3.2
+    cssutils=1.0.2
+
+    setuptools=44.1.1
+    zc.buildout=2.13.4
 
     [instance]
     recipe = plone.recipe.zope2instance
@@ -123,6 +129,12 @@ Create a buildout.cfg file with the following contents::
 
 Change the `5-latest` version in the `extends` directive above to use a different
 Plone version. This buildout should work on both 5.1 and 5.2 deployments.
+
+Change the version pin of zc.buildout and setuptools to match the version that running bin/pip command pulled in, eg:
+
+    Using cached zc.buildout-2.13.4-py2.py3-none-any.whl (153 kB)
+    Requirement already satisfied: setuptools<52,>=8.0 in ./lib/python2.7/site-packages (from zc.buildout) (44.1.1)
+
 
 Run buildout::
 
