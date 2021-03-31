@@ -75,7 +75,9 @@ input[type="text"].jaz-shop-coupon {
 .jaz-shop-checkout-form .fieldset-contact-info select,
 .template-shipping input[type="text"],
 .template-shipping select {
-	width: calc(100% - 120px);
+    width: ~"calc(100% - 120px)";
+    width: ~"-webkit-calc(100% - 120px)";
+    width: ~"-moz-calc(100% - 120px)";
 }
 .template-shipping .select2-input {
 	width: 100% !important;
