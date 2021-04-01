@@ -45,7 +45,7 @@ class CheckoutForm(BrowserView):
             return CheckoutFormAuthorizeNetAcceptJs(
                 self.context, self.request)(old_cart)
         elif payment_processor == 'Stripe':
-            return CheckoutFormStripe(self.context, self.request)(old_cart)
+            return CheckoutFormStripe(self.context, self.request)()
         else:
             raise Exception(
                     'No valid payment processor has been specified.')
