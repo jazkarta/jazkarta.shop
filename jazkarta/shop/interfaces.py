@@ -309,15 +309,31 @@ class ISettings(model.Schema):
         vocabulary='jazkarta.shop.countries',
     )
 
-    ups_username = schema.TextLine(title=u'ups.com Username')
+    ups_username = schema.TextLine(
+        title=u'ups.com Username',
+        description=u"Required if UPS shipping option is being used.",
+        required=False,
+    )
     ups_password = schema.Password(
         title=u'ups.com Password',
         required=False,
         )
-    ups_api_key = schema.TextLine(title=u'UPS API Key')
-    ups_account = schema.TextLine(title=u'UPS Account Number')
+    ups_api_key = schema.TextLine(
+        title=u'UPS API Key',
+        description=u"Required if UPS shipping option is being used.",
+        required=False,
+    )
+    ups_account = schema.TextLine(
+        title=u'UPS Account Number',
+        description=u"Required if UPS shipping option is being used.",
+        required=False,
+    )
 
-    usps_userid = schema.TextLine(title=u'USPS WebTools API User Id')
+    usps_userid = schema.TextLine(
+        title=u'USPS WebTools API User Id',
+        description=u"Required if USPS shipping option is being used.",
+        required=False,
+    )
 
     tax_handlers = schema.List(
         title=u'Calculate Tax Using',
