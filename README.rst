@@ -12,11 +12,6 @@ Shopping Cart
 
 Users can add items to their cart while browsing products on the website. They can then click the cart icon to view and adjust the contents of their shopping cart.
 
-Promo Codes
------------
-
-Promotional codes for discounts can be defined and applied to a shopping cart.
-
 Pluggable Payment Processors
 ----------------------------
 
@@ -164,12 +159,39 @@ Use login id “admin” and password “admin” for initial login so you can c
 Integrating the Package with Your Content
 =========================================
 
-To make your content types addable to your cart, implementing the IProduct interface is required::
+Add the "Jazkarta Shop Product" dexterity behavior to each content type that you wish to use with jazkarta.shop,
+either through the web or programatically in your code.
 
-    from jazkarta.shop.interfaces import IProduct
+When creating instances of your content type, make sure to set the weight and unit price on each one. This is will appear under the "Shop" fieldset when adding/editing your object.
 
-    class Journal(Container):
-         implements(IJournal, IProduct)
+
+Minimal configuration/Quickstart
+================================
+
+Proceed to the "Jazkarta Shop Settings" to configure a payment processor, optional shipping method api keys, shipped from address details as well as a recepit email message.
+
+Proceed to the "Jazkarta Shop Shipping Methods" to setup a shipping method.
+Destinations are grouped by shipping zones
+"Alaska, Canada, East, Hawaii, International, Midwest, US, West"
+
+It is important to select at least one shipping zone for your shipping method(s) to show up once the shipping address has been entered during the checkout process.
+
+Currently available zones can be seen in detail here::
+
+    WEST = {
+        'AZ', 'CA', 'CO', 'ID', 'MT', 'NV', 'NM', 'OR', 'UT', 'WY', 'WA'
+    }
+
+    MIDWEST = {
+        'AL', 'AR', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'MI', 'MN', 'MS',
+        'MO', 'NE', 'ND', 'OH', 'OK', 'SD', 'TN', 'TX', 'WI',
+    }
+
+    EAST = {
+        'CT', 'DE', 'FL', 'GA', 'ME', 'MD', 'MA', 'NH', 'NJ', 'NY', 'NC',
+        'PA', 'RI', 'SC', 'VT', 'VA', 'WV'
+    }
+
 
 Administration
 ==============
@@ -199,10 +221,22 @@ Jazkarta Shop Shipping Methods
 
 Named shipping methods can be added and edited. Each shipping method specifies the geographical areas it is used for, the shipping fee calculation method, minimum and maximum weights, and optionally a minimum purchase amount.
 
+If using UPS or USPS shipping methods, please make sure the revelevant api keys are added in the "Jazkarta Shop Settings" control panel.
+
 Jazkarta Shop Orders
 --------------------
 
 This control panel provides a table of order information such as date, items, shipping information and price.
+
+
+Future Work
+===========
+
+Promo Codes
+-------------
+Promotional codes for discounts can be defined and applied to a shopping cart.
+Currently a promo code widget is visible on the Shopping cart (review-cart) view, however this functionality is not complete
+
 
 Credits
 =======
