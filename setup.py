@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '1.0.dev0'
+version = '1.1.dev0'
 
 setup(
     name='jazkarta.shop',
@@ -27,7 +27,7 @@ setup(
         'setuptools',
         'authorizenet',
         'collective.z3cform.datagridfield',
-        'stripe',
+        'stripe~=2.56',
         'premailer',
         'python-ups',
         'requests[security]',
