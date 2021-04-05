@@ -1,5 +1,6 @@
 <div id="cartFormWrapper"
-     tal:define="cart view/old_cart|view/cart;
+     tal:define="cart view/old_cart|nothing;
+                 cart python:cart or view.cart;
                  can_edit view/cart_is_editable|python:False;
                  can_refund view/show_refund_column|nothing">
 <input type="hidden" name="total_order_amount" id="total_order_amount"

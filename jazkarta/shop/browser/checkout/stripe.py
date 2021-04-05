@@ -21,12 +21,6 @@ class CheckoutFormStripe(CheckoutFormBase):
     """ Renders a checkout form set up to submit through Stripe """
     index = ViewPageTemplateFile('../templates/checkout_form_stripe.pt')
 
-    def __call__(self):
-        self.update()
-        if 'submitted' in self.request.form:
-            self.handle_submit()
-        return self.render()
-
     def handle_submit(self):
         amount = self.amount
 
