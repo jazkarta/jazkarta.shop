@@ -6,13 +6,17 @@ from ..utils import get_setting
 
 STRIPE_JS_HTML = """
 <div id="stripe">
-    <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+    <script type="text/javascript" src="https://js.stripe.com/v3/"></script>
     <script type="text/javascript">
-        (function ($) {
-            $(document).ready(function() {
-                Stripe.setPublishableKey('%s');
-            });
-        })(jQuery);
+        var card;
+        var elements;
+        var stripe;
+        document.addEventListener("DOMContentLoaded", function(event) {
+                stripe = Stripe('%s');
+                elements = stripe.elements();
+                card = elements.create('card');
+                card.mount('#card-element');
+        });
     </script>
 </div>
 """
