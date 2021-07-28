@@ -5,20 +5,23 @@ from ..utils import get_setting
 
 
 STRIPE_JS_HTML = """
-<div id="stripe">
     <script type="text/javascript" src="https://js.stripe.com/v3/"></script>
     <script type="text/javascript">
         var card;
         var elements;
         var stripe;
+        var mounted;
         document.addEventListener("DOMContentLoaded", function(event) {
-                stripe = Stripe('%s');
-                elements = stripe.elements();
-                card = elements.create('card');
+            stripe = Stripe('%s');
+            elements = stripe.elements();
+            card = elements.create('card', {hidePostalCode: true,
+                                            iconStyle: 'solid'});
+            if ($('#card-element').length) {
                 card.mount('#card-element');
+                mounted = true;
+            }
         });
     </script>
-</div>
 """
 
 
