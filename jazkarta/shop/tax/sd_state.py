@@ -8,7 +8,7 @@ from ..interfaces import TaxRateException
 from ..interfaces import ITaxHandler
 from ..utils import get_setting
 
-TAXJAR_SMARTCALCS_BASE_URL = 'http://api.taxjar.com/v2/rates/'
+TAXJAR_SMARTCALCS_BASE_URL = 'http://api.taxjar.com/v2/rates'
 
 
 @implementer(ITaxHandler)
