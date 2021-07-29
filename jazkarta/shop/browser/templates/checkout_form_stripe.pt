@@ -21,9 +21,9 @@
       form.submit();
     }
 
-    function createToken() {
+    function createToken(data) {
       var $form = $('#checkout-form');
-      stripe.createToken(card).then(function(result) {
+      stripe.createToken(card, data).then(function(result) {
         if (result.error) {
         // Show the errors on the form
             $form.find('.checkout-error-wrapper').show();
@@ -70,7 +70,15 @@
         // Disable the submit button to prevent repeated clicks
         $form.find('input[type="submit"]').prop('disabled', true);
 
-        createToken();
+        var $card_info = $('#card-token-data');
+        var data = {
+            name: $card_info.find('input[name="first_name"]').val() + ' ' + $card_info.find('input[name="last_name"]').val(),
+            address_line1: $card_info.find('input[name="address"]').val(),
+            address_city: $card_info.find('input[name="city"]').val(),
+            address_state: $card_info.find('input[name="state"]').val(),
+            address_zip: $card_info.find('input[name="zip"]').val(),
+        };
+        createToken(data);
 
         // Prevent the form from submitting with the default action
         return false;
@@ -117,7 +125,7 @@
         <legend><span class="step">1.</span> Billing Address</legend>
 
         <div class="field field-address">
-          <div class="field-inputs">
+          <div class="field-inputs" id="card-token-data">
             <div class="field subfield-first-name">
               <label>First name</label>
               <input type="text" name="first_name" required="required" tal:attributes="value python: view.request.form.get('first_name', None)" />
