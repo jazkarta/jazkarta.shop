@@ -1,5 +1,6 @@
 from builtins import range
 from builtins import object
+from six.moves import range
 from datetime import date
 from plone.protect.utils import safeWrite
 from premailer import Premailer

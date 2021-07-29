@@ -1,6 +1,6 @@
 from builtins import str
 from builtins import object
-from zope.interface import implements
+from zope.interface import implementer
 from plone.app.portlets.portlets import base
 from plone.portlets.interfaces import IPortletDataProvider
 from Products.Five import BrowserView
@@ -15,8 +15,8 @@ class ICartPortlet(IPortletDataProvider):
     pass
 
 
+@implementer(ICartPortlet)
 class Assignment(base.Assignment):
-    implements(ICartPortlet)
 
     @property
     def title(self):
