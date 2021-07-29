@@ -141,7 +141,6 @@
                         <option id="form-widgets-country-29" value="Bosnia-Herzegovina">Bosnia-Herzegovina</option>
                         <option id="form-widgets-country-30" value="Botswana">Botswana</option>
                         <option id="form-widgets-country-31" value="Brazil">Brazil</option>
-                        <option id="form-widgets-country-32" value="British Virgin Islands">British Virgin Islands</option>
                         <option id="form-widgets-country-33" value="Brunei Darussalam">Brunei Darussalam</option>
                         <option id="form-widgets-country-34" value="Bulgaria">Bulgaria</option>
                         <option id="form-widgets-country-35" value="Burkina Faso">Burkina Faso</option>
@@ -380,6 +379,8 @@
             var $prov_select2 = $('#s2id_province-select');
             if ($country.val() == 'United States') {
               $state_text.attr('name', null).hide();
+              $('#formfield-form-widgets-state').removeClass('error');
+              $('#formfield-form-widgets-state .fieldErrorBox').html("");
               $prov_select.attr('name', null)
               $prov_select2.hide();
               $state_select.attr('name', 'form.widgets.state');
@@ -387,6 +388,8 @@
               $state_select2.show();
             } else if ($country.val() == 'Canada') {
               $state_text.attr('name', null).hide();
+              $('#formfield-form-widgets-state').removeClass('error');
+              $('#formfield-form-widgets-state .fieldErrorBox').html("");
               $state_select.attr('name', null);
               $state_select2.hide();
               $prov_select.attr('name', 'form.widgets.state');
