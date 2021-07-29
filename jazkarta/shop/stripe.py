@@ -1,6 +1,7 @@
 # Make sure we don't import this module recursively via `import stripe`
 from __future__ import absolute_import
 
+from builtins import str
 import stripe
 
 from jazkarta.shop import config

@@ -1,3 +1,4 @@
+from builtins import object
 from decimal import Decimal
 from Products.Five import BrowserView
 from zope.browserpage import ViewPageTemplateFile

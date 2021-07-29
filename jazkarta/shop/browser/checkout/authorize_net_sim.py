@@ -1,3 +1,4 @@
+from builtins import str
 import hmac
 import json
 import time

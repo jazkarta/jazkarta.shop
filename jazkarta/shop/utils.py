@@ -1,3 +1,4 @@
+from builtins import str
 from AccessControl import getSecurityManager
 from Acquisition import aq_inner
 from Acquisition import aq_parent
@@ -101,7 +102,7 @@ def format_currency(amount):
 
 def send_mail(subject, message, mfrom=None, mto=None):
     site = get_site()
-    if isinstance(message, unicode):
+    if isinstance(message, str):
         message = message.encode('utf8')
 
     if message.startswith('<html'):

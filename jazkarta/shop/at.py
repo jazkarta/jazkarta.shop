@@ -1,9 +1,13 @@
 """ Provide schema extender for archetype CT compatibility
 """
+from builtins import object
+try:
+    from archetypes.schemaextender.field import ExtensionField
+    from archetypes.schemaextender.interfaces import ISchemaExtender
+    from Products.Archetypes import atapi
+except ImportError:
+    pass
 
-from archetypes.schemaextender.field import ExtensionField
-from archetypes.schemaextender.interfaces import ISchemaExtender
-from Products.Archetypes import atapi
 from jazkarta.shop.interfaces import IATProduct
 from zope.component import adapts
 from zope.interface import implements
