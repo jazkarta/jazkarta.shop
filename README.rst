@@ -17,7 +17,7 @@ Pluggable Payment Processors
 
 Currently available:
 
-- Stripe
+- Stripe (Stripe Elements)
 - Authorize.net SIM (legacy)
 - Authorize.net Accept.js
 
@@ -57,7 +57,8 @@ Compatible With
 ---------------
 
 - Plone 4.3
-- Plone 5.x on Python 2.7
+- Plone 5.0.x, 5.1.x on Python 2.7
+- Plone 5.2.x on Python 2.7, 3.6, 3.7
 
 Installation
 ============
