@@ -105,9 +105,6 @@ def format_currency(amount):
 
 def send_mail(subject, message, mfrom=None, mto=None):
     site = get_site()
-    if isinstance(message, str):
-        message = message.encode('utf8')
-
     if message.startswith('<html'):
         portal_transforms = getToolByName(site, 'portal_transforms')
         text = str(portal_transforms.convert(
