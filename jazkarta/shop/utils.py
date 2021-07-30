@@ -2,7 +2,10 @@ from builtins import str
 from AccessControl import getSecurityManager
 from Acquisition import aq_inner
 from Acquisition import aq_parent
-from email.Header import Header
+try:
+    from email.Header import Header
+except ImportError:
+    from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from plone import api

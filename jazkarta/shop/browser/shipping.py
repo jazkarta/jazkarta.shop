@@ -26,7 +26,9 @@ from ..interfaces import CALCULATION_METHODS
 from ..interfaces import IShippingAddress
 from ..interfaces import IShippingMethod
 from ..interfaces import IDontShowJazkartaShopPortlets
-from ..ship_ups import calculate_ups_rates
+import sys
+if sys.version_info.major < 3:
+    from ..ship_ups import calculate_ups_rates
 from ..ship_usps import calculate_usps_rate
 from ..utils import get_current_userid
 
@@ -61,7 +63,7 @@ def calculate_shipping(cart, method, addr):
             request = getRequest()
             if '_ups_rates' in request.other:  # cache result on request
                 rates = request.other['_ups_rates']
-            else:
+            elif sys.version_info.major < 3:  # no ups support for Python 3 at the moment
                 rates = request.other['_ups_rates'] = calculate_ups_rates(
                     weight, addr['street'], addr['city'], addr['state'],
                     addr['postal_code'], addr['country'])

@@ -7,7 +7,10 @@ import datetime
 from BTrees.OOBTree import OOBTree
 from io import StringIO
 from DateTime import DateTime
-from cgi import escape
+try:
+    from cgi import escape
+except ImportError:
+    from html import escape
 from decimal import Decimal
 from plone.app.registry.browser.controlpanel import RegistryEditForm
 from plone.app.registry.browser.controlpanel import ControlPanelFormWrapper
