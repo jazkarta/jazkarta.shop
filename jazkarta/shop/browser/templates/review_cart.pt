@@ -127,7 +127,7 @@
 
     <form method="post" tal:attributes="action string:${portal_state/navigation_root_url}/review-cart">
       <input name="submitted" type="hidden" value="1" />
-
+      <input type="hidden" name="_authenticator" tal:attributes="value context/@@authenticator/token|nothing" />
       <div id="order-total">
         <p>
           <big>
