@@ -4,8 +4,6 @@ from decimal import Decimal
 from plone.app.vocabularies.catalog import CatalogSource
 from plone.autoform import directives as form
 from plone.autoform.interfaces import IFormFieldProvider
-from plone.formwidget.contenttree.source import PathSourceBinder
-from plone.formwidget.contenttree.source import UUIDSource
 from plone.supermodel import model
 from z3c.currency.field import Currency
 from z3c.form.browser.checkbox import CheckBoxWidget
@@ -31,24 +29,6 @@ try:
 except ImportError:
     # Plone4
     SELECT_WIDGET_PRESENT = False
-
-
-class CustomUUIDSource(UUIDSource):
-    """
-    This customization is needed to work around this error:
-      Module plone.app.content.browser.vocabulary, line 163, in __call__
-      TypeError: 'NoneType' object is not subscriptable
-    """
-    def search_catalog(self, query):
-        return self.catalog.search(dict(query, object_provides=[
-            'jazkarta.shop.interfaces.IProduct',
-            'jazkarta.shop.interfaces.IATProduct',
-            'Products.CMFCore.interfaces.IFolderish'
-        ]))
-
-
-class CustomUUIDSourceBinder(PathSourceBinder):
-    path_source = CustomUUIDSource
 
 
 @provider(IFormFieldProvider)
@@ -90,10 +70,7 @@ class IProduct(model.Schema):
     related_products = RelationList(
         title=u'Related products',
         description=u'Related products will be shown in the review cart screen when this product is present.',
-        value_type=RelationChoice(
-            title=u"Related product",
-            source=CustomUUIDSourceBinder()
-        ),
+        value_type=RelationChoice(vocabulary='plone.app.vocabularies.Catalog'),
         required=False,
     )
 
