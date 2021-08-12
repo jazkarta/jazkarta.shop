@@ -33,6 +33,7 @@ setup(
         'stripe~=2.56',
         'premailer',
         'python-ups; python_version<"3"',
+        'plone.formwidget.contenttree',
         'requests[security]',
         'z3c.currency',
         'plone.protect>=3.0.19', # Plone 4.3.11 ships with 2.0.3. Version 3.0.9+
