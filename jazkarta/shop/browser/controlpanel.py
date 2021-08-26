@@ -205,7 +205,7 @@ class OrderControlPanelView(ControlPanelFormWrapper, DateMixin, SiteSetupLinkMix
 
     def update(self):
         orders = list(_fetch_orders(storage.get_storage(), key=(), csv=False))
-        orders.sort(key=lambda o: o.get('date_sort', ''), reverse=True)
+        orders = sorted(orders, key=lambda o: o.get('date_sort', ''), reverse=True)
         start = int(self.request.get('b_start', 0))
 
         if len(orders) > 0:
