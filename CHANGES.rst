@@ -1,7 +1,6 @@
 Changelog
 
-- Python 3 support
-  UPS shipping support for python 2.x only
+- Python 3 support, (Archetypes and UPS shipping support for python 2.x only)
 
 - Stripe elements support
 
