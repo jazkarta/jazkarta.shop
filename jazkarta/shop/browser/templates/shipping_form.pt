@@ -22,7 +22,7 @@
             <tal:block tal:replace="structure view/widgets/street/@@ploneform-render-widget" />
             <tal:block tal:replace="structure view/widgets/city/@@ploneform-render-widget" />
             <tal:block tal:replace="structure view/widgets/state/@@ploneform-render-widget" />
-            <select id="state-select" class="pat-select2" style="display: none;">
+            <select id="state-select" style="display: block; clear: both;">
               <option value=""></option>
               <option value="AL">Alabama</option>
               <option value="AK">Alaska</option>
@@ -76,7 +76,7 @@
               <option value="WI">Wisconsin</option>
               <option value="WY">Wyoming</option>
             </select>
-            <select id="province-select" class="pat-select2" style="display: none;">
+            <select id="province-select" style="display: block; clear: both;">
               <option value=""></option>
               <option value="AB">Alberta</option>
               <option value="BC">British Columbia</option>
@@ -375,31 +375,29 @@
           var $country = $('select[name="form.widgets.country"]');
 
           var update_states = function() {
-            var $state_select2 = $('#s2id_state-select');
-            var $prov_select2 = $('#s2id_province-select');
             if ($country.val() == 'United States') {
               $state_text.attr('name', null).hide();
               $('#formfield-form-widgets-state').removeClass('error');
               $('#formfield-form-widgets-state .fieldErrorBox').html("");
               $prov_select.attr('name', null)
-              $prov_select2.hide();
+              $prov_select.hide();
               $state_select.attr('name', 'form.widgets.state');
               $state_select.val($state_text.val()).trigger('change');
-              $state_select2.show();
+              $state_select.show();
             } else if ($country.val() == 'Canada') {
               $state_text.attr('name', null).hide();
               $('#formfield-form-widgets-state').removeClass('error');
               $('#formfield-form-widgets-state .fieldErrorBox').html("");
               $state_select.attr('name', null);
-              $state_select2.hide();
+              $state_select.hide();
               $prov_select.attr('name', 'form.widgets.state');
               $prov_select.val($state_text.val()).trigger('change');
-              $prov_select2.show();
+              $prov_select.show();
             } else {
               $state_select.attr('name', null).hide();
-              $state_select2.hide();
+              $state_select.hide();
               $prov_select.attr('name', null).hide();
-              $prov_select2.hide();
+              $prov_select.hide();
               if ($state_text.is(':hidden')) {
                 $state_text.val('');
               }
