@@ -1,6 +1,7 @@
 Changelog
 
 - Python 3 support
+  UPS shipping support for python 2.x only
 
 - Stripe elements support
 

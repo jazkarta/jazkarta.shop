@@ -27,7 +27,7 @@ Pluggable Shipping Providers
 Currently available:
 
 - USPS 
-- UPS
+- UPS (python 2.x only)
 
 Pluggable Sales Tax APIs
 ------------------------
@@ -42,6 +42,7 @@ Purchasable Content Types
 -------------------------
 
 Types can be Dexterity or Archetypes. Make your own content type purchasable using a behavior or schema extender.
+(Note: Archetypes support in python 2.x only)
 
 Cart Stored in ZODB
 ------------------------
