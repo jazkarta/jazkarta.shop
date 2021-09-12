@@ -1,10 +1,16 @@
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import copy
 import csv
 import datetime
 from BTrees.OOBTree import OOBTree
-from cStringIO import StringIO
+from io import StringIO
 from DateTime import DateTime
-from cgi import escape
+try:
+    from cgi import escape
+except ImportError:
+    from html import escape
 from decimal import Decimal
 from plone.app.registry.browser.controlpanel import RegistryEditForm
 from plone.app.registry.browser.controlpanel import ControlPanelFormWrapper
@@ -36,7 +42,7 @@ ORDER_KEYS = ('userid', 'date', 'items', 'ship_to', 'taxes', 'ship_charge', 'tot
 
 def _fetch_orders(part, key=(), csv=False):
     if isinstance(part, OOBTree):
-        for k in part.keys():
+        for k in list(part.keys()):
             if k in ['cart', 'coupon', 'shipping_methods']:
                 continue
             key = key + (k,)
@@ -48,7 +54,7 @@ def _fetch_orders(part, key=(), csv=False):
             raw_date = key[-1]
             data['datetime'] = raw_date
             data['date'] = raw_date.strftime('%Y-%m-%d %I:%M %p') if hasattr(raw_date, 'strftime') else raw_date
-            items = data.get('items', {}).values()
+            items = list(data.get('items', {}).values())
             data['date_sort'] = raw_date.isoformat() if hasattr(raw_date, 'isoformat') else ''
             if len(key) == 3:
                 data['userid'] = key[0]
@@ -123,14 +129,14 @@ class OrderControlPanelForm(form.Form):
     label = _(u"Jazkarta Shop Orders")
 
 
-class SiteSetupLinkMixin:
+class SiteSetupLinkMixin(object):
     """ Mixin class that provides site setup url for certain views.
     """
 
     def plone_control_panel(self):
         return getSite().absolute_url() + '/@@overview-controlpanel'
 
-class DateMixin:
+class DateMixin(object):
     """ Mixin class that provides datepicker methods.
     """
 
@@ -336,7 +342,7 @@ class OrderDetailsControlPanelView(ControlPanelFormWrapper, SiteSetupLinkMixin):
     def update(self):
         order_id = self.request.get('order_id')
         self.order = get_order_from_id(order_id)
-        self.amount = sum([item['price'] * item['quantity'] for item in self.order['items'].values()])
+        self.amount = sum([item['price'] * item['quantity'] for item in list(self.order['items'].values())])
         if 'ship_charge' in self.order:
             self.amount += self.order['ship_charge']
         if 'taxes' in self.order:

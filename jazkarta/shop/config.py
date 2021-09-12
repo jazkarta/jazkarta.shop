@@ -67,7 +67,6 @@ SHIPPING_COUNTRIES = (
     ("Bosnia-Herzegovina", "BA"),
     ("Botswana", "BW"),
     ("Brazil", "BR"),
-    ("British Virgin Islands", ""),
     ("Brunei Darussalam", "BN"),
     ("Bulgaria", "BG"),
     ("Burkina Faso", "BF"),

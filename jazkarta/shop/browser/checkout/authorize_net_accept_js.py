@@ -1,3 +1,4 @@
+from builtins import str
 from AccessControl import getSecurityManager
 from persistent.mapping import PersistentMapping
 from ZODB.POSException import ConflictError

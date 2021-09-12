@@ -1,3 +1,4 @@
+from builtins import object
 from decimal import Decimal
 from Products.Five import BrowserView
 from zope.browserpage import ViewPageTemplateFile
@@ -47,10 +48,13 @@ class ReviewCartForm(CartViewMixin, BrowserView, P5Mixin):
 
         if 'submitted' in self.request.form:
             base_url = get_navigation_root_url()
+            args = ''
+            if self.request.form.get("_authenticator") is not None:
+                args = '?_authenticator=' + self.request.form.get("_authenticator")
             if self.cart.shippable:
-                return self.request.response.redirect(base_url + '/shipping')
+                return self.request.response.redirect(base_url + '/shipping' + args)
             else:
-                return self.request.response.redirect(base_url + '/checkout')
+                return self.request.response.redirect(base_url + '/checkout' + args)
 
         return self.index()
 

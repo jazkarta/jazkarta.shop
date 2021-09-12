@@ -8,52 +8,59 @@
 <head>
   <metal:js fill-slot="javascript_head_slot">
   <script type="text/javascript" tal:condition="view/amount">
-    var stripeResponseHandler = function(status, response) {
-      var $form = $('#checkout-form');
 
-      if (response.error) {
+    function stripeTokenHandler(token) {
+      // Insert the token ID into the form so it gets submitted to the server
+      var form = document.getElementById('checkout-form');
+      var hiddenInput = document.createElement('input');
+      hiddenInput.setAttribute('type', 'hidden');
+      hiddenInput.setAttribute('name', 'stripeToken');
+      hiddenInput.setAttribute('value', token.id);
+      form.appendChild(hiddenInput);
+      // Submit the form
+      form.submit();
+    }
+
+    function createToken(data) {
+      var $form = $('#checkout-form');
+      stripe.createToken(card, data).then(function(result) {
+        if (result.error) {
         // Show the errors on the form
-        $form.find('.checkout-error-wrapper').show();
-        $form.find('.checkout-error').text(response.error.message);
-        $form.find('input[type="submit"]').prop('disabled', false);
-      } else {
-        // token contains id, last4, and card type
-        var token = response.id;
-        // Insert the token into the form so it gets submitted to the server
-        $form.append($('<input type="hidden" name="stripeToken" />').val(token));
-        // and re-submit
-        $form.get(0).submit();
-      }
+            $form.find('.checkout-error-wrapper').show();
+            $form.find('.checkout-error').text(result.error.message);
+            $form.find('input[type="submit"]').prop('disabled', false);
+        } else {
+          // Send the token to your server
+            stripeTokenHandler(result.token);
+        }
+      });
     };
 
     jQuery(function($) {
       var $method = $('input[name="method"]');
       var $cc_field = $('.field-credit-card');
-      var $cc_exp_field = $('.field-expiration');
       var $number_field = $('.field-number');
       var $number_label = $('label', $number_field);
       var updateForm = function() {
         var method = $method.filter(':checked').val() || 'Online Payment';
         if (method == 'Online Payment') {
-          $cc_field.show(); $cc_exp_field.show(); $number_field.hide();
-          $('input', $cc_field).prop('required', true);
-          $('select', $cc_exp_field).prop('required', true);
+            $cc_field.show();
+            $number_field.hide();
         } else if (method == 'Check') {
-          $cc_field.hide(); $cc_exp_field.hide(); $number_field.show();
-          $number_label.html('Check #');
-          $('input', $cc_field).prop('required', false);
-          $('select', $cc_exp_field).prop('required', false);
+            $cc_field.hide();
+            $number_field.show();
+            $number_label.html('Check #');
         } else {
-          $cc_field.hide(); $cc_exp_field.hide(); $number_field.show();
-          $number_label.html('Receipt #');
-          $('input', $cc_field).prop('required', false);
-          $('select', $cc_exp_field).prop('required', false);
+            $cc_field.hide();
+            $number_field.show();
+            $number_label.html('Receipt #');
         }
       };
       updateForm();
       $method.click(updateForm);
 
       $('#checkout-form').submit(function(e) {
+
         // don't submit to Stripe if entering check or cash
         var method = $method.filter(':checked').val() || 'Online Payment';
         if (method != 'Online Payment') return true;
@@ -63,7 +70,15 @@
         // Disable the submit button to prevent repeated clicks
         $form.find('input[type="submit"]').prop('disabled', true);
 
-        Stripe.createToken($form, stripeResponseHandler);
+        var $card_info = $('#card-token-data');
+        var data = {
+            name: $card_info.find('input[name="first_name"]').val() + ' ' + $card_info.find('input[name="last_name"]').val(),
+            address_line1: $card_info.find('input[name="address"]').val(),
+            address_city: $card_info.find('input[name="city"]').val(),
+            address_state: $card_info.find('input[name="state"]').val(),
+            address_zip: $card_info.find('input[name="zip"]').val(),
+        };
+        createToken(data);
 
         // Prevent the form from submitting with the default action
         return false;
@@ -110,7 +125,7 @@
         <legend><span class="step">1.</span> Billing Address</legend>
 
         <div class="field field-address">
-          <div class="field-inputs">
+          <div class="field-inputs" id="card-token-data">
             <div class="field subfield-first-name">
               <label>First name</label>
               <input type="text" name="first_name" required="required" tal:attributes="value python: view.request.form.get('first_name', None)" />
@@ -172,47 +187,8 @@
           </div>
         </div>
 
-        <div class="field field-credit-card">
-          <div class="field-inputs">
-            <div class="subfield subfield-card-number" style="float: left;">
-              <label>Credit Card Number<br/>
-              <input type="text" required="required" data-stripe="number" size="20"/>&nbsp;<img src="++resource++jazkarta.shop/credit-cards.png" title="Accepted cards: Visa, Mastercard" />&nbsp;
-              </label>
-            </div>
-            <div class="subfield subfield-card-cvc">
-              <label>CVC<br/>
-                <input type="text" required="required" data-stripe="cvc" size="3" />
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <div class="field field-expiration">
-          <div class="field-inputs">
-            <label class="expiration-date">Expires</label>
-            <div class="subfield subfield-expiration">
-              <select class="card-expiration-month" required="true" data-stripe="exp-month">
-                <option value="">- Month -</option>
-                <option value="01">January</option>
-                <option value="02">February</option>
-                <option value="03">March</option>
-                <option value="04">April</option>
-                <option value="05">May</option>
-                <option value="06">June</option>
-                <option value="07">July</option>
-                <option value="08">August</option>
-                <option value="09">September</option>
-                <option value="10">October</option>
-                <option value="11">November</option>
-                <option value="12">December</option>
-              </select>
-              <select class="card-expiration-year" required="required" data-stripe="exp-year">
-                <option value="">- Year -</option>
-                <option tal:repeat="year view/years"
-                        tal:attributes="value string:${year}" tal:content="string:${year}"></option>
-              </select>
-            </div>
-          </div>
+        <div>&nbsp;</div>
+        <div id="card-element" class="field field-credit-card">
         </div>
 
         <div class="field field-number" tal:condition="view/is_superuser">

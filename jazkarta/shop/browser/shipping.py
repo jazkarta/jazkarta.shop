@@ -1,3 +1,6 @@
+from __future__ import division
+from builtins import str
+from past.utils import old_div
 from decimal import Decimal
 from persistent.mapping import PersistentMapping
 from plone.autoform.form import AutoExtensibleForm
@@ -23,7 +26,9 @@ from ..interfaces import CALCULATION_METHODS
 from ..interfaces import IShippingAddress
 from ..interfaces import IShippingMethod
 from ..interfaces import IDontShowJazkartaShopPortlets
-from ..ship_ups import calculate_ups_rates
+import sys
+if sys.version_info.major < 3:
+    from ..ship_ups import calculate_ups_rates
 from ..ship_usps import calculate_usps_rate
 from ..utils import get_current_userid
 
@@ -58,7 +63,7 @@ def calculate_shipping(cart, method, addr):
             request = getRequest()
             if '_ups_rates' in request.other:  # cache result on request
                 rates = request.other['_ups_rates']
-            else:
+            elif sys.version_info.major < 3:  # no ups support for Python 3 at the moment
                 rates = request.other['_ups_rates'] = calculate_ups_rates(
                     weight, addr['street'], addr['city'], addr['state'],
                     addr['postal_code'], addr['country'])
@@ -81,7 +86,7 @@ class ShippingMethodControlPanel(BrowserView, P5Mixin, SiteSetupLinkMixin):
     def shipping_methods(self):
         method_map = storage.get_shop_data(['shipping_methods'], default={})
         methods = []
-        for key, method in method_map.items():
+        for key, method in list(method_map.items()):
             method['key'] = key
             methods.append(method)
         return methods
@@ -138,8 +143,7 @@ class ShippingMethodForm(AutoExtensibleForm, Form, P5Mixin):
         if self._name == '+':
             method = PersistentMapping()
             if self.shipping_methods:
-                shipping_method_id = str(
-                    max(int(x) for x in self.shipping_methods.keys()) + 1)
+                shipping_method_id = str(max(int(x) for x in list(self.shipping_methods.keys())) + 1)
             else:
                 shipping_method_id = '0'
         else:
@@ -209,7 +213,7 @@ class ShippingForm(AutoExtensibleForm, Form, P5Mixin):
 
         cart = self.cart
         methods = []
-        for id, method in self.all_shipping_methods.items():
+        for id, method in list(self.all_shipping_methods.items()):
             if (method['min_purchase'] and
                     cart.shippable_subtotal < method['min_purchase']):
                 continue

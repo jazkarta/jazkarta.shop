@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '1.1.dev0'
+version = '2.0.dev0'
 
 setup(
     name='jazkarta.shop',
@@ -13,6 +13,9 @@ setup(
         "Framework :: Plone",
         "Framework :: Plone :: 5.0",
         "Programming Language :: Python",
+        "Programming Language :: Python :: 2.7.",
+        "Programming Language :: Python :: 3.6.",
+        "Programming Language :: Python :: 3.7.",
     ],
     keywords='ecommerce',
     author='Jazkarta',
@@ -29,7 +32,7 @@ setup(
         'collective.z3cform.datagridfield',
         'stripe~=2.56',
         'premailer',
-        'python-ups',
+        'python-ups; python_version<"3"',
         'requests[security]',
         'z3c.currency',
         'plone.protect>=3.0.19', # Plone 4.3.11 ships with 2.0.3. Version 3.0.9+

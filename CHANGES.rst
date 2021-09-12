@@ -1,5 +1,9 @@
 Changelog
 
+- Python 3 support
+
+- Stripe elements support
+
 - Authorize.net SIM is deprecating the use of MD5. 
   Added support for the the SHA512 that replaces it 
   (requires the signature key is specified)

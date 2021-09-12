@@ -1,7 +1,11 @@
+from builtins import str
 from AccessControl import getSecurityManager
 from Acquisition import aq_inner
 from Acquisition import aq_parent
-from email.Header import Header
+try:
+    from email.Header import Header
+except ImportError:
+    from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from plone import api
@@ -101,9 +105,6 @@ def format_currency(amount):
 
 def send_mail(subject, message, mfrom=None, mto=None):
     site = get_site()
-    if isinstance(message, unicode):
-        message = message.encode('utf8')
-
     if message.startswith('<html'):
         portal_transforms = getToolByName(site, 'portal_transforms')
         text = str(portal_transforms.convert(

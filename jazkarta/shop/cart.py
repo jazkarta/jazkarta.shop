@@ -1,3 +1,6 @@
+from __future__ import division
+from builtins import object
+from past.utils import old_div
 from collections import OrderedDict
 from datetime import datetime
 from decimal import Decimal
@@ -80,8 +83,8 @@ class LineItem(object):
     @property
     def discounted_price(self):
         if self._item.get('discount_pct'):
-            multiplier = (
-                100 - Decimal(self._item['discount_pct'])) / Decimal(100)
+            multiplier = old_div((
+                100 - Decimal(self._item['discount_pct'])), Decimal(100))
             price = Decimal(self.orig_price) * multiplier
         else:  # absolute discount
             price = Decimal(self.orig_price) - Decimal(
@@ -207,7 +210,7 @@ class Cart(object):
         )
 
     # We should be able to check bool(cart) to see if it has items.
-    def __nonzero__(self):
+    def __bool__(self):
         return bool(self._items)
 
     def __len__(self):
@@ -217,7 +220,7 @@ class Cart(object):
         if '_' in cart_id:
             return cart_id in self._items
         else:
-            return any(i['uid'] == cart_id for i in self._items.values())
+            return any(i['uid'] == cart_id for i in list(self._items.values()))
 
     def __getitem__(self, cart_id):
         return LineItem(self, cart_id, self._items[cart_id])
@@ -228,7 +231,7 @@ class Cart(object):
 
     @property
     def items(self):
-        return [LineItem(self, k, v) for k, v in self._items.items()]
+        return [LineItem(self, k, v) for k, v in list(self._items.items())]
 
     def save(self):
         """Make sure changes to the cart are persisted.
@@ -247,7 +250,7 @@ class Cart(object):
 
     @property
     def itemcount(self):
-        return sum(i['quantity'] for i in self._items.values())
+        return sum(i['quantity'] for i in list(self._items.values()))
 
     @property
     def orig_subtotal(self):
@@ -283,7 +286,7 @@ class Cart(object):
         taxable_subtotal += self.shipping
 
         taxes = []
-        for label, rate in rates.items():
+        for label, rate in list(rates.items()):
             # Calculate tax, rounded to nearest cent
             tax = (taxable_subtotal * rate).quantize(Decimal('0.01'))
             if tax != 0:

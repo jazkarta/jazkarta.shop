@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from builtins import object
 from Products.CMFPlone import interfaces as Plone
 from Products.CMFQuickInstallerTool import interfaces as QuickInstaller
 from zope.interface import implementer

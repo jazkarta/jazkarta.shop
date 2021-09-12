@@ -1,3 +1,6 @@
+from builtins import range
+from builtins import object
+from six.moves import range
 from datetime import date
 from plone.protect.utils import safeWrite
 from premailer import Premailer
@@ -21,7 +24,7 @@ from ...vocabs import country_names
 import logging
 
 
-class P5Mixin():
+class P5Mixin(object):
     """ utility method to distinguish between Plone 4 and 5 """
 
     def using_plone5(self):
@@ -198,4 +201,4 @@ class CheckoutFormBase(BrowserView, P5Mixin):
     @lazy_property
     def years(self):
         year = date.today().year
-        return range(year, year + 11)
+        return list(range(year, year + 11))

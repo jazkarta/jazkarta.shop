@@ -485,7 +485,7 @@ class IShippingAddress(model.Schema):
 # Make sure PersistentMapping fields will be read/written
 # using the DictionaryField manager.
 for s in (IShippingMethod, IShippingAddress):
-    for name, field in schema.getFields(s).items():
+    for name, field in list(schema.getFields(s).items()):
         alsoProvides(field, IDictField)
 
 
