@@ -47,11 +47,15 @@ def _fetch_orders(part, key=(), csv=False):
                 continue
             key = key + (k,)
             for data in _fetch_orders(part[k], key, csv):
+		#import pdb;pdb.set_trace()
                 yield data
     else:
         if 'orders' in key:
             data = copy.deepcopy(part)
             raw_date = key[-1]
+            threshold = datetime.datetime.now() - datetime.timedelta(365)
+            if raw_date < threshold:
+		return
             data['datetime'] = raw_date
             data['date'] = raw_date.strftime('%Y-%m-%d %I:%M %p') if hasattr(raw_date, 'strftime') else raw_date
             items = list(data.get('items', {}).values())

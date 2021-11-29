@@ -13,6 +13,19 @@ logger = logging.getLogger(__name__)
 anetLogger = logging.getLogger(constants.defaultLoggerName)
 anetLogger.addHandler(logging.StreamHandler())
 
+
+class AnetDebugFilter(logging.Filter):
+    def filter(self, record):
+        if record.levelno >= 10:
+            record.levelno = 30
+            return 1
+        else:
+            return 0
+
+
+anetdebugfilter = AnetDebugFilter()
+
+
 def _getMerchantAuth():
     merchantAuth = apicontractsv1.merchantAuthenticationType()
     if config.IN_PRODUCTION:
@@ -108,6 +121,7 @@ def createTransactionRequest(
     createtransactionrequest.transactionRequest = transactionrequest
 
     anetLogger.setLevel(10)
+    anetLogger.addFilter(anetdebugfilter)
     # Create the controller and get response
     createtransactioncontroller = createTransactionController(
         createtransactionrequest)
@@ -117,6 +131,7 @@ def createTransactionRequest(
 
     response = createtransactioncontroller.getresponse()
     anetLogger.setLevel(50)
+    anetLogger.removeFilter(anetdebugfilter)
     logger.info('createtransactioncontroller response: {}'.format(response.__repr__()))
     defaultMsg = 'Your card could not be processed.'
     if response.messages.resultCode == 'Ok':
@@ -176,6 +191,7 @@ def ARBCreateSubscriptionRequest(
     subscription.payment = payment
 
     anetLogger.setLevel(10)
+    anetLogger.addFilter(anetdebugfilter)
     # Creating the request
     request = apicontractsv1.ARBCreateSubscriptionRequest()
     request.merchantAuthentication = merchantAuth
@@ -190,10 +206,13 @@ def ARBCreateSubscriptionRequest(
     # Getting the response
     response = controller.getresponse()
     anetLogger.setLevel(50)
+    anetLogger.removeFilter(anetdebugfilter)
     logger.info('ARBCreateSubscriptionController response: {}'.format(response.__repr__()))
     defaultMsg = 'Your card could not be processed.'
     if response.messages.resultCode == 'Ok':
         return response
     else:
+        #import xml.dom.minidom
+        #logger.error('subscription error: {}'.format(xml.dom.minidom.parseString(controller._httpResponse.encode('utf-8').decode('utf-8')).toprettyxml()))
         raise PaymentProcessingException(
                 response.messages.message['text'] or defaultMsg)
