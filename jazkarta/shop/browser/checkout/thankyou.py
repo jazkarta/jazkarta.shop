@@ -10,7 +10,7 @@ class CheckoutThankYou(CheckoutFormBase):
     index = ViewPageTemplateFile('../templates/checkout_thankyou.pt')
 
     def handle_submit(self):
-        self.old_cart = self.cart.clone()
+        pass
 
     def render(self):
         return self.index()

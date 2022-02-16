@@ -9,6 +9,20 @@ from .utils import get_setting
 import logging
 
 logger = logging.getLogger(__name__)
+anetLogger = logging.getLogger(constants.defaultLoggerName)
+anetLogger.addHandler(logging.StreamHandler())
+
+
+class AnetDebugFilter(logging.Filter):
+    def filter(self, record):
+        if record.levelno >= 10:
+            record.levelno = 30
+            return 1
+        else:
+            return 0
+
+
+anetdebugfilter = AnetDebugFilter()
 
 
 def _getMerchantAuth():
@@ -105,6 +119,8 @@ def createTransactionRequest(
     createtransactionrequest.merchantAuthentication = merchantAuth
     createtransactionrequest.transactionRequest = transactionrequest
 
+    anetLogger.setLevel(10)
+    anetLogger.addFilter(anetdebugfilter)
     # Create the controller and get response
     createtransactioncontroller = createTransactionController(
         createtransactionrequest)
@@ -113,16 +129,17 @@ def createTransactionRequest(
     createtransactioncontroller.execute()
 
     response = createtransactioncontroller.getresponse()
+    anetLogger.setLevel(50)
+    anetLogger.removeFilter(anetdebugfilter)
+    logger.info('createtransactioncontroller response: {}'.format(response.__repr__()))
     defaultMsg = 'Your card could not be processed.'
-    if createtransactioncontroller._httpResponse:
-        logger.info('Authorize.net response: {}'.format(createtransactioncontroller._httpResponse))
     if response.messages.resultCode == 'Ok':
         if response.transactionResponse.responseCode != 1:  # Approved
             raise PaymentProcessingException(defaultMsg)
         return response
     else:
         raise PaymentProcessingException(
-            response.messages.message[0].text or defaultMsg)
+                response.messages.message['text'] or defaultMsg)
 
 
 def ARBCreateSubscriptionRequest(
@@ -172,6 +189,8 @@ def ARBCreateSubscriptionRequest(
     subscription.billTo = billto
     subscription.payment = payment
 
+    anetLogger.setLevel(10)
+    anetLogger.addFilter(anetdebugfilter)
     # Creating the request
     request = apicontractsv1.ARBCreateSubscriptionRequest()
     request.merchantAuthentication = merchantAuth
@@ -185,7 +204,14 @@ def ARBCreateSubscriptionRequest(
 
     # Getting the response
     response = controller.getresponse()
+    anetLogger.setLevel(50)
+    anetLogger.removeFilter(anetdebugfilter)
+    logger.info('ARBCreateSubscriptionController response: {}'.format(response.__repr__()))
+    defaultMsg = 'Your card could not be processed.'
     if response.messages.resultCode == 'Ok':
         return response
     else:
-        raise PaymentProcessingException(response.messages.message[0].text)
+        #import xml.dom.minidom
+        #logger.error('subscription error: {}'.format(xml.dom.minidom.parseString(controller._httpResponse.encode('utf-8').decode('utf-8')).toprettyxml()))
+        raise PaymentProcessingException(
+                response.messages.message['text'] or defaultMsg)
