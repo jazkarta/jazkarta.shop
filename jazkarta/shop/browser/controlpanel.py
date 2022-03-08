@@ -81,7 +81,7 @@ def _fetch_orders(part, key=(), csv=False):
                         href = '';
                 else:
                     href = title = i.get('href', '')
-                    
+
                 if csv:
                     # special parsing of items for csv export
                     item_str += u'{} x {} @ ${}'.format(
@@ -154,13 +154,11 @@ class DateMixin(object):
     def endDate(self):
         """ return end date - date picker
         """
-        end_date_day = self.request.get('End-Date_day')
-        end_date_month = self.request.get('End-Date_month')
-        end_date_year = self.request.get('End-Date_year')
-        if end_date_day is not None:
-            ed = datetime.date(int(end_date_year),
-                               int(end_date_month),
-                               int(end_date_day))
+        # pat-pickadate gives us a string ex: '2022-12-31'
+        end_date = self.request.get('End-Date')
+
+        if end_date:
+            ed = datetime.date(*map(int, end_date.split('-')))
         else:
             if self.orders_exist:
                 ed = self.to_datetime(self.most_recent_order_date,
@@ -172,13 +170,12 @@ class DateMixin(object):
     def startDate(self):
         """ return start date - date picker
         """
-        start_date_day = self.request.get('Start-Date_day')
-        start_date_month = self.request.get('Start-Date_month')
-        start_date_year = self.request.get('Start-Date_year')
-        if start_date_day is not None:
-            sd = datetime.date(int(start_date_year),
-                               int(start_date_month),
-                               int(start_date_day))
+
+        # pat-pickadate gives us a string ex: '2022-12-31'
+        start_date = self.request.get('Start-Date')
+
+        if start_date:
+            sd = datetime.date(*map(int, start_date.split('-')))
         else:
             if self.orders_exist:
                 sd = self.to_datetime(self.first_order_date,
@@ -207,7 +204,8 @@ class OrderControlPanelView(ControlPanelFormWrapper, DateMixin, SiteSetupLinkMix
         orders = list(_fetch_orders(storage.get_storage(), key=(), csv=False))
         orders.sort(key=lambda o: o.get('date_sort', ''), reverse=True)
         start = int(self.request.get('b_start', 0))
-
+        selected_start = self.startDate()
+        selected_end = self.endDate()
         if len(orders) > 0:
             self.orders_exist = True
 
