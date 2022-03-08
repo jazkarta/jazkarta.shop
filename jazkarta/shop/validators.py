@@ -1,4 +1,4 @@
-from Products.validation.validators.BaseValidators import EMAIL_RE
+from Products.CMFPlone.PloneTool import EMAIL_RE
 from zope.interface import Invalid
 import re
 
