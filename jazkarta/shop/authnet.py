@@ -1,4 +1,4 @@
-from builtins import str
+import six
 from authorizenet import apicontractsv1
 from authorizenet.constants import constants
 from authorizenet.apicontrollers import createTransactionController
@@ -44,8 +44,8 @@ def _getLineItems(cart):
         line_item.itemId = item.uid[:31]
         line_item.name = item.category
         line_item.description = item.name[:255]
-        line_item.quantity = str(item.quantity)
-        line_item.unitPrice = str(item.price)
+        line_item.quantity = six.text_type(item.quantity)
+        line_item.unitPrice = six.text_type(item.price)
         line_items.lineItem.append(line_item)
     return line_items
 
@@ -93,7 +93,7 @@ def createTransactionRequest(
     # Create a transactionRequestType object and add the previous objects to it
     transactionrequest = apicontractsv1.transactionRequestType()
     transactionrequest.transactionType = transactionType
-    transactionrequest.amount = str(cart.amount)
+    transactionrequest.amount = six.text_type(cart.amount)
     transactionrequest.order = order
     transactionrequest.payment = payment
     transactionrequest.billTo = customerAddress
@@ -167,7 +167,7 @@ def ARBCreateSubscriptionRequest(
     # Setting subscription details
     subscription = apicontractsv1.ARBSubscriptionType()
     subscription.paymentSchedule = paymentschedule
-    subscription.amount = str(cart.amount)
+    subscription.amount = six.text_type(cart.amount)
     subscription.order = order
     subscription.customer = customerData
     subscription.billTo = billto

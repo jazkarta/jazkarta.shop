@@ -1,4 +1,4 @@
-from builtins import str
+import six
 from AccessControl import getSecurityManager
 from persistent.mapping import PersistentMapping
 from ZODB.POSException import ConflictError
@@ -45,7 +45,7 @@ class CheckoutFormAuthorizeNetAcceptJs(CheckoutFormBase):
 
     @lazy_property
     def refId(self):
-        return str(time.time())
+        return six.text_type(time.time())
 
     capture_payment = True
     is_recurring = False
@@ -60,7 +60,7 @@ class CheckoutFormAuthorizeNetAcceptJs(CheckoutFormBase):
         try:
             is_email(self.request.form['email'])
         except Exception as e:
-            self.error = str(e)
+            self.error = six.text_type(e)
 
         if self.cart.shippable and not self.cart.data.get('ship_method'):
             self.error = ('Something went wrong while calculating shipping. '
@@ -146,9 +146,13 @@ class CheckoutFormAuthorizeNetAcceptJs(CheckoutFormBase):
         order['notes'] = self.request.form.get('notes')
         if response is not None:
             if self.is_recurring:
-                order['authorizenet_transaction_id'] = str(response.subscriptionId)
+                order['authorizenet_transaction_id'] = six.text_type(
+                    response.subscriptionId
+                )
             else:
-                order['authorizenet_transaction_id'] = str(response.transactionResponse.transId)
+                order['authorizenet_transaction_id'] = six.text_type(
+                    response.transactionResponse.transId
+                )
                 order['card_last4'] = response.transactionResponse.accountNumber[-4:]
                 order['card_type'] = response.transactionResponse.accountType
 

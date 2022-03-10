@@ -1,4 +1,4 @@
-from builtins import str
+import six
 from builtins import object
 from zope.interface import implementer
 from plone.app.portlets.portlets import base
@@ -8,8 +8,8 @@ from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from jazkarta.shop.interfaces import IDontShowJazkartaShopPortlets
 
-from zope.cachedescriptors.property import Lazy as lazy_property
 from ...cart import Cart
+
 
 class ICartPortlet(IPortletDataProvider):
     pass
@@ -73,7 +73,7 @@ class PortletData(BrowserView, JazkartaCartPortletMixin):
         if 'query' in list(self.request.keys()):
             query = self.request['query']
             if query == 'cart_size':
-                return str(self.size)
+                return six.text_type(self.size)
             elif query == 'cart_items':
                 return "item" if self.size == 1 else "items"
             else:

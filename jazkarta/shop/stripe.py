@@ -1,7 +1,7 @@
 # Make sure we don't import this module recursively via `import stripe`
 from __future__ import absolute_import
 
-from builtins import str
+import six
 import stripe
 
 from jazkarta.shop import config
@@ -51,6 +51,6 @@ def process_interactive_payment(cart, card_token, contact_info):
         raise PaymentProcessingException(errmsg)
 
     except Exception as e:
-        raise PaymentProcessingException(str(e))
+        raise PaymentProcessingException(six.text_type(e))
 
     return result

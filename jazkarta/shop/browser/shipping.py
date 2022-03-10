@@ -1,6 +1,5 @@
 from __future__ import division
-from builtins import str
-from past.utils import old_div
+import six
 from decimal import Decimal
 from persistent.mapping import PersistentMapping
 from plone.autoform.form import AutoExtensibleForm
@@ -143,7 +142,9 @@ class ShippingMethodForm(AutoExtensibleForm, Form, P5Mixin):
         if self._name == '+':
             method = PersistentMapping()
             if self.shipping_methods:
-                shipping_method_id = str(max(int(x) for x in list(self.shipping_methods.keys())) + 1)
+                shipping_method_id = six.text_type(
+                    max(int(x) for x in list(self.shipping_methods.keys())) + 1
+                )
             else:
                 shipping_method_id = '0'
         else:
