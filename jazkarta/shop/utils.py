@@ -1,4 +1,4 @@
-from builtins import str
+import six
 from AccessControl import getSecurityManager
 from Acquisition import aq_inner
 from Acquisition import aq_parent
@@ -40,6 +40,7 @@ def get_site():
     while not ISiteRoot.providedBy(possible_site):
         possible_site = aq_parent(possible_site)
     return possible_site
+
 
 def get_navigation_root_url():
     return getSite().absolute_url()
@@ -107,7 +108,7 @@ def send_mail(subject, message, mfrom=None, mto=None):
     site = get_site()
     if message.startswith('<html'):
         portal_transforms = getToolByName(site, 'portal_transforms')
-        text = str(portal_transforms.convert(
+        text = six.text_type(portal_transforms.convert(
             'html_to_web_intelligent_plain_text', message))
         msg = MIMEMultipart('alternative')
         msg.attach(MIMEText(text, 'plain', 'utf-8'))

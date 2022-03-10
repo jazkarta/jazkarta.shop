@@ -1,4 +1,4 @@
-from builtins import str
+import six
 import hmac
 import json
 import time
@@ -9,7 +9,6 @@ from premailer import Premailer
 from ZODB.POSException import ConflictError
 from zope.browserpage import ViewPageTemplateFile
 from zope.cachedescriptors.property import Lazy as lazy_property
-from Products.Five import BrowserView
 from jazkarta.shop import config
 from jazkarta.shop import storage
 from . import CheckoutFormBase
@@ -106,8 +105,12 @@ class SIMPropertyFields(CheckoutFormBase):
         https://github.com/AuthorizeNet/sample-code-python/blob/master/
         sha512/compute-transhash-sha512
         """
-        values = (str(self.x_login), self.x_fp_sequence,
-             self.x_fp_timestamp, str(self.amount))
+        values = (
+            six.text_type(self.x_login),
+            self.x_fp_sequence,
+            self.x_fp_timestamp,
+            six.text_type(self.amount)
+        )
         source = "^".join(values) + '^'
         sig = self.signature_key.decode("hex")
         hashed_values = hmac.new(sig, source, sha512)
@@ -122,7 +125,7 @@ class SIMPropertyFields(CheckoutFormBase):
         Notes: The sequence number can be a merchant-assigned value, such as an
         invoice number or any randomly generated number.
         """
-        return str(int(random.random() * 100000000000))
+        return six.text_type(int(random.random() * 100000000000))
 
     @lazy_property
     def x_fp_timestamp(self):
@@ -139,7 +142,7 @@ class SIMPropertyFields(CheckoutFormBase):
         For debugging local time vs authorize.net server time
         http://developer.authorize.net/api/reference/responseCode97.html
         """
-        return str(int(time.time()))
+        return six.text_type(int(time.time()))
 
 
 class UpdateFpFields(SIMPropertyFields):

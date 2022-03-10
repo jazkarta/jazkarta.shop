@@ -1,4 +1,4 @@
-from builtins import str
+import six
 from AccessControl import getSecurityManager
 from persistent.mapping import PersistentMapping
 from ZODB.POSException import ConflictError
@@ -28,7 +28,7 @@ class CheckoutFormStripe(CheckoutFormBase):
         try:
             is_email(self.request.form['email'])
         except Exception as e:
-            self.error = str(e)
+            self.error = six.text_type(e)
 
         if self.cart.shippable and not self.cart.data.get('ship_method'):
             self.error = ('Something went wrong while calculating shipping. '
