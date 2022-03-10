@@ -1,3 +1,4 @@
+from builtins import object
 from decimal import Decimal
 from zope.component import adapter
 from zope.interface import implementer

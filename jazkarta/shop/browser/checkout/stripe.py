@@ -1,3 +1,4 @@
+import six
 from AccessControl import getSecurityManager
 from persistent.mapping import PersistentMapping
 from ZODB.POSException import ConflictError
@@ -27,7 +28,7 @@ class CheckoutFormStripe(CheckoutFormBase):
         try:
             is_email(self.request.form['email'])
         except Exception as e:
-            self.error = str(e)
+            self.error = six.text_type(e)
 
         if self.cart.shippable and not self.cart.data.get('ship_method'):
             self.error = ('Something went wrong while calculating shipping. '
@@ -105,6 +106,15 @@ class CheckoutFormStripe(CheckoutFormBase):
                 charge_result['card']['exp_month'],
                 charge_result['card']['exp_year'] % 100
             )
+        elif 'payment_method_details' in charge_result: # stripe api v2
+            paymentdetails = charge_result['payment_method_details']
+            if 'card' in paymentdetails:
+                order['card_last4'] = paymentdetails['card']['last4']
+                order['card_type'] = paymentdetails['card']['brand']
+                order['card_exp'] = '{:02d}{:02d}'.format(
+                    paymentdetails['card']['exp_month'],
+                    paymentdetails['card']['exp_year'] % 100
+                )
 
         if self.is_superuser():
             order['proxy_userid'] = getSecurityManager().getUser().getId()

@@ -1,12 +1,16 @@
 """ Provide schema extender for archetype CT compatibility
 """
+from builtins import object
+try:
+    from archetypes.schemaextender.field import ExtensionField
+    from archetypes.schemaextender.interfaces import ISchemaExtender
+    from Products.Archetypes import atapi
+except ImportError:
+    pass
 
-from archetypes.schemaextender.field import ExtensionField
-from archetypes.schemaextender.interfaces import ISchemaExtender
-from Products.Archetypes import atapi
 from jazkarta.shop.interfaces import IATProduct
-from zope.component import adapts
-from zope.interface import implements
+from zope.component import adapter
+from zope.interface import implementer
 
 
 class ExtendedStringField(ExtensionField, atapi.StringField):
@@ -22,10 +26,9 @@ class ExtendedBooleanField(ExtensionField, atapi.BooleanField):
 class ExtendedFloatField(ExtensionField, atapi.FloatField):
     pass
 
-
+@adapter(IATProduct)
+@implementer(ISchemaExtender)
 class ProductSchemaExtender(object):
-    implements(ISchemaExtender)
-    adapts(IATProduct)
 
     _fields = [
         ExtendedStringField(

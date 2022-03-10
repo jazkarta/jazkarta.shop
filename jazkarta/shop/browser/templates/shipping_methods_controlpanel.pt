@@ -32,7 +32,7 @@
       </tr>
       <tr tal:repeat="method view/shipping_methods">
         <td tal:content="method/name"></td>
-        <td tal:content="python:', '.join(method['zones'])" />
+        <td tal:content="python:', '.join(sorted(method['zones']))" />
         <td tal:content="python:'${:.2f}'.format(method['min_purchase']) if method['min_purchase'] else ''" />
         <td tal:content="python:view.format_calculation(method['calculation'])" tal:on-error="nothing" />
         <td>

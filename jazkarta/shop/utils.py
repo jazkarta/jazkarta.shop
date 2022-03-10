@@ -1,7 +1,11 @@
+import six
 from AccessControl import getSecurityManager
 from Acquisition import aq_inner
 from Acquisition import aq_parent
-from email.Header import Header
+try:
+    from email.Header import Header
+except ImportError:
+    from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from plone import api
@@ -36,6 +40,7 @@ def get_site():
     while not ISiteRoot.providedBy(possible_site):
         possible_site = aq_parent(possible_site)
     return possible_site
+
 
 def get_navigation_root_url():
     return getSite().absolute_url()
@@ -101,12 +106,9 @@ def format_currency(amount):
 
 def send_mail(subject, message, mfrom=None, mto=None):
     site = get_site()
-    if isinstance(message, unicode):
-        message = message.encode('utf8')
-
     if message.startswith('<html'):
         portal_transforms = getToolByName(site, 'portal_transforms')
-        text = str(portal_transforms.convert(
+        text = six.text_type(portal_transforms.convert(
             'html_to_web_intelligent_plain_text', message))
         msg = MIMEMultipart('alternative')
         msg.attach(MIMEText(text, 'plain', 'utf-8'))

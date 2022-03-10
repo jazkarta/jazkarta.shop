@@ -1,3 +1,4 @@
+from builtins import object
 from decimal import Decimal
 from lxml.etree import fromstring
 from zope.interface import implementer
@@ -8,7 +9,7 @@ from ..interfaces import TaxRateException
 from ..interfaces import ITaxHandler
 from ..utils import get_setting
 
-TAXJAR_SMARTCALCS_BASE_URL = 'http://api.taxjar.com/v2/rates/'
+TAXJAR_SMARTCALCS_BASE_URL = 'http://api.taxjar.com/v2/rates'
 
 
 @implementer(ITaxHandler)

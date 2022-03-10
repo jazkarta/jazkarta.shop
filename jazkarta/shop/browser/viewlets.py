@@ -1,3 +1,4 @@
+from builtins import object
 from plone.app.layout.viewlets.common import ViewletBase
 from Products.Five import BrowserView
 from zope.cachedescriptors.property import Lazy as lazy_property
