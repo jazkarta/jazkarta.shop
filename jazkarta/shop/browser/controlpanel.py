@@ -1,11 +1,11 @@
 from future import standard_library
 standard_library.install_aliases()
 from builtins import object
+from collections import namedtuple
 import copy
 import csv
 import datetime
-from BTrees.OOBTree import OOBTree
-from io import StringIO
+from six import StringIO
 from DateTime import DateTime
 try:
     from cgi import escape
@@ -17,6 +17,7 @@ from plone.app.registry.browser.controlpanel import ControlPanelFormWrapper
 from plone.batching import Batch
 from plone.z3cform import layout
 from Products.Five import BrowserView
+from Products.ZCatalog.Lazy import Lazy
 from zope.component.hooks import getSite
 from zope.interface import implementer
 from z3c.form import form
@@ -39,89 +40,120 @@ SettingsControlPanelView.label = _(u"Jazkarta Shop Settings")
 
 
 ORDER_KEYS = ('userid', 'date', 'items', 'ship_to', 'taxes', 'ship_charge', 'total')
+IGNORED_KEYS = frozenset(['cart', 'coupon', 'shipping_methods'])
+OrderRef = namedtuple('order_ref', ['date', 'user'])
 
-def _fetch_orders(part, key=(), csv=False):
-    if isinstance(part, OOBTree):
-        for k in list(part.keys()):
-            if k in ['cart', 'coupon', 'shipping_methods']:
+
+class LazyFilteredOrders(Lazy):
+    earliest_date = None
+    latest_date = None
+
+    def __init__(self, storage, start_date=None, end_date=None, csv=False):
+        self.storage = storage
+        self.csv = csv
+        keys = []
+        # Get all sorted order keys within the date range from the storage without
+        # retrieving order data.
+        for entry in storage.keys():
+            if entry in IGNORED_KEYS:
                 continue
-            key = key + (k,)
-            for data in _fetch_orders(part[k], key, csv):
-                yield data
-    else:
-        if 'orders' in key:
-            data = copy.deepcopy(part)
-            raw_date = key[-1]
-            data['datetime'] = raw_date
-            data['date'] = raw_date.strftime('%Y-%m-%d %I:%M %p') if hasattr(raw_date, 'strftime') else raw_date
-            items = list(data.get('items', {}).values())
-            data['date_sort'] = raw_date.isoformat() if hasattr(raw_date, 'isoformat') else ''
-            if len(key) == 3:
-                data['userid'] = key[0]
-                data['orderid'] = '{}|{}'.format(key[0], data['date_sort'])
+            if entry == 'orders':
+                user = None
+                container = storage[entry]
+            elif 'orders' in storage[entry]:
+                user = entry
+                container = storage[entry]['orders']
             else:
-                data['userid'] = 'Anonymous'
-                data['orderid'] = '_orders_|{}'.format(data['date_sort'])
-            data['taxes'] = sum(item.get('tax', 0) for item in data.get('taxes', ()))
-            data['total'] = (sum((i.get('price', 0.0) * i.get('quantity', 1)) for i in items) +
-                             data['taxes'] + data.get('ship_charge', 0))
+                continue
+            for date in container.keys(min=start_date, max=end_date):
+                keys.append(OrderRef(date, user))
+        keys.sort(reverse=True)
+        self._data = keys
+        if len(keys):
+            self.earliest_date = keys[-1].date
+            self.latest_date = keys[0].date
+        # Optimize Lazy length checks
+        self._len = self._rlen = len(keys)
 
-            item_str = u'<ul>'
-            if csv:
-                item_str = u''
-            for i in items:
-                uid = i.get('uid', None)
-                if uid:
-                    product = resolve_uid(uid)
-                    title = i['name']
-                    # do an attr check in case the product is no longer present in the system
-                    if hasattr(product,'absolute_url'):
-                        href = product.absolute_url()
-                    else:
-                        href = '';
-                else:
-                    href = title = i.get('href', '')
+    def __getitem__(self, index):
+        data = self._data
+        key = data[index]
+        user = key.user
+        date = key.date
+        csv = self.csv
+        if user:
+            container = self.storage[user]['orders']
+        else:
+            container = self.storage['orders']
+        entry = container[date]
+        # Replicate item generation logic from `_fetch_orders` method
+        data = copy.deepcopy(entry)
+        data['date'] = date.strftime('%Y-%m-%d %I:%M %p') if hasattr(date, 'strftime') else date
+        data['date_sort'] = date.isoformat() if hasattr(date, 'isoformat') else ''
+        data['userid'] = user or 'Anonymous'
+        data['orderid'] = '{}|{}'.format(user or '_orders_', data['date_sort'])
+        data['taxes'] = sum(item.get('tax', 0) for item in data.get('taxes', ()))
+        items = list(data.get('items', {}).values())
+        data['total'] = (sum((i.get('price', 0.0) * i.get('quantity', 1)) for i in items) +
+                         data['taxes'] + data.get('ship_charge', 0))
 
-                if csv:
-                    # special parsing of items for csv export
-                    item_str += u'{} x {} @ ${}'.format(
-                         title, i.get('quantity', 1), i.get('price', 0.0)
-                    )
-                    # add new line character to all but last item
-                    if i != items[len(items)-1]:
-                        item_str += u'\n'
+        item_str = u'<ul>'
+        if csv:
+            item_str = u''
+        for i in items:
+            uid = i.get('uid', None)
+            if uid:
+                product = resolve_uid(uid)
+                title = i['name']
+                # do an attr check in case the product is no longer present in
+                # the system
+                if hasattr(product, 'absolute_url'):
+                    href = product.absolute_url()
                 else:
-                    item_str += u'<li><a href="{}">{}</a> x {} @ ${}</li>'.format(
-                        href, title, i.get('quantity', 1), i.get('price', 0.0)
-                    )
-            data['items'] = item_str + u'</ul>'
-            if csv:
-                data['items'] = item_str
-            address = data.get('ship_to', {})
-            if csv:
-                data['ship_to'] = u'{} {}, {}, {}, {} {}, {}'.format(
-                    escape(address.get('first_name', '')),
-                    escape(address.get('last_name', '')),
-                    escape(address.get('street', '')),
-                    escape(address.get('city', '')),
-                    escape(address.get('state', '')),
-                    escape(address.get('postal_code', '')),
-                    escape(address.get('country', '')),
-                )
-                # check if shipping address has been entered
-                if data['ship_to'].replace(',','').replace(' ','') == '':
-                    data['ship_to'] = u''
+                    href = ''
             else:
-                data['ship_to'] = u'<p>{} {}</p><p>{}</p><p>{}, {} {}</p><p>{}</p>'.format(
-                    escape(address.get('first_name', '')),
-                    escape(address.get('last_name', '')),
-                    escape(address.get('street', '')),
-                    escape(address.get('city', '')),
-                    escape(address.get('state', '')),
-                    escape(address.get('postal_code', '')),
-                    escape(address.get('country', '')),
+                href = title = i.get('href', '')
+
+            if csv:
+                # special parsing of items for csv export
+                item_str += u'{} x {} @ ${}'.format(
+                        title, i.get('quantity', 1), i.get('price', 0.0)
                 )
-            yield data
+                # add new line character to all but last item
+                if i != items[len(items)-1]:
+                    item_str += u'\n'
+            else:
+                item_str += u'<li><a href="{}">{}</a> x {} @ ${}</li>'.format(
+                    href, title, i.get('quantity', 1), i.get('price', 0.0)
+                )
+        data['items'] = item_str + u'</ul>'
+        if csv:
+            data['items'] = item_str
+        address = data.get('ship_to', {})
+        if csv:
+            data['ship_to'] = u'{} {}, {}, {}, {} {}, {}'.format(
+                escape(address.get('first_name', '')),
+                escape(address.get('last_name', '')),
+                escape(address.get('street', '')),
+                escape(address.get('city', '')),
+                escape(address.get('state', '')),
+                escape(address.get('postal_code', '')),
+                escape(address.get('country', '')),
+            )
+            # check if shipping address has been entered
+            if data['ship_to'].replace(',','').replace(' ','') == '':
+                data['ship_to'] = u''
+        else:
+            data['ship_to'] = u'<p>{} {}</p><p>{}</p><p>{}, {} {}</p><p>{}</p>'.format(
+                escape(address.get('first_name', '')),
+                escape(address.get('last_name', '')),
+                escape(address.get('street', '')),
+                escape(address.get('city', '')),
+                escape(address.get('state', '')),
+                escape(address.get('postal_code', '')),
+                escape(address.get('country', '')),
+            )
+        return data
 
 
 class OrderControlPanelForm(form.Form):
@@ -135,6 +167,7 @@ class SiteSetupLinkMixin(object):
 
     def plone_control_panel(self):
         return getSite().absolute_url() + '/@@overview-controlpanel'
+
 
 class DateMixin(object):
     """ Mixin class that provides datepicker methods.
@@ -158,14 +191,8 @@ class DateMixin(object):
         end_date = self.request.get('End-Date')
 
         if end_date:
-            ed = datetime.date(*map(int, end_date.split('-')))
-        else:
-            if self.orders_exist:
-                ed = self.to_datetime(self.most_recent_order_date,
-                    '%Y-%m-%d %I:%M %p').date()
-            else:
-                ed = datetime.date.today()
-        return ed
+            # End at midnight the following day
+            return datetime.datetime(*map(int, end_date.split('-'))) + datetime.timedelta(days=1)
 
     def startDate(self):
         """ return start date - date picker
@@ -175,14 +202,7 @@ class DateMixin(object):
         start_date = self.request.get('Start-Date')
 
         if start_date:
-            sd = datetime.date(*map(int, start_date.split('-')))
-        else:
-            if self.orders_exist:
-                sd = self.to_datetime(self.first_order_date,
-                    '%Y-%m-%d %I:%M %p').date()
-            else:
-                sd = datetime.date.today()
-        return sd
+            return datetime.datetime(*map(int, start_date.split('-')))
 
     def to_datetime(self, date, date_format):
         """ convert to datetime format helper method
@@ -201,46 +221,16 @@ class OrderControlPanelView(ControlPanelFormWrapper, DateMixin, SiteSetupLinkMix
     orders_exist = False
 
     def update(self):
-        orders = list(_fetch_orders(storage.get_storage(), key=(), csv=False))
-        orders.sort(key=lambda o: o.get('date_sort', ''), reverse=True)
         start = int(self.request.get('b_start', 0))
         selected_start = self.startDate()
         selected_end = self.endDate()
-        if len(orders) > 0:
+        order_sequence = LazyFilteredOrders(
+            storage.get_storage(), selected_start, selected_end, csv=False
+        )
+        if len(order_sequence) > 0:
             self.orders_exist = True
 
-            self.most_recent_order_date = orders[0]['date']
-            self.first_order_date = orders[len(orders)-1]['date']
-
-            # default in case date selection integrity check fails
-            # this could happen if end date < start date
-            self.end_index = 0
-            self.start_index = len(orders)-1
-
-            selected_start = self.startDate()
-            selected_end = self.endDate()
-
-            if self.check_date_integrity():
-                filtered_orders = []
-                index_list = []
-                count = -1
-                for order in orders:
-                    count += 1
-                    if order['datetime'].date() > selected_end:
-                        continue
-                    if order['datetime'].date() < selected_start:
-                        break
-                    filtered_orders.append(order)
-                    index_list.append(count)
-
-                if len(index_list) > 0: # it is possible no orders are found
-                                        # even if the date range is correct
-                    self.end_index = min(index_list)
-                    self.start_index = max(index_list)
-
-                orders = filtered_orders
-
-        self.batch = Batch(orders, size=50, start=start)
+        self.batch = Batch(order_sequence, size=50, start=start)
         super(OrderControlPanelView, self).update()
 
 
@@ -251,46 +241,38 @@ class ExportShopOrders(BrowserView, DateMixin):
 
     def __call__(self):
         csv_content = None
+        selected_start = self.startDate()
+        selected_end = self.endDate()
         # get shop order entries
-        orders = list(_fetch_orders(storage.get_storage(), key=(), csv=True))
-        orders.sort(key=lambda o: o.get('date_sort', ''), reverse=True)
+        order_sequence = LazyFilteredOrders(
+            storage.get_storage(), selected_start, selected_end, csv=False
+        )
         orders_csv = StringIO()
 
-        # get indexes of selected orders dates if supplied
-        first_order = self.request.get('first_order') # most recent order in selection
-        last_order = self.request.get('last_order') # oldest order in selection
-        if first_order and last_order:
-            try:
-                if int(last_order) <= len(orders)-1 and int(first_order) >= 0:
-                    # trim selection
-                    orders = orders[int(first_order):int(last_order)+1]
-            except ValueError:
-                pass
-
-        if orders and len(orders) > 0:
+        if (order_sequence) > 0:
             writer = csv.DictWriter(
                 orders_csv,
-                fieldnames=['userid', 'date', 'items',
-                            'ship_to', 'taxes', 'ship_charge',
-                            'total'],
+                fieldnames=[u'userid', u'date', u'items',
+                            u'ship_to', u'taxes', u'ship_charge',
+                            u'total'],
                 restval='',
                 extrasaction='ignore',
                 dialect='excel',
                 quoting=csv.QUOTE_ALL
-           )
+            )
 
             # Column titles
-            ldict={'userid': "User ID",
-                   'date': "Date",
-                   'items': "Items",
-                   'ship_to': "Ship to",
-                   'taxes': "Taxes",
-                   'ship_charge': "Ship Charge",
-                   'total': "Total",
+            ldict={u'userid': u"User ID",
+                   u'date': u"Date",
+                   u'items': u"Items",
+                   u'ship_to': u"Ship to",
+                   u'taxes': u"Taxes",
+                   u'ship_charge': u"Ship Charge",
+                   u'total': u"Total",
                   }
             writer.writerow(ldict)
 
-            for order in orders:
+            for order in order_sequence:
                 ship_charge = order.get('ship_charge', '')
 
                 ldict={'userid': order['userid'],
@@ -307,9 +289,8 @@ class ExportShopOrders(BrowserView, DateMixin):
             orders_csv.close()
 
             # filename generation with date range included
-            end = self.to_datetime(orders[0]['date'],'%Y-%m-%d %I:%M %p')
-            start = self.to_datetime(orders[len(orders)-1]['date'],
-                '%Y-%m-%d %I:%M %p')
+            start = selected_start or order_sequence.earliest_date 
+            end = selected_end or order_sequence.latest_date
             end_str = end.strftime(u'%m%d%Y')
             start_str = start.strftime(u'%m%d%Y')
             if start_str == end_str:
@@ -319,7 +300,7 @@ class ExportShopOrders(BrowserView, DateMixin):
 
             self.request.response.setHeader("Content-Disposition",
                                             "attachment; filename=%s.csv" %
-                                             nice_filename)
+                                            nice_filename)
             self.request.response.setHeader("Content-Type", "text/csv")
             self.request.response.setHeader("Content-Length", len(csv_content))
             self.request.response.setHeader('Last-Modified',

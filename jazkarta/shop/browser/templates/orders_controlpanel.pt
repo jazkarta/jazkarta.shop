@@ -15,7 +15,7 @@
     </a>
     <h1 class="documentFirstHeading">Shop Orders</h1>
 
-    <form id="update-order-selection" name="update-order-selection" method="post"
+    <form id="update-order-selection" name="update-order-selection" method="GET"
               tal:attributes="action string:${view/__name__}">
         <div>
              <table id="shop-order-date-selection-table">
@@ -65,7 +65,13 @@
             </tal:bad_dates>
         <div>
             <form id="export_csv" name="export-csv2" method="post"
-                tal:attributes="action string:${context/absolute_url}/@@export-shop-orders-csv?first_order=${view/end_index}&last_order=${view/start_index}">
+                  tal:attributes="action string:${context/absolute_url}/@@export-shop-orders-csv">
+                <input name="Start-Date"
+                       type="hidden"
+                       tal:attributes="value python:request.get('Start-Date', None)" />
+                <input name="End-Date"
+                       type="hidden"
+                       tal:attributes="value python:request.get('End-Date', None)" />
                 <button id="export_csv_button" type="submit" name="export_csv">Export CSV</button>
             </form>
         </div>
@@ -83,18 +89,33 @@
         </tr>
       </thead>
       <tbody>
-          <tr tal:repeat="entry batch">
-            <tal:value repeat="key view/keys">
+          <tal:row repeat="entry batch">
+          <tr tal:define="oddrow repeat/entry/odd" tal:attributes="class python:oddrow and 'odd' or 'even'">
+            <tal:value repeat="key view/keys" >
                 <td tal:content="structure python:entry.get(key, '')">Value</td>
             </tal:value>
             <td>
               <a tal:attributes="href string:@@jazkarta-shop-order-details?order_id=${entry/orderid}">Show Details</a>
+            </td>
           </tr>
+          </tal:row>
       </tbody>
     </table>
     <tal:batchnavigation define="batchnavigation nocall:context/@@batchnavigation"
                          replace="structure python:batchnavigation(batch)" />
   </div>
+  <script>
+    $(window).on('load', function () {
+        $('input.pattern-pickadate-date').on('change', function () {
+            window.setTimeout(function () {
+                var $start = $('input[name="Start-Date"][type!="hidden"]');
+                var $end = $('input[name="End-Date"][type!="hidden"]');
+                $('input[type="hidden"][name="Start-Date"]').val($start.val());
+                $('input[type="hidden"][name="End-Date"]').val($end.val());
+            }, 50);
+        });
+    });
+  </script>
 </metal:main>
 </body>
 </html>
