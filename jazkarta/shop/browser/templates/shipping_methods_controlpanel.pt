@@ -12,14 +12,15 @@
     <a tal:attributes="href view/plone_control_panel" class="link-parent" id="setup-link">
         Site Setup
     </a>
-  <div data-pat-plone-modal='{"actionOptions": {"displayInModal": false}}'>
+  <div data-pat-plone-modal='{"actionOptions": {"displayInModal": false}}'
+       tal:define="view_name view/__name__|string:jazkarta-shop-shipping-methods">
     <h1 class="documentFirstHeading">Shipping Methods</h1>
 
     <tal:using_p5 tal:condition="view/using_plone5">
-        <a class="pat-plone-modal green button" href="${context/absolute_url}/${view/__name__}/+"><button>Add Shipping Method</button></a>
+        <a class="pat-plone-modal green button" href="${context/absolute_url}/${view_name}/+"><button>Add Shipping Method</button></a>
     </tal:using_p5>
     <tal:using_p4 tal:condition="not:view/using_plone5">
-        <a tal:attributes="href string:${context/absolute_url}/${view/__name__}/+"><button>Add Shipping Method</button></a>
+        <a tal:attributes="href string:${context/absolute_url}/${view_name}/+"><button>Add Shipping Method</button></a>
     </tal:using_p4>
 
     <table class="listing">
@@ -37,10 +38,10 @@
         <td tal:content="python:view.format_calculation(method['calculation'])" tal:on-error="nothing" />
         <td>
           <tal:using_p5 tal:condition="view/using_plone5">
-            <a class="pat-plone-modal" href="${context/absolute_url}/${view/__name__}/${method/key}">Edit</a>
+            <a class="pat-plone-modal" href="${context/absolute_url}/${view_name}/${method/key}">Edit</a>
           </tal:using_p5>
           <tal:using_p4 tal:condition="not:view/using_plone5">
-            <a tal:attributes="href string:${context/absolute_url}/${view/__name__}/${method/key}">Edit</a>
+            <a tal:attributes="href string:${context/absolute_url}/${view_name}/${method/key}">Edit</a>
           </tal:using_p4>
         </td>
       </tr>

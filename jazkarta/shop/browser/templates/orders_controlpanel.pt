@@ -16,7 +16,7 @@
     <h1 class="documentFirstHeading">Shop Orders</h1>
 
     <form id="update-order-selection" name="update-order-selection" method="GET"
-              tal:attributes="action string:${view/__name__}">
+              tal:attributes="action view/__name__|string:jazkarta-shop-orders">
         <div>
              <table id="shop-order-date-selection-table">
                  <tbody>
