@@ -1,15 +1,47 @@
+import logging
 import six
+
 from authorizenet import apicontractsv1
 from authorizenet.constants import constants
 from authorizenet.apicontrollers import createTransactionController
 from authorizenet.apicontrollers import ARBCreateSubscriptionController
+from contextlib import contextmanager
 from datetime import date
+
 from . import config
 from .interfaces import PaymentProcessingException
 from .utils import get_setting
-import logging
+
+
+class AuthorizeDotNetDebugFilter(logging.Filter):
+    def filter(self, record):
+        if record.levelno >= logging.DEBUG:
+            record.levelno = logging.WARNING
+            return 1
+        else:
+            return 0
+
 
 logger = logging.getLogger(__name__)
+authnet_logger = logging.getLogger(constants.defaultLoggerName)
+authnet_logger.addHandler(logging.StreamHandler())
+authnet_debugfilter = AuthorizeDotNetDebugFilter()
+
+
+@contextmanager
+def enhanced_authnet_logging():
+    """Boost authorizenet's own logging so we can get a better view
+    into what's happening during transaction processing.
+    """
+    # Bump up the logging
+    authnet_logger.setLevel(logging.DEBUG)
+    authnet_logger.addFilter(authnet_debugfilter)
+
+    yield
+
+    # Ratchet it down again
+    authnet_logger.setLevel(logging.CRITICAL)
+    authnet_logger.removeFilter(authnet_debugfilter)
 
 
 def _getMerchantAuth():
@@ -106,17 +138,19 @@ def createTransactionRequest(
     createtransactionrequest.merchantAuthentication = merchantAuth
     createtransactionrequest.transactionRequest = transactionrequest
 
-    # Create the controller and get response
-    createtransactioncontroller = createTransactionController(
-        createtransactionrequest)
-    if config.IN_PRODUCTION:
-        createtransactioncontroller.setenvironment(constants.PRODUCTION)
-    createtransactioncontroller.execute()
+    with enhanced_authnet_logging():
+        controller = createTransactionController(createtransactionrequest)
+        if config.IN_PRODUCTION:
+            controller.setenvironment(constants.PRODUCTION)
+        controller.execute()
+        response = controller.getresponse()
 
-    response = createtransactioncontroller.getresponse()
+    logger.info(
+        'createTransactionController response: {}'.format(response.__repr__())
+    )
     defaultMsg = 'Your card could not be processed.'
-    if createtransactioncontroller._httpResponse:
-        logger.info('Authorize.net response: {}'.format(createtransactioncontroller._httpResponse))
+    if controller._httpResponse:
+        logger.info('Authorize.net response: {}'.format(controller._httpResponse))
     if response.messages.resultCode == 'Ok':
         if response.transactionResponse.responseCode != 1:  # Approved
             raise PaymentProcessingException(defaultMsg)
@@ -178,14 +212,16 @@ def ARBCreateSubscriptionRequest(
     request.merchantAuthentication = merchantAuth
     request.subscription = subscription
 
-    # Creating and executing the controller
-    controller = ARBCreateSubscriptionController(request)
-    if config.IN_PRODUCTION:
-        controller.setenvironment(constants.PRODUCTION)
-    controller.execute()
+    with enhanced_authnet_logging():
+        controller = ARBCreateSubscriptionController(request)
+        if config.IN_PRODUCTION:
+            controller.setenvironment(constants.PRODUCTION)
+        controller.execute()
+        response = controller.getresponse()
 
-    # Getting the response
-    response = controller.getresponse()
+    logger.info(
+        'ARBCreateSubscriptionController response: {}'.format(response.__repr__())
+    )
     if response.messages.resultCode == 'Ok':
         return response
     else:
