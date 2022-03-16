@@ -92,10 +92,10 @@ class LazyFilteredOrders(Lazy):
         data['date_sort'] = date.isoformat() if hasattr(date, 'isoformat') else ''
         data['userid'] = user or 'Anonymous'
         data['orderid'] = '{}|{}'.format(user or '_orders_', data['date_sort'])
-        data['taxes'] = sum(item.get('tax', 0) for item in data.get('taxes', ()))
+        data['taxes'] = sum(item.get('tax', Decimal('0.00')) for item in data.get('taxes', ()))
         items = list(data.get('items', {}).values())
-        data['total'] = (sum((i.get('price', 0.0) * i.get('quantity', 1)) for i in items) +
-                         data['taxes'] + data.get('ship_charge', 0))
+        data['total'] = (sum((i.get('price', Decimal('0.00')) * i.get('quantity', 1)) for i in items) +
+                         data['taxes'] + data.get('ship_charge', Decimal('0.00')))
 
         item_str = u'<ul>'
         if csv:
@@ -117,14 +117,14 @@ class LazyFilteredOrders(Lazy):
             if csv:
                 # special parsing of items for csv export
                 item_str += u'{} x {} @ ${}'.format(
-                        title, i.get('quantity', 1), i.get('price', 0.0)
+                        title, i.get('quantity', 1), i.get('price', Decimal('0.00'))
                 )
                 # add new line character to all but last item
                 if i != items[len(items)-1]:
                     item_str += u'\n'
             else:
                 item_str += u'<li><a href="{}">{}</a> x {} @ ${}</li>'.format(
-                    href, title, i.get('quantity', 1), i.get('price', 0.0)
+                    href, title, i.get('quantity', 1), i.get('price', Decimal('0.00'))
                 )
         data['items'] = item_str + u'</ul>'
         if csv:
