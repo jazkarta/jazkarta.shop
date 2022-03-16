@@ -180,7 +180,9 @@ class DateMixin(object):
     def check_date_integrity(self):
         """ returns False if start_date specified is later than the end_date
         """
-        if self.startDate() > self.endDate():
+        start = self.startDate()
+        end = self.endDate()
+        if start and end and start >= end:
             return False
         return True
 
@@ -289,7 +291,7 @@ class ExportShopOrders(BrowserView, DateMixin):
             orders_csv.close()
 
             # filename generation with date range included
-            start = selected_start or order_sequence.earliest_date 
+            start = selected_start or order_sequence.earliest_date
             end = selected_end or order_sequence.latest_date
             end_str = end.strftime(u'%m%d%Y')
             start_str = start.strftime(u'%m%d%Y')
