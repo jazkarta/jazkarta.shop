@@ -240,7 +240,10 @@ class Cart(object):
         """
         self.data['items'] = self._items
         if self.storage_id:
-            storage.set_shop_data([self.storage_id, 'cart'], self.data)
+            if len(self.data['items']):
+                storage.set_shop_data([self.storage_id, 'cart'], self.data)
+            else:
+                storage.del_shop_data([self.storage_id, 'cart'])
 
     def clear(self):
         items = self._items
