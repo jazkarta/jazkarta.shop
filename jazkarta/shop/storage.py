@@ -37,7 +37,7 @@ def del_shop_data(path):
     if key in storage:
         del storage[key]
     # If the parent has no remaining keys, delete it too
-    if len(storage.keys()) == 0:
+    if len(storage.keys()) == 0 and len(path) > 1:
         del_shop_data(path[:-1])
 
 
