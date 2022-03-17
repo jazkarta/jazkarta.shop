@@ -247,7 +247,7 @@ class ExportShopOrders(BrowserView, DateMixin):
         selected_end = self.endDate()
         # get shop order entries
         order_sequence = LazyFilteredOrders(
-            storage.get_storage(), selected_start, selected_end, csv=False
+            storage.get_storage(), selected_start, selected_end, csv=True
         )
         orders_csv = StringIO()
 
