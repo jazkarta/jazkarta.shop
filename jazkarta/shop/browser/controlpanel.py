@@ -90,7 +90,7 @@ class LazyFilteredOrders(Lazy):
         data = copy.deepcopy(entry)
         data['date'] = date.strftime('%Y-%m-%d %I:%M %p') if hasattr(date, 'strftime') else date
         data['date_sort'] = date.isoformat() if hasattr(date, 'isoformat') else ''
-        data['userid'] = user or 'Anonymous'
+        data['userid'] = user or u'Anonymous'
         data['orderid'] = '{}|{}'.format(user or '_orders_', data['date_sort'])
         data['taxes'] = sum(item.get('tax', Decimal('0.00')) for item in data.get('taxes', ()))
         items = list(data.get('items', {}).values())
@@ -126,9 +126,10 @@ class LazyFilteredOrders(Lazy):
                 item_str += u'<li><a href="{}">{}</a> x {} @ ${}</li>'.format(
                     href, title, i.get('quantity', 1), i.get('price', Decimal('0.00'))
                 )
-        data['items'] = item_str + u'</ul>'
         if csv:
             data['items'] = item_str
+        else:
+            data['items'] = item_str + u'</ul>'
         address = data.get('ship_to', {})
         if csv:
             data['ship_to'] = u'{} {}, {}, {}, {} {}, {}'.format(
@@ -143,6 +144,10 @@ class LazyFilteredOrders(Lazy):
             # check if shipping address has been entered
             if data['ship_to'].replace(',','').replace(' ','') == '':
                 data['ship_to'] = u''
+            # CSV output needs to be encoded
+            data['items'] = data['items'].encode('utf-8')
+            data['ship_to'] = data['ship_to'].encode('utf-8')
+            data['userid'] = data['userid'].encode('utf-8')
         else:
             data['ship_to'] = u'<p>{} {}</p><p>{}</p><p>{}, {} {}</p><p>{}</p>'.format(
                 escape(address.get('first_name', '')),
@@ -254,9 +259,9 @@ class ExportShopOrders(BrowserView, DateMixin):
         if (order_sequence) > 0:
             writer = csv.DictWriter(
                 orders_csv,
-                fieldnames=[u'userid', u'date', u'items',
-                            u'ship_to', u'taxes', u'ship_charge',
-                            u'total'],
+                fieldnames=['userid', 'date', 'items',
+                            'ship_to', 'taxes', 'ship_charge',
+                            'total'],
                 restval='',
                 extrasaction='ignore',
                 dialect='excel',
@@ -264,13 +269,13 @@ class ExportShopOrders(BrowserView, DateMixin):
             )
 
             # Column titles
-            ldict={u'userid': u"User ID",
-                   u'date': u"Date",
-                   u'items': u"Items",
-                   u'ship_to': u"Ship to",
-                   u'taxes': u"Taxes",
-                   u'ship_charge': u"Ship Charge",
-                   u'total': u"Total",
+            ldict={'userid': "User ID",
+                   'date': "Date",
+                   'items': "Items",
+                   'ship_to': "Ship to",
+                   'taxes': "Taxes",
+                   'ship_charge': "Ship Charge",
+                   'total': "Total",
                   }
             writer.writerow(ldict)
 
@@ -280,7 +285,7 @@ class ExportShopOrders(BrowserView, DateMixin):
                 ldict={'userid': order['userid'],
                        'date': order['date'],
                        'items': order['items'],
-                       'ship_to': order['ship_to'].encode('utf8'),
+                       'ship_to': order['ship_to'],
                        'taxes': order['taxes'],
                        'ship_charge': ship_charge,
                        'total': order['total'],
