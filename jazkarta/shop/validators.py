@@ -7,6 +7,6 @@ FULL_DOMAIN_RE = re.compile(r'^[^@]+@[^@.]+\.[^@]+$')
 
 
 def is_email(value):
-    if not re.match('^' + EMAIL_RE, value) or not FULL_DOMAIN_RE.match(value):
+    if not EMAIL_RE.match(value) or not FULL_DOMAIN_RE.match(value):
         raise Invalid(u'Please enter a valid e-mail address.')
     return True
