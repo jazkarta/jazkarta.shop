@@ -3,10 +3,14 @@
      data-toggle="collapse" data-target=".jaz-shop-cart">
     <span class="jaz-shop-cart-trigger-label">My Cart</span>
     <div class="items"
-         tal:define="itemcount view/cart/itemcount"
-         tal:condition="itemcount">
-      <strong tal:content="itemcount" />
-      item<span tal:replace="python:'s' if itemcount > 1 else ''" />
+         tal:define="itemcount view/cart/itemcount">
+      <tal:noitems tal:condition="not:itemcount">
+        <strong>0</strong> items
+      </tal:noitems>
+      <tal:items tal:condition="itemcount">
+          <strong tal:content="itemcount" />
+          item<span tal:replace="python:'s' if itemcount > 1 else ''" />
+      </tal:items>
     </div>
   </a>
   <div class="jaz-shop-cart"
