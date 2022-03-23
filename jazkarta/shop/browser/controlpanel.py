@@ -1,7 +1,6 @@
 from future import standard_library
 standard_library.install_aliases()
 from builtins import object
-from collections import namedtuple
 import copy
 import csv
 import datetime
@@ -40,8 +39,6 @@ SettingsControlPanelView.label = _(u"Jazkarta Shop Settings")
 
 
 ORDER_KEYS = ('userid', 'date', 'items', 'ship_to', 'taxes', 'ship_charge', 'total')
-IGNORED_KEYS = frozenset(['cart', 'coupon', 'shipping_methods'])
-OrderRef = namedtuple('order_ref', ['date', 'user'])
 
 
 class LazyFilteredOrders(Lazy):
@@ -51,22 +48,10 @@ class LazyFilteredOrders(Lazy):
     def __init__(self, storage, start_date=None, end_date=None, csv=False):
         self.storage = storage
         self.csv = csv
-        keys = []
         # Get all sorted order keys within the date range from the storage without
         # retrieving order data.
-        for entry in storage.keys():
-            if entry in IGNORED_KEYS:
-                continue
-            if entry == 'orders':
-                user = None
-                container = storage[entry]
-            elif 'orders' in storage[entry]:
-                user = entry
-                container = storage[entry]['orders']
-            else:
-                continue
-            for date in container.keys(min=start_date, max=end_date):
-                keys.append(OrderRef(date, user))
+        orders = storage.get('orders', {})
+        keys = list(orders.keys(min=start_date, max=end_date))
         keys.sort(reverse=True)
         self._data = keys
         if len(keys):
@@ -76,22 +61,16 @@ class LazyFilteredOrders(Lazy):
         self._len = self._rlen = len(keys)
 
     def __getitem__(self, index):
+        user = None
         data = self._data
-        key = data[index]
-        user = key.user
-        date = key.date
+        date = data[index]
         csv = self.csv
-        if user:
-            container = self.storage[user]['orders']
-        else:
-            container = self.storage['orders']
+        container = self.storage['orders']
         entry = container[date]
         # Replicate item generation logic from `_fetch_orders` method
         data = copy.deepcopy(entry)
         data['date'] = date.strftime('%Y-%m-%d %I:%M %p') if hasattr(date, 'strftime') else date
         data['date_sort'] = date.isoformat() if hasattr(date, 'isoformat') else ''
-        data['userid'] = user or u'Anonymous'
-        data['orderid'] = '{}|{}'.format(user or '_orders_', data['date_sort'])
         data['taxes'] = sum(item.get('tax', Decimal('0.00')) for item in data.get('taxes', ()))
         items = list(data.get('items', {}).values())
         data['total'] = (sum((i.get('price', Decimal('0.00')) * i.get('quantity', 1)) for i in items) +
@@ -101,6 +80,9 @@ class LazyFilteredOrders(Lazy):
         if csv:
             item_str = u''
         for i in items:
+            # The user id is stored on the line items
+            if user is None and i.get('user'):
+                user = i['user']
             uid = i.get('uid', None)
             if uid:
                 product = resolve_uid(uid)
@@ -126,6 +108,8 @@ class LazyFilteredOrders(Lazy):
                 item_str += u'<li><a href="{}">{}</a> x {} @ ${}</li>'.format(
                     href, title, i.get('quantity', 1), i.get('price', Decimal('0.00'))
                 )
+        data['userid'] = user or u'Anonymous'
+        data['orderid'] = '{}|{}'.format(user or '_orders_', data['date_sort'])
         if csv:
             data['items'] = item_str
         else:
