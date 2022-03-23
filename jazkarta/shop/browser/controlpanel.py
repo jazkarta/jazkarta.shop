@@ -71,7 +71,6 @@ class LazyFilteredOrders(Lazy):
         data = copy.deepcopy(entry)
         data['date'] = date.strftime('%Y-%m-%d %I:%M %p') if hasattr(date, 'strftime') else date
         data['date_sort'] = date.isoformat() if hasattr(date, 'isoformat') else ''
-        data['orderid'] = '{}|{}'.format(user or '_orders_', data['date_sort'])
         data['taxes'] = sum(item.get('tax', Decimal('0.00')) for item in data.get('taxes', ()))
         items = list(data.get('items', {}).values())
         data['total'] = (sum((i.get('price', Decimal('0.00')) * i.get('quantity', 1)) for i in items) +
@@ -110,6 +109,7 @@ class LazyFilteredOrders(Lazy):
                     href, title, i.get('quantity', 1), i.get('price', Decimal('0.00'))
                 )
         data['userid'] = user or u'Anonymous'
+        data['orderid'] = '{}|{}'.format(user or '_orders_', data['date_sort'])
         if csv:
             data['items'] = item_str
         else:
