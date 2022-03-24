@@ -250,6 +250,7 @@ class Cart(object):
         items.clear()
         self.data.clear()
         self.data['items'] = items
+        self.save()
 
     @property
     def itemcount(self):

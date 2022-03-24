@@ -136,7 +136,6 @@ class CheckoutFormBase(BrowserView, P5Mixin):
         is still intact in case `store_order` needs to be retried.
         """
         self.cart.clear()
-        self.cart.save()
 
     def thankyou_page(self):
         if self.order_id is None:
