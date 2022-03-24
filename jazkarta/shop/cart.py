@@ -185,7 +185,6 @@ class Cart(object):
                 else:
                     # create a new cart
                     data = PersistentMapping()
-                storage.set_shop_data([user_id, 'cart'], data)
         else:
             storage_id = browser_id
             data = storage.get_shop_data([browser_id, 'cart'])
@@ -228,6 +227,7 @@ class Cart(object):
     def __delitem__(self, cart_id):
         del self._items[cart_id]
         notify(ItemRemoved(self))
+        self.save()
 
     @property
     def items(self):
@@ -240,13 +240,17 @@ class Cart(object):
         """
         self.data['items'] = self._items
         if self.storage_id:
-            storage.set_shop_data([self.storage_id, 'cart'], self.data)
+            if len(self.data['items']):
+                storage.set_shop_data([self.storage_id, 'cart'], self.data)
+            else:
+                storage.del_shop_data([self.storage_id, 'cart'])
 
     def clear(self):
         items = self._items
         items.clear()
         self.data.clear()
         self.data['items'] = items
+        self.save()
 
     @property
     def itemcount(self):
