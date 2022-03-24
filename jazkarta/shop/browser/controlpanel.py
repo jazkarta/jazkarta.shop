@@ -55,8 +55,8 @@ class LazyFilteredOrders(Lazy):
         keys.sort(reverse=True)
         self._data = keys
         if len(keys):
-            self.earliest_date = keys[-1].date
-            self.latest_date = keys[0].date
+            self.earliest_date = keys[-1]
+            self.latest_date = keys[0]
         # Optimize Lazy length checks
         self._len = self._rlen = len(keys)
 
