@@ -6,7 +6,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - .:/jazkarta.shop
+      - ./jazkarta/shop:/app/lib/python3.8/site-packages/jazkarta/shop
     environment:
       SITE: Plone
       TYPE: classic

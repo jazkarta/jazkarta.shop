@@ -10,30 +10,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Update docker-compose
-        run: docker-compose --version && pip install -U docker-compose==1.29.1
+
       - name: Build jazkarta.shop docker image
-        run: docker-compose build
+        run: docker build . -t jazkarta.shop
+        env:
+           DOCKER_BUILDKIT: "1" 
+
       - name: Start Plone server
         run: docker-compose up -d
-      - name: Make sure the server container is running
-        run: |
-          # If we find the string `plone_1` in the output of `docker-compose ps`
-          # and on the same line the word `healthy`, it means that the container is running. 
-          docker-compose ps|grep plone_1.*healthy
-      - name: Wait until the server is running
-        run: |
-          # Port 8080 is open. The Plone server might still be starting. We need to wait until
-          # it's ready to serve requests. We try four times.
-          curl --retry-connrefused --retry-max-time 40 --retry 5 --fail -v http://localhost:8080/ ||
-          (sleep 3 &&
-          curl --retry-connrefused --retry-max-time 40 --retry 5 --fail -v http://localhost:8080/) ||
-          (sleep 3 &&
-          curl --retry-connrefused --retry-max-time 40 --retry 5 --fail -v http://localhost:8080/) ||
-          (sleep 3 &&
-          curl --retry-connrefused --retry-max-time 40 --retry 5 --fail -v http://localhost:8080/)
+        env:
+           DOCKER_BUILDKIT: "1" 
+
       - name: Check that jazkarta.shop was installed
-        if: ${{false}}  # The `PROFILES` environment variable is not working
         run: curl --fail -v http://localhost:8080/Plone/review-cart
 
       - name: 'UI Tests - Chrome'
