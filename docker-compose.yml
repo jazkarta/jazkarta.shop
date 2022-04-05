@@ -10,10 +10,19 @@ services:
     environment:
       SITE: Plone
       TYPE: classic
-      # This is not working on Github Actions. It works locally
-      # Commenting out for now
-      # PROFILES: "jazkarta.shop:default"
+      DEBUG_MODE: "on"
+      ZEO_ADDRESS: zeo:8100
+      PROFILES: "jazkarta.shop:default"
+    depends_on:
+      - zeo
 
+  zeo:
+    image: plone/plone-zeo:latest
+    restart: always
+    volumes:
+      - data:/data
+    ports:
+    - "8100"
   # The `dummy` service is here to make sure `docker-compose up` exits only when
   # `plone`'s health is `healthy`.
   dummy:
@@ -21,3 +30,6 @@ services:
     depends_on:
       plone:
         condition: service_healthy
+
+volumes:
+  data: {}
