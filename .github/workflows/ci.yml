@@ -10,6 +10,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Update docker-compose
+        run: docker-compose --version && pip install -U docker-compose==1.29.1
       - name: Build jazkarta.shop docker image
         run: docker-compose build
       - name: Start Plone server
