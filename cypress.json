@@ -1,0 +1,8 @@
+{
+    "projectId": "5awy1r",
+    "baseUrl": "http://localhost:8080/Plone",
+    "env": {
+        "SITE_OWNER_NAME": "admin",
+        "SITE_OWNER_PASSWORD": "admin"
+    }
+}

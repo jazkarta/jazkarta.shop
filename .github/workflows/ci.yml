@@ -33,6 +33,20 @@ jobs:
       - name: Check that jazkarta.shop was installed
         if: ${{false}}  # The `PROFILES` environment variable is not working
         run: curl --fail -v http://localhost:8080/Plone/review-cart
+
+      - name: 'UI Tests - Chrome'
+        uses: cypress-io/github-action@v2
+        with:
+          browser: chrome
+          record: true
+          parallel: true
+          group: 'UI - Chrome'
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          # Recommended: pass the GitHub token lets this action correctly
+          # determine the unique run id necessary to re-run the checks
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Print plone server logs
         if: always()  # This step should be also run when a previous step failed
         run: docker-compose logs plone
