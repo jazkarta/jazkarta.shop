@@ -10,7 +10,9 @@ services:
     environment:
       SITE: Plone
       TYPE: classic
-      PROFILES: "jazkarta.shop:default"
+      # This is not working on Github Actions. It works locally
+      # Commenting out for now
+      # PROFILES: "jazkarta.shop:default"
 
   # The `dummy` service is here to make sure `docker-compose up` exits only when
   # `plone`'s health is `healthy`.
