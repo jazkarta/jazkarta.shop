@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+  plone:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/jazkarta.shop
+    environment:
+      SITE: Plone
+      TYPE: classic
+      PROFILES: "jazkarta.shop:default"
