@@ -11,3 +11,11 @@ services:
       SITE: Plone
       TYPE: classic
       PROFILES: "jazkarta.shop:default"
+
+  # The `dummy` service is here to make sure `docker-compose up` exits only when
+  # `plone`'s health is `healthy`.
+  dummy:
+    image: busybox
+    depends_on:
+      plone:
+        condition: service_healthy
