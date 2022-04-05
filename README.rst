@@ -62,6 +62,13 @@ Compatible With
 - Plone 5.0.x, 5.1.x on Python 2.7
 - Plone 5.2.x on Python 2.7, 3.6, 3.7
 
+Translations
+============
+
+This product has been translated into
+
+- English (U.S.)
+
 Installation
 ============
 
