@@ -7,6 +7,7 @@ from plone.autoform.interfaces import IFormFieldProvider
 from plone.supermodel import model
 from z3c.currency.field import Currency
 from z3c.form.browser.checkbox import CheckBoxWidget
+from z3c.relationfield.schema import RelationList
 from zope.component.interfaces import ObjectEvent
 from zope.interface import alsoProvides
 from zope.interface import Attribute
@@ -69,6 +70,23 @@ class IProduct(model.Schema):
         'shop', label=u"Shop",
         fields=(
             'product_category', 'price', 'stock_level', 'taxable', 'weight',
+        ),
+    )
+
+
+@provider(IFormFieldProvider)
+class IRelatedProducts(model.Schema):
+    """Marker for content that can have related products."""
+
+    related_products = RelationList(
+        title = 'Related products',
+        default = [],
+        required = False
+    )
+    model.fieldset(
+        'shop', label=u"Shop",
+        fields=(
+            'related_products',
         ),
     )
 

@@ -40,6 +40,11 @@
     description="Allows the content type to be purchased in the shop."
     provides=".interfaces.IProduct"
     />
+  <plone:behavior
+    title="Jazkarta Shop Related Products"
+    description="Allows the content type to have related products."
+    provides=".interfaces.IRelatedProducts"
+    />
   <adapter factory=".purchasable.DefaultPurchaseHandler" />
   <adapter factory=".purchasable.DefaultArchetypesPurchaseHandler" />
 
