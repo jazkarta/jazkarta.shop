@@ -1,5 +1,11 @@
-from collective.z3cform.datagridfield import DataGridFieldFactory
-from collective.z3cform.datagridfield import DictRow
+try:
+    # collective.z3cform.datagridfield < 2.0
+    from collective.z3cform.datagridfield import DataGridFieldFactory
+    from collective.z3cform.datagridfield import DictRow
+except ImportError:
+    # collective.z3cform.datagridfield >= 2.0
+    from collective.z3cform.datagridfield.datagridfield import DataGridFieldFactory
+    from collective.z3cform.datagridfield.row import DictRow
 from decimal import Decimal
 from plone.app.vocabularies.catalog import CatalogSource
 from plone.autoform import directives as form
