@@ -61,6 +61,15 @@
     />
 
   <browser:page
+    name="related-products"
+    for="*"
+    class=".cart.RelatedProductsView"
+    template="templates/related_products.pt"
+    permission="zope2.View"
+    layer="..interfaces.IBrowserLayer"
+    />
+
+  <browser:page
     name="update-cart"
     for="plone.app.layout.navigation.interfaces.INavigationRoot"
     class=".cart.UpdateCartView"

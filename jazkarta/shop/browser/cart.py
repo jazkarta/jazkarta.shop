@@ -116,3 +116,8 @@ def format_discount(coupon):
     else:
         discount = '%s%%' % int(coupon.amount)
     return discount
+
+
+class RelatedProductsView(BrowserView):
+    def products(self):
+        return []

@@ -150,6 +150,7 @@
       </div>
 
     </form>
+    <tal:related metal:use-macro="context/@@related-products/JazkartaShopRelatedProducts">
 </metal:main>
 </body>
 </html>

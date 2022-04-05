@@ -1,0 +1,3 @@
+<div class="jaz-shop-related-products" metal:define-macro="JazkartaShopRelatedProducts">
+    RELATED PRODUCTS of jaz.shop
+</div>
