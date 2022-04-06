@@ -45,6 +45,11 @@ Purchasable Content Types
 Types can be Dexterity or Archetypes. Make your own content type purchasable using a behavior or schema extender.
 (Note: Archetypes support in Python 2.x only)
 
+Related products
+----------------
+
+A product can have other products related to it. When users review their cart, they will be presented with a list of products related to the ones they're about to purchase.
+
 Cart Stored in ZODB
 ------------------------
 
