@@ -3,6 +3,19 @@ before(() => {
     cy.visit("http://localhost:8080/Plone/dexterity-types/Document/@@behaviors");
     cy.get('input[name="form.widgets.jazkarta.shop.interfaces.IProduct:list"]').check();
     cy.contains("Save").click();
+    cy.visit("http://localhost:8080/Plone/@@jazkarta-shop-settings");
+    cy.getByLabel('Payment Processor').select('Stripe');
+    cy.getByLabel('Stripe Secret Key (Development)').clear().type('foo');
+    cy.getByLabel('Stripe Publishable Key (Development)').clear().type('foo');
+    cy.getByLabel('Stripe Secret Key (Production)').clear().type('foo');
+    cy.getByLabel('Stripe Publishable Key (Production)').clear().type('foo');
+    cy.getByLabel('Receipt Email Introduction').clear().type('Thanks for your order');
+    cy.getByLabel('Ship From Name').clear().type('A company');
+    cy.getByLabel('Ship From Address').clear().type('Vendor street 101');
+    cy.getByLabel('Ship From City').clear().type('A-city');
+    cy.getByLabel('Ship From State').clear().type('A-state');
+    cy.getByLabel('Ship From Zip').clear().type('00000');
+    cy.contains("Save").click();
 });
 describe('Admin operations', () => {
     it('can view an empty order list', () => {
@@ -13,10 +26,31 @@ describe('Admin operations', () => {
         cy.ploneLoginAsRole("Manager");
         createProduct({ title: 'Product', price: '10' });
     })
-    it('creates two related buyable products', () => {
+    it('buys one product', () => {
         cy.ploneLoginAsRole("Manager");
         createProduct({ title: 'Product 1', price: '10' });
-        createProduct({ title: 'Product 2', price: '50' });
+
+        cy.intercept({
+            method: 'POST',
+            url: '/Plone/shopping-cart',
+        }).as('updateCart');
+        cy.contains("Add to cart").click();
+        cy.wait('@updateCart').its('response.statusCode').should('equal', 200);
+        cy.wait(500);
+
+        cy.contains("My Cart").click();
+        cy.contains("Checkout").click();
+        cy.contains("Proceed to Checkout").click();
+        cy.get("input[name=first_name]").type("John");
+        cy.get("input[name=last_name]").type("Doe");
+        cy.get("input[name=address]").type("Customer street 101");
+        cy.get("input[name=city]").type("Customer City");
+        cy.get("input[name=state]").type("Customer State");
+        cy.get("input[name=zip]").type("000000");
+        cy.get("input[name=email]").type("customer@example.com");
+        cy.get("input[name=phone]").type("+1-555-555-5555");
+        cy.contains("Cash").click();
+        cy.contains("Complete Purchase").click();
     })
 })
 
