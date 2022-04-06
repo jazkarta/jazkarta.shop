@@ -66,27 +66,21 @@ class IProduct(model.Schema):
         required=False,
     )
 
-    model.fieldset(
-        'shop', label=u"Shop",
-        fields=(
-            'product_category', 'price', 'stock_level', 'taxable', 'weight',
-        ),
-    )
-
-
-@provider(IFormFieldProvider)
-class IRelatedProducts(model.Schema):
-    """Marker for content that can have related products."""
-
     related_products = RelationList(
-        title = 'Related products',
-        default = [],
-        required = False
+        title='Related products',
+        description=u'Recommendations to users who bought this product, shown during checkout.',
+        default=[],
+        required=False,
+        value_type=schema.Choice(
+            source=CatalogSource(
+                object_provides='jazkarta.shop.interfaces.IProduct'),
+        )
     )
+
     model.fieldset(
         'shop', label=u"Shop",
         fields=(
-            'related_products',
+            'product_category', 'price', 'stock_level', 'taxable', 'weight', 'related_products',
         ),
     )
 
