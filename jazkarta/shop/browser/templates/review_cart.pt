@@ -150,7 +150,7 @@
       </div>
 
     </form>
-    <tal:related metal:use-macro="context/@@related-products/JazkartaShopRelatedProducts">
+    <tal:related tal:replace="structure context/@@related-products">
 </metal:main>
 </body>
 </html>

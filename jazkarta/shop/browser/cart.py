@@ -4,8 +4,8 @@ from Products.Five import BrowserView
 from zope.browserpage import ViewPageTemplateFile
 from zope.cachedescriptors.property import Lazy as lazy_property
 from zope.interface import implementer
-import json
 
+from ..interfaces import IProduct
 from ..interfaces import OutOfStock
 from ..interfaces import IDontShowJazkartaShopPortlets
 from ..cart import Cart
@@ -118,6 +118,16 @@ def format_discount(coupon):
     return discount
 
 
-class RelatedProductsView(BrowserView):
+class RelatedProductsView(CartViewMixin, BrowserView):
+
     def products(self):
-        return []
+        products_in_cart = [el.product for el in self.cart.items]
+        result = []
+
+        for item in products_in_cart:
+            product = IProduct(item)
+            for related in product.related_products:
+                obj = related.to_object
+                if obj not in result and obj not in products_in_cart:
+                    result.append(obj)
+        return result

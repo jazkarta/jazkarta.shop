@@ -1,3 +1,7 @@
-<div class="jaz-shop-related-products" metal:define-macro="JazkartaShopRelatedProducts">
-    RELATED PRODUCTS of jaz.shop
+<div class="jaz-shop-related-products">
+    <div tal:repeat="product view/products">
+        <a href="${product/absolute_url}">
+            <h4>${product/title}</h4> ($ ${product/price})
+        </a>
+    </div>
 </div>
