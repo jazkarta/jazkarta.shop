@@ -3,11 +3,12 @@
     <h1>Related Products</h1>
     <ul>
       <li tal:repeat="product view/products">
-        <a href="${product/absolute_url}">
+        <a href="${product/obj/absolute_url}">
           <article class="product-item" itemscope itemtype="http://schema.org/Product">
-            <h4 itemprop="name">${product/title} ($ ${product/price})</h4>
-            <p tal:condition="product/description" class="documentDescription description">
-              ${product/description}
+            <h4 itemprop="name">${product/obj/title} ($ ${product/obj/price})</h4>
+            <img tal:condition="product/image_url" src="${product/image_url}" alt="${product/obj/title}">
+            <p tal:condition="product/obj/description" class="documentDescription description">
+              ${product/obj/description}
             </p>
           </article>
         </a>
