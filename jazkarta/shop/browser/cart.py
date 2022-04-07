@@ -1,12 +1,12 @@
 from builtins import object
 from decimal import Decimal
-from plone.app.contenttypes.behaviors.leadimage import ILeadImage
 from Products.Five import BrowserView
 from zope.browserpage import ViewPageTemplateFile
 from zope.cachedescriptors.property import Lazy as lazy_property
 from zope.interface import implementer
 
 from ..interfaces import IProduct
+from ..interfaces import IProductImage
 from ..interfaces import OutOfStock
 from ..interfaces import IDontShowJazkartaShopPortlets
 from ..cart import Cart
@@ -131,7 +131,7 @@ class RelatedProductsView(CartViewMixin, BrowserView):
                 obj = related.to_object
                 if obj not in result and obj not in products_in_cart:
                     result.append({'obj': obj, 'image_url': None})
-                    with_image = ILeadImage(obj, None)
-                    if with_image is not None and with_image.image is not None:
-                        result[-1]['image_url'] = obj.absolute_url() + '/@@images/image/mini'
+                    with_image = IProductImage(obj, None)
+                    if with_image is not None:
+                        result[-1]['image_url'] = with_image.url()
         return result

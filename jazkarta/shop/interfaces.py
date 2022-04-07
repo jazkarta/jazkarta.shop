@@ -542,3 +542,12 @@ class CheckoutComplete(ObjectEvent):
 
 class ItemRemoved(ObjectEvent):
     """Item removed from cart"""
+
+
+# Product image support
+
+
+class IProductImage(Interface):
+
+    def url():
+        """Return the URL of the image for a product"""
