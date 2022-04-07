@@ -1,7 +1,18 @@
 <div class="jaz-shop-related-products">
-    <div tal:repeat="product view/products">
+  <section id="related-products">
+    <h1>Related Products</h1>
+    <ul>
+      <li tal:repeat="product view/products">
         <a href="${product/absolute_url}">
-            <h4>${product/title}</h4> ($ ${product/price})
+          <article class="product-item" itemscope itemtype="http://schema.org/Product">
+            <h4 itemprop="name">${product/title} ($ ${product/price})</h4>
+            <p tal:condition="product/description" class="documentDescription description">
+              ${product/description}
+            </p>
+          </article>
         </a>
-    </div>
+      </li>
+    </ul>
+
+  </section>
 </div>
