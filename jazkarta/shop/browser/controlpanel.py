@@ -51,7 +51,12 @@ class LazyFilteredOrders(Lazy):
         # Get all sorted order keys within the date range from the storage without
         # retrieving order data.
         orders = storage.get('orders', {})
-        keys = list(orders.keys(min=start_date, max=end_date))
+        # If we requested read-only storage and it was empty we got a dict which doesn't
+        # support key filtering
+        if isinstance(orders, dict):
+            keys = []
+        else:
+            keys = list(orders.keys(min=start_date, max=end_date))
         keys.sort(reverse=True)
         self._data = keys
         if len(keys):

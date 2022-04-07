@@ -122,7 +122,7 @@
       <input type="hidden" name="submitted" value="1"/>
 
       <tal:using_p5 tal:condition="view/using_plone5">
-          <div class="portalMessage error checkout-error-wrapper"
+          <div class="portalMessage alert-error checkout-error-wrapper"
                tal:attributes="style python:'display: none;;' if not view.error else ''">
             <strong>Error</strong>
             <span class="checkout-error" tal:content="view/error"></span>

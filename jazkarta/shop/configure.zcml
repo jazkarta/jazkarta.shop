@@ -39,6 +39,7 @@
     title="Jazkarta Shop Product"
     description="Allows the content type to be purchased in the shop."
     provides=".interfaces.IProduct"
+    name="jazkarta.shop.behavior"
     />
   <adapter factory=".purchasable.DefaultPurchaseHandler" />
   <adapter factory=".purchasable.DefaultArchetypesPurchaseHandler" />
