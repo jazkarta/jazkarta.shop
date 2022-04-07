@@ -2,7 +2,7 @@ before(() => {
     cy.ploneLoginAsRole("Manager");
     // Enable product behavior on the `Document` content type
     cy.visit("http://localhost:8080/Plone/dexterity-types/Document/@@behaviors");
-    cy.get('input[name="form.widgets.jazkarta.shop.interfaces.IProduct:list"]').check();
+    cy.getByLabel('Jazkarta Shop Product').check()
     cy.contains("Save").click();
     // Configure the Stripe processor
     cy.visit("http://localhost:8080/Plone/@@jazkarta-shop-settings");
