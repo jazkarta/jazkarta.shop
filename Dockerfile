@@ -6,7 +6,7 @@ USER root
 #RUN /app/bin/pip install -U pip==22.0.4 
 
 COPY . /jazkarta.shop
-RUN /app/bin/pip install /jazkarta.shop --use-deprecated legacy-resolver
+RUN /app/bin/pip install Products.PrintingMailHost /jazkarta.shop --use-deprecated legacy-resolver
 
 RUN <<DOCKEREOF
 cat >> /app/etc/zope.conf <<EOF

@@ -1,8 +1,10 @@
 before(() => {
     cy.ploneLoginAsRole("Manager");
+    // Enable product behavior on the `Document` content type
     cy.visit("http://localhost:8080/Plone/dexterity-types/Document/@@behaviors");
     cy.get('input[name="form.widgets.jazkarta.shop.interfaces.IProduct:list"]').check();
     cy.contains("Save").click();
+    // Configure the Stripe processor
     cy.visit("http://localhost:8080/Plone/@@jazkarta-shop-settings");
     cy.getByLabel('Payment Processor').select('Stripe');
     cy.getByLabel('Stripe Secret Key (Development)').clear().type('foo');
@@ -16,6 +18,13 @@ before(() => {
     cy.getByLabel('Ship From State').clear().type('A-state');
     cy.getByLabel('Ship From Zip').clear().type('00000');
     cy.contains("Save").click();
+    // Configure the email for the site
+    cy.visit("http://localhost:8080/Plone/@@mail-controlpanel");
+    cy.getByLabel("Site 'From' name").clear().type('Jazkarta Shop');
+    cy.getByLabel("Site 'From' address").clear().type('jazkarta.shop@example.com');
+    cy.getByLabel("E-mail characterset").clear().type('utf-8');
+    cy.contains("Save and send test e-mail").click();
+    cy.contains("Success! Check your mailbox for the test message");
 });
 describe('Admin operations', () => {
     it('can view an empty order list', () => {
@@ -51,6 +60,8 @@ describe('Admin operations', () => {
         cy.get("input[name=phone]").type("+1-555-555-5555");
         cy.contains("Cash").click();
         cy.contains("Complete Purchase").click();
+        cy.contains("Thank You");
+        cy.contains("Your purchases total $10.00");
     })
 })
 
