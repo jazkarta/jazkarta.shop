@@ -73,7 +73,7 @@ class IProduct(model.Schema):
     )
 
     recommended_products = RelationList(
-        title='Recommended products',
+        title=u'Recommended products',
         description=u'Recommendations to users who bought this product, shown during checkout.',
         default=[],
         required=False,

@@ -1,8 +1,14 @@
 Changelog
 =========
 
-2.0 (2022-04-08)
-----------------
+2.0.2 (2022-04-08)
+-----------------
+
+- Fix Python 2.7 compatibility issue
+
+
+2.0.1 (2022-04-08)
+-----------------
 
 First public release incorporates the following features and fixes:
 
