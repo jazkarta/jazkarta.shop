@@ -61,6 +61,15 @@
     />
 
   <browser:page
+    name="recommended-products"
+    for="*"
+    class=".cart.RecommendedProductsView"
+    template="templates/recommended_products.pt"
+    permission="zope2.View"
+    layer="..interfaces.IBrowserLayer"
+    />
+
+  <browser:page
     name="update-cart"
     for="plone.app.layout.navigation.interfaces.INavigationRoot"
     class=".cart.UpdateCartView"

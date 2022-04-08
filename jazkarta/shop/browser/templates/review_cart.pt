@@ -150,6 +150,7 @@
       </div>
 
     </form>
+    <tal:recommended tal:replace="structure context/@@recommended-products">
 </metal:main>
 </body>
 </html>

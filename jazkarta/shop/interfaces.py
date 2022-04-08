@@ -1,5 +1,11 @@
-from collective.z3cform.datagridfield import DataGridFieldFactory
-from collective.z3cform.datagridfield import DictRow
+try:
+    # collective.z3cform.datagridfield < 2.0
+    from collective.z3cform.datagridfield import DataGridFieldFactory
+    from collective.z3cform.datagridfield import DictRow
+except ImportError:
+    # collective.z3cform.datagridfield >= 2.0
+    from collective.z3cform.datagridfield.datagridfield import DataGridFieldFactory
+    from collective.z3cform.datagridfield.row import DictRow
 from decimal import Decimal
 from plone.app.vocabularies.catalog import CatalogSource
 from plone.autoform import directives as form
@@ -7,6 +13,7 @@ from plone.autoform.interfaces import IFormFieldProvider
 from plone.supermodel import model
 from z3c.currency.field import Currency
 from z3c.form.browser.checkbox import CheckBoxWidget
+from z3c.relationfield.schema import RelationList
 from zope.component.interfaces import ObjectEvent
 from zope.interface import alsoProvides
 from zope.interface import Attribute
@@ -65,10 +72,21 @@ class IProduct(model.Schema):
         required=False,
     )
 
+    recommended_products = RelationList(
+        title='Recommended products',
+        description=u'Recommendations to users who bought this product, shown during checkout.',
+        default=[],
+        required=False,
+        value_type=schema.Choice(
+            source=CatalogSource(
+                object_provides='jazkarta.shop.interfaces.IProduct'),
+        )
+    )
+
     model.fieldset(
         'shop', label=u"Shop",
         fields=(
-            'product_category', 'price', 'stock_level', 'taxable', 'weight',
+            'product_category', 'price', 'stock_level', 'taxable', 'weight', 'recommended_products',
         ),
     )
 

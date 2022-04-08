@@ -4,8 +4,8 @@ from Products.Five import BrowserView
 from zope.browserpage import ViewPageTemplateFile
 from zope.cachedescriptors.property import Lazy as lazy_property
 from zope.interface import implementer
-import json
 
+from ..interfaces import IProduct
 from ..interfaces import OutOfStock
 from ..interfaces import IDontShowJazkartaShopPortlets
 from ..cart import Cart
@@ -116,3 +116,25 @@ def format_discount(coupon):
     else:
         discount = '%s%%' % int(coupon.amount)
     return discount
+
+
+class RecommendedProductsView(CartViewMixin, BrowserView):
+
+    def products(self):
+        products_in_cart = [el.product for el in self.cart.items]
+        result = []
+
+        for item in products_in_cart:
+            product = IProduct(item)
+            for recommended in product.recommended_products:
+                obj = recommended.to_object
+                if obj not in result and obj not in products_in_cart:
+                    result.append(self.get_product_data(obj))
+        return result
+
+    def get_product_data(self, product):
+        try:
+            image_url = product.unrestrictedTraverse('@@images', None).scale('image', 'mini').url
+        except (AttributeError, KeyError):
+            image_url = None
+        return {'obj': product, 'image_url': image_url}
