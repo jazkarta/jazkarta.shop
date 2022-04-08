@@ -65,7 +65,7 @@ Compatible With
 
 - Plone 4.3
 - Plone 5.0.x, 5.1.x on Python 2.7
-- Plone 5.2.x on Python 2.7, 3.6, 3.7
+- Plone 5.2.x on Python 2.7, 3.6, 3.7, 3.8
 
 Translations
 ============
@@ -201,3 +201,4 @@ Authors
 - Witek
 - Fulvio Casali
 - Silvio Tomatis
+- Alessandro Ceglie

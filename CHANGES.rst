@@ -1,4 +1,12 @@
 Changelog
+=========
+
+2.0 (2022-04-08)
+----------------
+
+First public release incorporates the following features and fixes:
+
+- Support for recommended products in cart view
 
 - using Pickadate pattern to choose dates in @@jazkarta-shop-orders
 
