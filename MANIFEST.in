@@ -2,4 +2,5 @@ graft jazkarta
 include *.rst
 include *.txt
 include LICENSE.*
+include TODO
 global-exclude *.pyc
