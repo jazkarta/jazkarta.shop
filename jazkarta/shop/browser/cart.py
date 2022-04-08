@@ -6,7 +6,6 @@ from zope.cachedescriptors.property import Lazy as lazy_property
 from zope.interface import implementer
 
 from ..interfaces import IProduct
-from ..interfaces import IProductImage
 from ..interfaces import OutOfStock
 from ..interfaces import IDontShowJazkartaShopPortlets
 from ..cart import Cart
@@ -130,8 +129,12 @@ class RecommendedProductsView(CartViewMixin, BrowserView):
             for recommended in product.recommended_products:
                 obj = recommended.to_object
                 if obj not in result and obj not in products_in_cart:
-                    result.append({'obj': obj, 'image_url': None})
-                    with_image = IProductImage(obj, None)
-                    if with_image is not None:
-                        result[-1]['image_url'] = with_image.url()
+                    result.append(self.get_product_data(obj))
         return result
+
+    def get_product_data(self, product):
+        try:
+            image_url = product.unrestrictedTraverse('@@images', None).scale('image', 'mini').url
+        except (AttributeError, KeyError):
+            image_url = None
+        return {'obj': product, 'image_url': image_url}

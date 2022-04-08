@@ -47,8 +47,6 @@
     zcml:condition="installed Products.Archetypes"
     name="jazkarta.shop.product" />
 
-  <adapter factory=".image.LeadImageAdapter" />
-
   <!-- Handle storing form fields in a PersistentMapping -->
   <adapter
     factory="z3c.form.datamanager.DictionaryField"
