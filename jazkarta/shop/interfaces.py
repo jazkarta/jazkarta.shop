@@ -72,8 +72,8 @@ class IProduct(model.Schema):
         required=False,
     )
 
-    related_products = RelationList(
-        title='Related products',
+    recommended_products = RelationList(
+        title='Recommended products',
         description=u'Recommendations to users who bought this product, shown during checkout.',
         default=[],
         required=False,
@@ -86,7 +86,7 @@ class IProduct(model.Schema):
     model.fieldset(
         'shop', label=u"Shop",
         fields=(
-            'product_category', 'price', 'stock_level', 'taxable', 'weight', 'related_products',
+            'product_category', 'price', 'stock_level', 'taxable', 'weight', 'recommended_products',
         ),
     )
 

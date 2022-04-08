@@ -119,7 +119,7 @@ def format_discount(coupon):
     return discount
 
 
-class RelatedProductsView(CartViewMixin, BrowserView):
+class RecommendedProductsView(CartViewMixin, BrowserView):
 
     def products(self):
         products_in_cart = [el.product for el in self.cart.items]
@@ -127,8 +127,8 @@ class RelatedProductsView(CartViewMixin, BrowserView):
 
         for item in products_in_cart:
             product = IProduct(item)
-            for related in product.related_products:
-                obj = related.to_object
+            for recommended in product.recommended_products:
+                obj = recommended.to_object
                 if obj not in result and obj not in products_in_cart:
                     result.append({'obj': obj, 'image_url': None})
                     with_image = IProductImage(obj, None)
