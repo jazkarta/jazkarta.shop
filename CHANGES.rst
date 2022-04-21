@@ -1,6 +1,11 @@
 Changelog
 =========
 
+2.0.3 (2022-04-21)
+-----------------
+
+- Fix issue with recommended product rendering on custom AT products.
+
 2.0.2 (2022-04-08)
 -----------------
 
