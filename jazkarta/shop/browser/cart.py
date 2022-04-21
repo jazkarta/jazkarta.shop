@@ -125,8 +125,10 @@ class RecommendedProductsView(CartViewMixin, BrowserView):
         result = []
 
         for item in products_in_cart:
-            product = IProduct(item)
-            for recommended in product.recommended_products:
+            product = IProduct(item, alternate=None)
+            if product is None:
+                continue
+            for recommended in getattr(product, 'recommended_products', ()):
                 obj = recommended.to_object
                 if obj not in result and obj not in products_in_cart:
                     result.append(self.get_product_data(obj))
