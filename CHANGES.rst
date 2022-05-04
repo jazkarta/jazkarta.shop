@@ -1,6 +1,11 @@
 Changelog
 =========
 
+2.0.4 (2022-05-04)
+-----------------
+
+- Don't render recommended products when there aren't any.
+
 2.0.3 (2022-04-21)
 -----------------
 
