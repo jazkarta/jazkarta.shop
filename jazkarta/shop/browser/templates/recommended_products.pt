@@ -1,4 +1,4 @@
-<div class="jaz-shop-recommended-products">
+<div class="jaz-shop-recommended-products" tal:condition="view/products|nothing">
   <section id="recommended-products">
     <h2>Recommended Products</h2>
     <ul>
