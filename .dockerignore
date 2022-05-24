@@ -1,0 +1,16 @@
+# By whitelisting the minimal files to get the dependencies installed
+# we can leverage the docker cache while still reacting to changes in
+# the requirements. The generated image is supposed to be used with a bind
+# mount of the jazkarta.shop code.
+
+# Taken from https://kevinpollet.dev/posts/how-to-use-your-dockerignore-as-a-whitelist
+
+# Ignore everything
+*
+
+# Allow files and folders with a pattern starting with !
+!setup.py
+!README.rst
+!./jazkarta/__init__.py
+!./jazkarta/shop/__init__.py
+!entrypoint-jaz-shop.sh

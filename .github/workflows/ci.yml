@@ -1,0 +1,42 @@
+name: Test
+
+on:
+  - push
+
+jobs:
+  test:
+    name: Run e2e tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Build jazkarta.shop docker image
+        run: docker build . -t jazkarta.shop
+        env:
+           DOCKER_BUILDKIT: "1" 
+
+      - name: Start Plone server
+        run: docker-compose up -d
+        env:
+           DOCKER_BUILDKIT: "1" 
+
+      - name: Check that jazkarta.shop was installed
+        run: curl --fail -v http://localhost:8080/Plone/review-cart
+
+      - name: 'UI Tests - Chrome'
+        uses: cypress-io/github-action@v2
+        with:
+          browser: chrome
+          record: true
+          parallel: true
+          group: 'UI - Chrome'
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          # Recommended: pass the GitHub token lets this action correctly
+          # determine the unique run id necessary to re-run the checks
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Print plone server logs
+        if: always()  # This step should be also run when a previous step failed
+        run: docker-compose logs plone
