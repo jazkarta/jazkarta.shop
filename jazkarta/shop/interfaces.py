@@ -13,6 +13,7 @@ from plone.autoform.interfaces import IFormFieldProvider
 from plone.supermodel import model
 from z3c.currency.field import Currency
 from z3c.form.browser.checkbox import CheckBoxWidget
+from z3c.relationfield.schema import RelationList
 from zope.component.interfaces import ObjectEvent
 from zope.interface import alsoProvides
 from zope.interface import Attribute
@@ -71,10 +72,21 @@ class IProduct(model.Schema):
         required=False,
     )
 
+    recommended_products = RelationList(
+        title=u'Recommended products',
+        description=u'Recommendations to users who bought this product, shown during checkout.',
+        default=[],
+        required=False,
+        value_type=schema.Choice(
+            source=CatalogSource(
+                object_provides='jazkarta.shop.interfaces.IProduct'),
+        )
+    )
+
     model.fieldset(
         'shop', label=u"Shop",
         fields=(
-            'product_category', 'price', 'stock_level', 'taxable', 'weight',
+            'product_category', 'price', 'stock_level', 'taxable', 'weight', 'recommended_products',
         ),
     )
 

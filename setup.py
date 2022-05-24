@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '2.0.dev0'
+version = '2.0.5'
 
 setup(
     name='jazkarta.shop',
@@ -11,11 +11,14 @@ setup(
     # http://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         "Framework :: Plone",
-        "Framework :: Plone :: 5.0",
+        "Framework :: Plone :: 4.3",
+        "Framework :: Plone :: 5.1",
+        "Framework :: Plone :: 5.2",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.7.",
-        "Programming Language :: Python :: 3.6.",
-        "Programming Language :: Python :: 3.7.",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
     ],
     keywords='ecommerce',
     author='Jazkarta',

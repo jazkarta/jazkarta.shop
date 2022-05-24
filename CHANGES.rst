@@ -1,4 +1,33 @@
 Changelog
+=========
+
+2.0.5 (2022-05-04)
+-----------------
+
+- Better CSS Selector.
+
+2.0.4 (2022-05-04)
+-----------------
+
+- Don't render recommended products when there aren't any.
+
+2.0.3 (2022-04-21)
+-----------------
+
+- Fix issue with recommended product rendering on custom AT products.
+
+2.0.2 (2022-04-08)
+-----------------
+
+- Fix Python 2.7 compatibility issue
+
+
+2.0.1 (2022-04-08)
+-----------------
+
+First public release incorporates the following features and fixes:
+
+- Support for recommended products in cart view
 
 - using Pickadate pattern to choose dates in @@jazkarta-shop-orders
 

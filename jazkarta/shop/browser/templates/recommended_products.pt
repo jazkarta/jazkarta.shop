@@ -1,0 +1,19 @@
+<div class="jaz-shop-recommended-products" tal:condition="view/products|nothing">
+  <section id="recommended-products">
+    <h2>Recommended Products</h2>
+    <ul>
+      <li tal:repeat="product view/products">
+        <a href="${product/obj/absolute_url}">
+          <article class="product-item" itemscope itemtype="http://schema.org/Product">
+            <h3 itemprop="name">${product/obj/title} ($ ${product/obj/price})</h3>
+            <img tal:condition="product/image_url" src="${product/image_url}" alt="${product/obj/title}">
+            <p tal:condition="product/obj/description" class="documentDescription description">
+              ${product/obj/description}
+            </p>
+          </article>
+        </a>
+      </li>
+    </ul>
+
+  </section>
+</div>

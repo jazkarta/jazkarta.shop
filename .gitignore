@@ -2,4 +2,8 @@
 *.[a-z]*~
 *.py[co]
 *.sublime*
-node_modules
+.installed.cfg
+.mr.developer.cfg
+bin/
+develop-eggs/
+parts/

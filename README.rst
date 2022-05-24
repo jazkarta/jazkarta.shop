@@ -45,6 +45,11 @@ Purchasable Content Types
 Types can be Dexterity or Archetypes. Make your own content type purchasable using a behavior or schema extender.
 (Note: Archetypes support in Python 2.x only)
 
+Recommended products
+--------------------
+
+A product can have other products related to it so that they can be recommended at the time of purchase. When users review their cart, they will be presented with a list of recommended products populated from the Recommended Products fields of all the products they're about to purchase.
+
 Cart Stored in ZODB
 ------------------------
 
@@ -60,7 +65,7 @@ Compatible With
 
 - Plone 4.3
 - Plone 5.0.x, 5.1.x on Python 2.7
-- Plone 5.2.x on Python 2.7, 3.6, 3.7
+- Plone 5.2.x on Python 2.7, 3.6, 3.7, 3.8
 
 Translations
 ============
@@ -196,3 +201,4 @@ Authors
 - Witek
 - Fulvio Casali
 - Silvio Tomatis
+- Alessandro Ceglie

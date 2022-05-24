@@ -103,7 +103,7 @@
       </big>
     </p>
 
-    <form class="jaz-shop-half-form"
+    <form id="jaz-shop-promo-form" class="jaz-shop-half-form"
           method="post" tal:attributes="action string:${portal_state/navigation_root_url}/review-cart">
         <label>Promo Code</label>
         <p>
@@ -150,6 +150,7 @@
       </div>
 
     </form>
+    <tal:recommended tal:replace="structure context/@@recommended-products">
 </metal:main>
 </body>
 </html>
