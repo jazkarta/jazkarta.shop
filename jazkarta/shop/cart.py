@@ -350,14 +350,15 @@ class Cart(object):
 
             lineitem = LineItem(self, cart_id, lineitem_info)
 
-            # If item is free, complete "purchase" immediately
-            # rather than adding to cart.
+#            # If item is free, complete "purchase" immediately
+#            # rather than adding to cart.
 #            if not lineitem.price:
 #                purchase_handler.after_purchase(lineitem_info)
 #                continue
 #            else:
 #                needs_checkout = True
-            needs_checkout = True
+
+            needs_checkout = True # take all items through checkout process
 
             # Update cart
             if cart_id in self._items:

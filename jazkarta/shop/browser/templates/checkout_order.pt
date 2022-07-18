@@ -45,10 +45,13 @@
 <p tal:condition="cart/ship_method|nothing">
   <strong>Shipping method: </strong><span tal:content="cart/ship_method">Payment method</span>
 </p>
+<p tal:condition="cart/bill_to|nothing">
+  <strong>Digital product(s) destination: </strong><span tal:content="cart/bill_to/email">Email</span>
+</p>
 <br />
 <div tal:define="address cart/ship_to|nothing"
      tal:condition="cart/ship_to|nothing">
-  <h3>Ship to</h3>
+  <h3>Shipping information</h3>
   <dl>
     <dt tal:content="string:${address/last_name}, ${address/first_name}">Name</dt>
     <dd><span tal:condition="address/address|address/street|nothing" tal:content="string:${address/address|address/street}." /> <span tal:condition="address/city|nothing" tal:content="string:${address/city}," /> <span tal:condition="address/state|nothing" tal:content="string:${address/state}." /> <span tal:condition="address/zip|nothing" tal:content="string:${address/zip}." /> <span tal:condition="address/country|nothing" tal:content="string:${address/country}." /></dd>
@@ -56,10 +59,11 @@
 </div>
 <div tal:define="address cart/bill_to|nothing"
      tal:condition="cart/bill_to|nothing">
-  <h3>Bill to</h3>
+  <h3>Billing information</h3>
   <dl>
-    <dt tal:content="string:${address/last_name}, ${address/first_name}">Name</dt>
+    <dt><span tal:condition="address/last_name|nothing" tal:content="string:${address/last_name}, ">Lastname</span><span tal:condition="address/first_name|nothing" tal:content="string:${address/first_name}">First Name</span></dt>
     <dd><span tal:condition="address/address|address/street|nothing" tal:content="string:${address/address|address/street}." /> <span tal:condition="address/city|nothing" tal:content="string:${address/city}," /> <span tal:condition="address/state|nothing" tal:content="string:${address/state}." /> <span tal:condition="address/zip|nothing" tal:content="string:${address/zip}." /> <span tal:condition="address/country|nothing" tal:content="string:${address/country}." /></dd>
+    <dd><span <span tal:condition="address/email|nothing" tal:content="string:${address/email}" /></dd>
   </dl>
 </div>
 <div tal:condition="cart/notes|nothing">

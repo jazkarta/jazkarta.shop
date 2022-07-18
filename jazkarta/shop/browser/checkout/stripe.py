@@ -42,7 +42,7 @@ class CheckoutFormStripe(CheckoutFormBase):
         contact_info = PersistentMapping()
         for f in ('first_name', 'last_name', 'email', 'phone', 'address',
                   'city', 'state', 'zip', 'country'):
-            if f in self.request.form: #digital downloads wont have complete billing info, only email
+            if f in self.request.form: # for digital products only email address is currently required in /checkout
                 contact_info[f] = self.request.form[f]
             else:
                 contact_info[f] = None
