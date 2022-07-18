@@ -176,19 +176,22 @@
       </fieldset>
     </tal:paid>
     <tal:free tal:condition="python:view.amount == 0">
+        <tal:items tal:condition="python:view.cart.items"> <!-- dont show if empty cart, and somehow user navigates to checkout view -->
 
-      <fieldset class="fieldset-contact-info">
-        <legend>Enter your email to receive your digital downloads.</legend>
-        <div>&nbsp;</div>
-        <div class="field field-address">
-          <div class="field-inputs">
-            <div class="field subfield-email">
-              <label>Email</label>
-              <input type="email" name="email" required="required" tal:attributes="value python:request.form.get('email', '')" />
+          <fieldset class="fieldset-contact-info">
+            <legend>Enter your email to receive your digital downloads.</legend>
+            <div>&nbsp;</div>
+            <div class="field field-address">
+              <div class="field-inputs">
+                <div class="field subfield-email">
+                  <label>Email</label>
+                  <input type="email" name="email" required="required" tal:attributes="value python:request.form.get('email', '')" />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </fieldset>
+          </fieldset>
+
+        </tal:items>
     </tal:free>
 
       <fieldset class="fieldset-payment-info jaz-shop-half-form" tal:condition="view/amount">
