@@ -42,34 +42,45 @@ class CheckoutFormStripe(CheckoutFormBase):
         contact_info = PersistentMapping()
         for f in ('first_name', 'last_name', 'email', 'phone', 'address',
                   'city', 'state', 'zip', 'country'):
-            contact_info[f] = self.request.form[f]
+            if f in self.request.form: #digital downloads wont have complete billing info, only email
+                contact_info[f] = self.request.form[f]
+            else:
+                contact_info[f] = None
 
-        method = 'Online Payment'
-        if self.is_superuser():
-            method = self.request.form.get('method', 'None')
-            if method not in ('Online Payment', 'Check', 'Cash', 'None'):
-                raise Forbidden('Invalid payment method: %s' % method)
-            if amount and (method == 'None'):
-                raise Forbidden('Invalid payment method: None')
+        if 'nocharge' not in self.request.form:
+            method = 'Online Payment'
+            if self.is_superuser():
+                method = self.request.form.get('method', 'None')
+                if method not in ('Online Payment', 'Check', 'Cash', 'None'):
+                    raise Forbidden('Invalid payment method: %s' % method)
+                if amount and (method == 'None'):
+                    raise Forbidden('Invalid payment method: None')
 
-        charge_result = {'success': True}
-        if amount and method == 'Online Payment':
-            if 'stripeToken' not in self.request.form:
-                self.error = 'Unable to process payment. Please try again.'
-                return
-            card_token = self.request.form['stripeToken']
+            charge_result = {'success': True}
+            if amount and method == 'Online Payment':
+                if 'stripeToken' not in self.request.form:
+                    self.error = 'Unable to process payment. Please try again.'
+                    return
+                card_token = self.request.form['stripeToken']
 
-            try:
-                charge_result = process_interactive_payment(
-                    self.cart, card_token, contact_info)
-                charge_result['success'] = True
-            except PaymentProcessingException as e:
-                charge_result = {
-                    'success': False,
-                    'err_msg': e.message,
-                    'err_code': getattr(e, 'code', None),
-                }
-                self.error = e.message
+                try:
+                    charge_result = process_interactive_payment(
+                        self.cart, card_token, contact_info)
+                    charge_result['success'] = True
+                except PaymentProcessingException as e:
+                    charge_result = {
+                        'success': False,
+                        'err_msg': e.message,
+                        'err_code': getattr(e, 'code', None),
+                    }
+                    self.error = e.message
+        else:
+            method = 'Free download'
+            charge_result = {
+                'success': True,
+                'err_msg': "Free download",
+                'err_code': None,
+            }
 
         if not self.error:
             try:
