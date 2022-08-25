@@ -47,7 +47,7 @@ class CheckoutFormStripe(CheckoutFormBase):
             else:
                 contact_info[f] = None
 
-        if 'nocharge' not in self.request.form:
+        if not amount and 'nocharge' not in self.request.form:
             method = 'Online Payment'
             if self.is_superuser():
                 method = self.request.form.get('method', 'None')
