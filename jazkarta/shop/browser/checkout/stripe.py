@@ -47,7 +47,14 @@ class CheckoutFormStripe(CheckoutFormBase):
             else:
                 contact_info[f] = None
 
-        if amount and 'nocharge' not in self.request.form:
+        if not amount and 'nocharge' in self.request.form:
+            method = 'Free download'
+            charge_result = {
+                'success': True,
+                'err_msg': "Free download",
+                'err_code': None,
+            }
+        else:
             method = 'Online Payment'
             if self.is_superuser():
                 method = self.request.form.get('method', 'None')
@@ -57,30 +64,24 @@ class CheckoutFormStripe(CheckoutFormBase):
                     raise Forbidden('Invalid payment method: None')
 
             charge_result = {'success': True}
-            if amount and method == 'Online Payment':
-                if 'stripeToken' not in self.request.form:
-                    self.error = 'Unable to process payment. Please try again.'
-                    return
-                card_token = self.request.form['stripeToken']
 
-                try:
-                    charge_result = process_interactive_payment(
-                        self.cart, card_token, contact_info)
-                    charge_result['success'] = True
-                except PaymentProcessingException as e:
-                    charge_result = {
-                        'success': False,
-                        'err_msg': e.message,
-                        'err_code': getattr(e, 'code', None),
-                    }
-                    self.error = e.message
-        else:
-            method = 'Free download'
-            charge_result = {
-                'success': True,
-                'err_msg': "Free download",
-                'err_code': None,
-            }
+        if amount and method == 'Online Payment':
+            if 'stripeToken' not in self.request.form:
+                self.error = 'Unable to process payment. Please try again.'
+                return
+            card_token = self.request.form['stripeToken']
+
+            try:
+                charge_result = process_interactive_payment(
+                    self.cart, card_token, contact_info)
+                charge_result['success'] = True
+            except PaymentProcessingException as e:
+                charge_result = {
+                    'success': False,
+                    'err_msg': e.message,
+                    'err_code': getattr(e, 'code', None),
+                }
+                self.error = e.message
 
         if not self.error:
             try:
@@ -88,9 +89,9 @@ class CheckoutFormStripe(CheckoutFormBase):
                 self.notify_purchased()
                 self.clear_cart()
             except ConflictError:
-                    self.error = ('Failed to store results of payment after '
-                                  'multiple retries. Please contact us for '
-                                  'assistance. ')
+                self.error = ('Failed to store results of payment after '
+                                'multiple retries. Please contact us for '
+                                'assistance. ')
 
     # This code runs after the payment is processed
     # to update various data in the ZODB.
