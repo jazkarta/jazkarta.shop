@@ -2,7 +2,7 @@
 jazkarta.shop
 =============
 
-An e-commerce shopping cart and checkout for `Plone <http://plone.com>`_, optimized for use in the US and Canada.
+An e-commerce shopping cart and checkout for `Plone <http://plone.org>`_, optimized for use in the US and Canada.
 
 Features
 ========
@@ -108,7 +108,7 @@ Minimal configuration/Quickstart
 ================================
 
 Proceed to the "Jazkarta Shop Settings" to configure a payment processor, optional shipping method API keys, 
-shipped from address details as well as a recepit email message.
+shipped from address details as well as a receipt email message.
 
 Proceed to the "Jazkarta Shop Shipping Methods" to setup a shipping method.
 Destinations are grouped by shipping zones
@@ -159,14 +159,16 @@ jazkarta.shop requires the environment variable ``JAZKARTA_SHOP_ENV`` to be set 
 Jazkarta Shop Shipping Methods
 ------------------------------
 
-Named shipping methods can be added and edited. Each shipping method specifies the geographical areas it is used for, the shipping fee calculation method, minimum and maximum weights, and optionally a minimum purchase amount.
+Named shipping methods can be added and edited. Each shipping method specifies the geographical areas it is used for, the shipping fee 
+calculation method, minimum and maximum weights, and optionally a minimum purchase amount.
 
 If using UPS or USPS shipping methods, please make sure the revelevant API keys are added in the "Jazkarta Shop Settings" control panel.
 
 Jazkarta Shop Orders
 --------------------
 
-This control panel provides a table of order information such as date, items, shipping information and price.
+This control panel provides a table of order information such as date, items, shipping information and price. Orders can be filtered by date and
+exported to CSV.
 
 Future Work
 ===========
