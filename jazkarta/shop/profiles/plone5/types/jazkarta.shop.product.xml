@@ -16,9 +16,10 @@
  <property name="default_view_fallback">False</property>
  <property name="add_permission">jazkarta.shop.AddProduct</property>
  <property name="klass">plone.dexterity.content.Item</property>
- <property name="behaviors">
+ <property name="behaviors" purge="False">
   <element value="plone.app.content.interfaces.INameFromTitle"/>
-  <element value="plone.app.contenttypes.behaviors.richtext.IRichText"/>
+  <element value="plone.app.contenttypes.behaviors.richtext.IRichText" remove="True"/>
+  <element value="plone.richtext"/>
   <element value="jazkarta.shop.product" />
   <element value="plone.app.dexterity.behaviors.metadata.IDublinCore"/>
   <element value="plone.app.dexterity.behaviors.discussion.IAllowDiscussion"/>
