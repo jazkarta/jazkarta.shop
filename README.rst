@@ -154,7 +154,7 @@ This control panel allows configuration of:
 - Optional Taxjar API token
 - Optional after-checkout callback URL
 
-jazkarta.shop requires the environment variable ``JAZKARTA_SHOP_PRODUCTION`` to be set to ``True`` when it is running in production mode. eg:
+jazkarta.shop requires the environment variable ``JAZKARTA_SHOP_PRODUCTION`` to be set to ``True`` when it is running in production mode. eg::
 
     [buildout]
 
