@@ -219,3 +219,4 @@ Authors
 - Fulvio Casali
 - Silvio Tomatis
 - Alessandro Ceglie
+- Jesse Snyder
