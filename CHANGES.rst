@@ -1,6 +1,14 @@
 Changelog
 =========
 
+Unreleased
+-----------
+
+- Add support for free digital products (stripe)
+  This fixes free products not being added to the cart
+- Don't rely on only the request value to bypass stripe charges.
+
+
 2.0.5 (2022-05-04)
 -----------------
 
