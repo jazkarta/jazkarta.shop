@@ -42,17 +42,29 @@ class CheckoutFormStripe(CheckoutFormBase):
         contact_info = PersistentMapping()
         for f in ('first_name', 'last_name', 'email', 'phone', 'address',
                   'city', 'state', 'zip', 'country'):
-            contact_info[f] = self.request.form[f]
+            if f in self.request.form: # for digital products only email address is currently required in /checkout
+                contact_info[f] = self.request.form[f]
+            else:
+                contact_info[f] = None
 
-        method = 'Online Payment'
-        if self.is_superuser():
-            method = self.request.form.get('method', 'None')
-            if method not in ('Online Payment', 'Check', 'Cash', 'None'):
-                raise Forbidden('Invalid payment method: %s' % method)
-            if amount and (method == 'None'):
-                raise Forbidden('Invalid payment method: None')
+        if not amount and 'nocharge' in self.request.form:
+            method = 'Free download'
+            charge_result = {
+                'success': True,
+                'err_msg': "Free download",
+                'err_code': None,
+            }
+        else:
+            method = 'Online Payment'
+            if self.is_superuser():
+                method = self.request.form.get('method', 'None')
+                if method not in ('Online Payment', 'Check', 'Cash', 'None'):
+                    raise Forbidden('Invalid payment method: %s' % method)
+                if amount and (method == 'None'):
+                    raise Forbidden('Invalid payment method: None')
 
-        charge_result = {'success': True}
+            charge_result = {'success': True}
+
         if amount and method == 'Online Payment':
             if 'stripeToken' not in self.request.form:
                 self.error = 'Unable to process payment. Please try again.'
@@ -77,9 +89,9 @@ class CheckoutFormStripe(CheckoutFormBase):
                 self.notify_purchased()
                 self.clear_cart()
             except ConflictError:
-                    self.error = ('Failed to store results of payment after '
-                                  'multiple retries. Please contact us for '
-                                  'assistance. ')
+                self.error = ('Failed to store results of payment after '
+                                'multiple retries. Please contact us for '
+                                'assistance. ')
 
     # This code runs after the payment is processed
     # to update various data in the ZODB.

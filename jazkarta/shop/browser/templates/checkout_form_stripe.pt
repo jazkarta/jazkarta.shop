@@ -105,6 +105,9 @@
     <form method="post" tal:attributes="action string:${portal_state/navigation_root_url}/checkout" id="checkout-form" class="jaz-shop-checkout-form">
       <input type="hidden" name="amount" tal:attributes="value view/amount" />
       <input type="hidden" name="submitted" value="1"/>
+      <tal:free tal:condition="python:view.amount == 0">
+          <input type="hidden" name="nocharge" value="1"/>
+      </tal:free>
 
       <tal:using_p5 tal:condition="view/using_plone5">
           <div class="portalMessage alert-error checkout-error-wrapper"
@@ -121,6 +124,7 @@
           </div>
       </tal:using_p4>
 
+    <tal:paid tal:condition="python:view.amount != 0">
       <fieldset class="fieldset-contact-info jaz-shop-half-form">
         <legend><span class="step">1.</span> Billing Address</legend>
 
@@ -170,6 +174,25 @@
           </div>
         </div>
       </fieldset>
+    </tal:paid>
+    <tal:free tal:condition="python:view.amount == 0">
+        <tal:items tal:condition="python:view.cart.items"> <!-- dont show if empty cart, and somehow user navigates to checkout view -->
+
+          <fieldset class="fieldset-contact-info">
+            <legend>Enter your email to receive your digital downloads.</legend>
+            <div>&nbsp;</div>
+            <div class="field field-address">
+              <div class="field-inputs">
+                <div class="field subfield-email">
+                  <label>Email</label>
+                  <input type="email" name="email" required="required" tal:attributes="value python:request.form.get('email', '')" />
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+        </tal:items>
+    </tal:free>
 
       <fieldset class="fieldset-payment-info jaz-shop-half-form" tal:condition="view/amount">
         <legend>
