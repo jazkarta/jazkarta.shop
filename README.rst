@@ -94,7 +94,7 @@ and then running::
 Integrating the Package with Your Content
 =========================================
 
-Add the "Jazkarta Shop Product" Dexterity behavior to each content type that you wish to use with jazkarta.shop,
+Add the "Jazkarta Shop Product" ``jazkarta.shop.interfaces.IProduct`` Dexterity behavior to each content type that you wish to use with jazkarta.shop,
 either through the web or programmatically in your code. 
 
 To add the schema extender on Archetypes content types,  programmatically implement the 
@@ -184,6 +184,18 @@ Jazkarta Shop Orders
 
 This control panel provides a table of order information such as date, items, shipping information and price. Orders can be filtered by date and
 exported to CSV.
+
+Basic notes on use
+------------------
+
+For each content type that has the "Jazkarta Shop Product" behavior enabled, there is a "Add to Cart" button that is present, when viewing the content type. This allows the user to add an item to the cart. There is a clickable cart viewlet used to display the shopping cart in the site header. It contains a link to ``/review-cart`` view. ``/review-cart`` and ``/checkout`` views can be used to modify/update cart contents. 
+
+The basic use flow: ``Add to Cart`` -> click checkout in viewlet -> ``/review-cart`` -> ``/shipping`` -> ``/checkout`` -> purchase
+
+Events
+------
+
+Additionally clicking on the "Add to Cart" button, fires an 'item-added' jquery event, which can optionally be used as a hook for custom js code to alert the user that the cart contents have changed.
 
 Future Work
 ===========
