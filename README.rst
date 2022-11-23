@@ -197,7 +197,7 @@ Click "Add to Cart" button -> Click "Checkout" in viewlet -> ``/review-cart`` ->
 Events
 ------
 
-Additionally clicking on the "Add to Cart" button, fires an 'item-added' jquery event, which can optionally be used as a hook for custom js code to alert the user that the cart contents have changed.
+Additionally clicking on the "Add to Cart" button, fires an ``item-added`` jquery event, which can optionally be used as a hook for custom js code to alert the user that the cart contents have changed.
 
 Future Work
 ===========
