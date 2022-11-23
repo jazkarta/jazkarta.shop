@@ -23,6 +23,7 @@ jQuery(function($){
             	'add': uid
             }, function(data) {
               $('.jaz-shop-cart-wrapper').replaceWith(data);
+              jQuery("body").trigger("item-added") // add notification of item added
             }, 'html');
         });
 
