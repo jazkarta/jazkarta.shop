@@ -188,11 +188,11 @@ exported to CSV.
 Basic notes on use
 ------------------
 
-For each content type that has the "Jazkarta Shop Product" behavior enabled, there is a "Add to Cart" button that is present, when viewing the content type. This allows the user to add an item to the cart. There is a clickable cart viewlet (My Cart) used to display the shopping cart in the site header. It contains a "Checkout" link to ``/review-cart`` view. ``/review-cart`` and ``/checkout`` views can be used to modify/update cart contents. 
+For each content type that has the "Jazkarta Shop Product" behavior enabled, there is a "Add to Cart" button that is present, when viewing the content type. This allows the user to add an item to the cart. There is a clickable cart viewlet "My Cart" used to display the shopping cart in the site header. It contains a "Checkout" link to ``/review-cart`` view. ``/review-cart`` and ``/checkout`` views can be used to modify/update cart contents. 
 
 The basic use flow:
 
-Click "Add to Cart" button -> Click checkout in viewlet -> ``/review-cart`` -> ``/shipping`` -> ``/checkout`` -> purchase
+Click "Add to Cart" button -> Click "Checkout" in viewlet -> ``/review-cart`` -> ``/shipping`` -> ``/checkout`` -> purchase
 
 Events
 ------
