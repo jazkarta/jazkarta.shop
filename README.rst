@@ -192,7 +192,7 @@ For each content type that has the "Jazkarta Shop Product" behavior enabled, the
 
 The basic use flow:
 
-Click Add to Cart button -> Click checkout in viewlet -> ``/review-cart`` -> ``/shipping`` -> ``/checkout`` -> purchase
+Click "Add to Cart" button -> Click checkout in viewlet -> ``/review-cart`` -> ``/shipping`` -> ``/checkout`` -> purchase
 
 Events
 ------
