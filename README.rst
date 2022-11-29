@@ -45,7 +45,7 @@ Purchasable Content Types
 Types can be Dexterity or Archetypes. Make your own content type purchasable using a behavior or schema extender.
 (Note: Archetypes support in Python 2.x only)
 
-Recommended products
+Recommended Products
 --------------------
 
 A product can have other products related to it so that they can be recommended at the time of purchase. When users review their cart, they will be presented with a list of recommended products populated from the Recommended Products fields of all the products they're about to purchase.
@@ -55,10 +55,12 @@ Cart Stored in ZODB
 
 Shopping cart data is stored in the ZODB rather than in sessions even for anonymous users. This makes it easier to deploy when running multiple Zope instances.
 
-PloneFormGen Integration
+Form Integration
 ------------------------
 
-Provided by jazkarta.pfg.jazshop.
+PloneFormGen integration provided by jazkarta.pfg.jazshop.
+
+Easyform integration provided by jazkarta.easyformplugin.jazshop.
   
 Compatible With
 ---------------
@@ -104,7 +106,7 @@ on individual instances.
 When creating instances of your content type, make sure to set the weight and unit price on each one. 
 This is will appear under the "Shop" fieldset when adding/editing your object.
 
-Minimal configuration/Quickstart
+Minimal Configuration/Quickstart
 ================================
 
 Proceed to the "Jazkarta Shop Settings" to configure a payment processor, optional shipping method API keys, 
@@ -185,10 +187,12 @@ Jazkarta Shop Orders
 This control panel provides a table of order information such as date, items, shipping information and price. Orders can be filtered by date and
 exported to CSV.
 
-Basic notes on use
+Basic Notes on Use
 ------------------
 
-For each content type that has the "Jazkarta Shop Product" behavior enabled, there is a "Add to Cart" button that is present, when viewing the content type. This allows the user to add an item to the cart. There is a clickable cart viewlet "My Cart" used to display the shopping cart in the site header. It contains a "Checkout" link to ``/review-cart`` view. ``/review-cart`` and ``/checkout`` views can be used to modify/update cart contents. 
+For each content type that has the "Jazkarta Shop Product" behavior enabled, an "Add to Cart" button shown when viewing the content type. 
+This allows the user to add an item to the cart. A clickable cart viewlet "My Cart" is used to display the shopping cart in the site header. 
+It contains a "Checkout" link to the ``/review-cart`` view. ``/review-cart`` and ``/checkout`` views can be used to modify/update cart contents. 
 
 The basic use flow:
 
@@ -197,7 +201,8 @@ Click "Add to Cart" button -> Click "Checkout" in viewlet -> ``/review-cart`` ->
 Events
 ------
 
-Additionally clicking on the "Add to Cart" button, fires an ``item-added`` jquery event, which can optionally be used as a hook for custom js code to alert the user that the cart contents have changed.
+Clicking on the "Add to Cart" button fires an ``item-added`` jquery event, which can optionally be used as a hook for custom js code 
+to alert the user that the cart contents have changed.
 
 Future Work
 ===========
