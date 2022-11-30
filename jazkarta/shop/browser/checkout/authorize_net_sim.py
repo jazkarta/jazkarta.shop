@@ -110,7 +110,7 @@ class SIMPropertyFields(CheckoutFormBase):
             six.ensure_binary(self.x_login, encoding="utf-8"),
             self.x_fp_sequence,
             self.x_fp_timestamp,
-            six.ensure_binary(self.amount, encoding="utf-8")
+            six.binary_type(str(self.amount), encoding="utf-8")
         )
         source = six.ensure_binary("^".join(values) + '^', encoding="utf-8")
         sig = codecs.decode(self.signature_key, encoding="hex")
