@@ -346,7 +346,7 @@ class Cart(object):
             cart_id = lineitem_info['uid'] + '_' + (userid or '')
             if kw:
                 cart_id += '_' + sha1(
-                    json.dumps(kw, sort_keys=True)).hexdigest()
+                    json.dumps(kw, sort_keys=True).encode('utf-8')).hexdigest()
 
             lineitem = LineItem(self, cart_id, lineitem_info)
 
