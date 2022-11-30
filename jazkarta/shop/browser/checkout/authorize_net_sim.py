@@ -1,4 +1,5 @@
 import six
+import codecs
 import hmac
 import json
 import time
@@ -106,13 +107,13 @@ class SIMPropertyFields(CheckoutFormBase):
         sha512/compute-transhash-sha512
         """
         values = (
-            six.text_type(self.x_login),
+            six.binary_type(self.x_login),
             self.x_fp_sequence,
             self.x_fp_timestamp,
-            six.text_type(self.amount)
+            six.binary_type(self.amount)
         )
-        source = "^".join(values) + '^'
-        sig = self.signature_key.decode("hex")
+        source = six.binary_type("^".join(values) + '^')
+        sig = codecs.decode(self.signature_key, encoding="hex")
         hashed_values = hmac.new(sig, source, sha512)
         return hashed_values.hexdigest().upper()
 
