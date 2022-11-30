@@ -107,12 +107,12 @@ class SIMPropertyFields(CheckoutFormBase):
         sha512/compute-transhash-sha512
         """
         values = (
-            six.binary_type(self.x_login),
+            six.ensure_binary(self.x_login, encoding="utf-8"),
             self.x_fp_sequence,
             self.x_fp_timestamp,
-            six.binary_type(self.amount)
+            six.ensure_binary(self.amount, encoding="utf-8")
         )
-        source = six.binary_type("^".join(values) + '^')
+        source = six.ensure_binary("^".join(values) + '^', encoding="utf-8")
         sig = codecs.decode(self.signature_key, encoding="hex")
         hashed_values = hmac.new(sig, source, sha512)
         return hashed_values.hexdigest().upper()
