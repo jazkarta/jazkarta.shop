@@ -245,7 +245,7 @@ class ExportShopOrders(BrowserView, DateMixin):
         )
         orders_csv = StringIO()
 
-        if (order_sequence) > 0:
+        if len(order_sequence) > 0:
             writer = csv.DictWriter(
                 orders_csv,
                 fieldnames=['userid', 'date', 'items',
@@ -303,7 +303,7 @@ class ExportShopOrders(BrowserView, DateMixin):
                                             DateTime.rfc822(DateTime()))
             self.request.response.setHeader("Cache-Control", "no-store")
             self.request.response.setHeader("Pragma", "no-cache")
-            self.request.response.write(csv_content)
+            self.request.response.write(csv_content.encode())
 
         return csv_content
 
