@@ -5,6 +5,7 @@ import copy
 import csv
 import datetime
 from six import StringIO
+from six import PY3
 from DateTime import DateTime
 try:
     from cgi import escape
@@ -133,10 +134,11 @@ class LazyFilteredOrders(Lazy):
             # check if shipping address has been entered
             if data['ship_to'].replace(',','').replace(' ','') == '':
                 data['ship_to'] = u''
-            # CSV output needs to be encoded
-            data['items'] = data['items'].encode('utf-8')
-            data['ship_to'] = data['ship_to'].encode('utf-8')
-            data['userid'] = data['userid'].encode('utf-8')
+            # CSV output needs to be encoded in PY2
+            # the encoding in PY3 is done on the whole stream later
+            data['items'] = data['items']     if PY3 else data['items'].encode('utf-8')
+            data['ship_to'] = data['ship_to'] if PY3 else data['ship_to'].encode('utf-8')
+            data['userid'] = data['userid']   if PY3 else data['userid'].encode('utf-8')
         else:
             data['ship_to'] = u'<p>{} {}</p><p>{}</p><p>{}, {} {}</p><p>{}</p>'.format(
                 escape(address.get('first_name', '')),
@@ -303,7 +305,7 @@ class ExportShopOrders(BrowserView, DateMixin):
                                             DateTime.rfc822(DateTime()))
             self.request.response.setHeader("Cache-Control", "no-store")
             self.request.response.setHeader("Pragma", "no-cache")
-            self.request.response.write(csv_content.encode())
+            self.request.response.write(csv_content.encode() if PY3 else csv_content)
 
         return csv_content
 
