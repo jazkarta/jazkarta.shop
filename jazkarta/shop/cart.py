@@ -401,14 +401,9 @@ class Cart(object):
         self.save()
 
     def thankyou_message(self):
-        # @@@ get from setting
-        thankyou_message_path = 'shop/thank-you'
-
-        try:
-            page = get_site().unrestrictedTraverse(thankyou_message_path)
-            return page.getText()
-        except (AttributeError, KeyError):
-            return ''
+        # Support for a custom thank-you message, configurable via a setting,
+        # would be a nice extension here, but it's not implemented currently.
+        return ""
 
     @property
     def ship_to(self):
