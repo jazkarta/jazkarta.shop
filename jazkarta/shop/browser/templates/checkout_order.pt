@@ -54,7 +54,7 @@
   <h3>Shipping information</h3>
   <dl>
     <dt tal:content="string:${address/last_name}, ${address/first_name}">Name</dt>
-    <dd><span tal:condition="address/address|address/street|nothing" tal:content="string:${address/address|address/street}." /> <span tal:condition="address/city|nothing" tal:content="string:${address/city}," /> <span tal:condition="address/state|nothing" tal:content="string:${address/state}." /> <span tal:condition="address/zip|nothing" tal:content="string:${address/zip}." /> <span tal:condition="address/country|nothing" tal:content="string:${address/country}." /></dd>
+    <dd><span tal:condition="address/address|address/street|nothing" tal:content="string:${address/address|address/street}." /> <span tal:condition="address/city|nothing" tal:content="string:${address/city}," /> <span tal:condition="address/state|nothing" tal:content="string:${address/state}." /> <span tal:condition="address/postal_code|nothing" tal:content="string:${address/postal_code}." /> <span tal:condition="address/country|nothing" tal:content="string:${address/country}." /></dd>
   </dl>
 </div>
 <div tal:define="address cart/bill_to|nothing"
