@@ -1,4 +1,5 @@
 import six
+import time
 from AccessControl import getSecurityManager
 from persistent.mapping import PersistentMapping
 from ZODB.POSException import ConflictError
@@ -17,7 +18,9 @@ from ...utils import get_setting
 from ...utils import resolve_uid
 from ...utils import run_in_transaction
 from ...validators import is_email
-import time
+
+SUBSCRIPTION_SLEEP_INCREMENT = 2
+SUBSCRIPTION_RETRIES = 4
 
 
 class CheckoutFormAuthorizeNetAcceptJs(CheckoutFormBase):
@@ -50,6 +53,26 @@ class CheckoutFormAuthorizeNetAcceptJs(CheckoutFormBase):
     capture_payment = True
     is_recurring = False
     recurring_months = None
+    retries = 0
+
+    def retry_subscription_request(self, opaque_data, contact_info):
+        while self.retries < SUBSCRIPTION_RETRIES:
+            try:
+                return ARBCreateSubscriptionRequest(
+                    self.cart, self.refId, opaque_data, contact_info,
+                    months=self.recurring_months
+                )
+            except PaymentProcessingException as e:
+                self.retries += 1
+                # Raise the error once retries have been exceeded
+                if self.retries >= SUBSCRIPTION_RETRIES:
+                    raise e
+                # Retry after delay for specific error
+                if 'Invalid OTS Token' in str(e):
+                    time.sleep(SUBSCRIPTION_SLEEP_INCREMENT * self.retries)
+                    continue
+                # Raise the error for any other error
+                raise e
 
     def handle_submit(self):
         if not len(self.cart.items):
@@ -104,9 +127,9 @@ class CheckoutFormAuthorizeNetAcceptJs(CheckoutFormBase):
 
             try:
                 if self.is_recurring:
-                    response = ARBCreateSubscriptionRequest(
-                        self.cart, self.refId, opaque_data, contact_info,
-                        months=self.recurring_months)
+                    response = self.retry_subscription_request(
+                        opaque_data, contact_info
+                    )
                 else:
                     transactionType = (
                         'authCaptureTransaction' if self.capture_payment
@@ -116,7 +139,7 @@ class CheckoutFormAuthorizeNetAcceptJs(CheckoutFormBase):
                         self.cart, self.refId, opaque_data, contact_info,
                         transactionType=transactionType)
             except PaymentProcessingException as e:
-                self.error = e.message
+                self.error = str(e)
 
         if not self.error:
             try:
