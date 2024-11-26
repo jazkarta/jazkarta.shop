@@ -18,6 +18,7 @@ from ...utils import get_setting
 from ...utils import resolve_uid
 from ...utils import run_in_transaction
 from ...validators import is_email
+from ... import logger
 
 SUBSCRIPTION_SLEEP_INCREMENT = 2
 SUBSCRIPTION_RETRIES = 4
@@ -69,7 +70,12 @@ class CheckoutFormAuthorizeNetAcceptJs(CheckoutFormBase):
                     raise e
                 # Retry after delay for specific error
                 if 'Invalid OTS Token' in str(e):
-                    time.sleep(SUBSCRIPTION_SLEEP_INCREMENT * self.retries)
+                    delay = SUBSCRIPTION_SLEEP_INCREMENT * self.retries
+                    logger.warn(
+                        "Error on Auth.net subscription request. Retrying "
+                        "({}) after {} seconds".format(self.retries, delay)
+                    )
+                    time.sleep(delay)
                     continue
                 # Raise the error for any other error
                 raise e
