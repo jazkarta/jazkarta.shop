@@ -78,10 +78,10 @@ class CheckoutFormStripe(CheckoutFormBase):
             except PaymentProcessingException as e:
                 charge_result = {
                     'success': False,
-                    'err_msg': e.message,
+                    'err_msg': str(e),
                     'err_code': getattr(e, 'code', None),
                 }
-                self.error = e.message
+                self.error = str(e)
 
         if not self.error:
             try:
