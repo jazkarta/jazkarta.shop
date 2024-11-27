@@ -25,7 +25,9 @@ SUBSCRIPTION_RETRIES = 4
 
 
 class CheckoutFormAuthorizeNetAcceptJs(CheckoutFormBase):
-    """ Renders a checkout form set up to submit through Stripe """
+    """ Renders a checkout form set up to submit through authorize.net Accept.js
+    """
+
     index = ViewPageTemplateFile(
         '../templates/checkout_form_authorize_net_accept_js.pt')
 
