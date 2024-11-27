@@ -14,12 +14,12 @@ jobs:
       - name: Build jazkarta.shop docker image
         run: docker build . -t jazkarta.shop
         env:
-           DOCKER_BUILDKIT: "1" 
+           DOCKER_BUILDKIT: "1"
 
       - name: Start Plone server
-        run: docker-compose up -d
+        run: docker compose up -d
         env:
-           DOCKER_BUILDKIT: "1" 
+           DOCKER_BUILDKIT: "1"
 
       - name: Check that jazkarta.shop was installed
         run: curl --fail -v http://localhost:8080/Plone/review-cart
@@ -39,4 +39,4 @@ jobs:
 
       - name: Print plone server logs
         if: always()  # This step should be also run when a previous step failed
-        run: docker-compose logs plone
+        run: docker compose logs plone
