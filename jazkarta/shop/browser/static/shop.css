@@ -1,134 +1,134 @@
 .jaz-shop-cart-wrapper {
-	float: right;
-	position: relative;
+  float: right;
+  position: relative;
 }
 .jaz-shop-cart,
 .jaz-shop-cart-portlet {
-	position: absolute;
-	right: 0;
-	display: none;
-	z-index: 2;
-	background: rgba(20,20,20,0.9);
-	color: #fff;
-	width: 200px;
-	padding: .5em;
+  position: absolute;
+  right: 0;
+  display: none;
+  z-index: 2;
+  background: rgba(20, 20, 20, 0.9);
+  color: #fff;
+  width: 200px;
+  padding: 0.5em;
 }
 .portlet .jaz-shop-cart-portlet {
-	width: 400px;
+  width: 400px;
 }
 .jaz-shop-cart-portlet-wrapper {
-    position: relative;
-    right: 130px;
+  position: relative;
+  right: 130px;
 }
 .jaz-shop-cart-portlet-trigger:hover {
-    cursor: pointer;
+  cursor: pointer;
 }
 .collapse[aria-expanded="true"] {
-	display: block;
+  display: block;
 }
-
 @media (min-width: 800px) {
-	.jaz-shop-half-form {
-		width: 45%;
-		margin-right: 5%;
-		float: left;
-	}
-	.jaz-shop-half-form + * {
-		clear: left;
-	}
-	.jaz-shop-half-form + .jaz-shop-half-form {
-		clear: none;
-	}
+  .jaz-shop-half-form {
+    width: 45%;
+    margin-right: 5%;
+    float: left;
+  }
+  .jaz-shop-half-form + * {
+    clear: left;
+  }
+  .jaz-shop-half-form + .jaz-shop-half-form {
+    clear: none;
+  }
 }
-
 input[type="text"].jaz-shop-quantity {
-	display: inline;
-	width: 2em;
-	height: auto;
-	padding: 0;
-	text-align: center;
+  display: inline;
+  width: 2em;
+  height: auto;
+  padding: 0;
+  text-align: center;
 }
-
 input[type="text"].jaz-shop-coupon {
-	display: inline;
-	width: auto;
+  display: inline;
+  width: auto;
 }
-
 .jaz-shop-buttons {
-	text-align: center;
-	margin: 2em auto;
+  text-align: center;
+  margin: 2em auto;
 }
-
 .jaz-shop-checkout-form input[type="text"] {
-	display: inline;
+  display: inline;
 }
 .jaz-shop-checkout-form input[type="text"][size] {
-	width: auto;
+  width: auto;
 }
 .jaz-shop-checkout-form .fieldset-contact-info label,
 .jaz-shop-shipping-address label {
-	width: 120px;
-	float: left;
+  width: 120px;
+  float: left;
+}
+.jaz-shop-checkout-form .fieldset-contact-info .subfield-billing-address-is-shipping-address label {
+  width: 83%;
+  margin-bottom: 10px;
+}
+.jaz-shop-checkout-form .fieldset-contact-info .subfield-billing-address-is-shipping-address input {
+  margin-top: 18px;
 }
 .jaz-shop-checkout-form .fieldset-contact-info input[type="text"],
 .jaz-shop-checkout-form .fieldset-contact-info input[type="email"],
 .jaz-shop-checkout-form .fieldset-contact-info select,
 .template-shipping input[type="text"],
 .template-shipping select {
-	width: calc(100% - 120px);
+  width: calc(100% - 120px);
+  width: -webkit-calc(100% - 120px);
+  width: -moz-calc(100% - 120px);
 }
 .template-shipping .select2-input {
-	width: 100% !important;
+  width: 100% !important;
 }
 .jaz-shop-checkout-form .fieldset-payment-info select {
-	display: inline;
-	width: 30%;
+  display: inline;
+  width: 30%;
 }
-
 /* for p4 only */
 jaz-shop-message.warning,
 jaz-shop-message.error {
-    margin: 1em 0;
-    font-size: 80%;
-    border: 1px solid #996;
-    background-color: #ffffe3;
-    clear: both;
+  margin: 1em 0;
+  font-size: 80%;
+  border: 1px solid #996;
+  background-color: #ffffe3;
+  clear: both;
 }
-
 /* extra styling to shipping form's select drop downs under p4 */
 .p4_select {
-    margin: 0em 0em 0em 2em;
+  margin: 0em 0em 0em 2em;
 }
-
 /* shop orders date range selection */
 #export_csv_button {
-    width: 100px;
+  width: 100px;
 }
 #shop-order-date-selection-table img {
-    display: none;
+  display: none;
 }
 #shop-order-date-selection-table .order-date-picker-box {
-    padding-right: 20px;
+  padding-right: 20px;
 }
 #content #shop-order-date-selection-table {
-    margin-left: 0px !important;
+  margin-left: 0px !important;
 }
-
 /* P5 fixes for shop orders date range selection */
 #shop-order-date-selection-table {
-    background-color: inherit;
+  background-color: inherit;
 }
 #shop-order-date-selection-table,
 #shop-order-date-selection-table > tbody > tr,
 #shop-order-date-selection-table > tbody > tr > td,
 #shop-order-date-selection-table > tbody > tr > th {
-    border: none;
+  border: none;
 }
-
 /* P5 fixes for shipping page field layout */
 .container .jaz-shop-shipping-address label {
   float: none;
 }
 .jaz-shop-shipping-address #formfield-form-widgets-country {
-    margin-top: 20px;
+  margin-top: 20px;
 }
+/*# sourceMappingURL=shop.css.map */

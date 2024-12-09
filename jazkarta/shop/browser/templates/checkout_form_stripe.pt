@@ -36,6 +36,23 @@
       });
     };
 
+    function billingAddressIsShippingAddress(value) {
+      fields = Array('first_name', 'last_name', 'address', 'city', 'state', 'zip', 'country');
+      for (let i = 0; i < fields.length; i++) {
+        let field = document.getElementById(fields[i])
+        if (Boolean(value)) {
+          field.disabled='disabled';
+          field.required='';
+          field.value=field.shipping_value;
+        } else {
+          field.disabled='';
+          field.required='required';
+          field.shipping_value=field.value;
+          field.value='';
+        }
+      }
+    }
+
     jQuery(function($) {
       var $method = $('input[name="method"]');
       var $cc_field = $('.field-credit-card');
@@ -130,34 +147,38 @@
 
         <div class="field field-address">
           <div class="field-inputs" id="card-token-data">
+          <div class="field subfield-billing-address-is-shipping-address" tal:condition="python:view.cart.ship_to">
+            <label>Billing address is same as shipping address</label>
+            <input type="checkbox" name="billing_address_is_shipping_address" tal:attributes="checked python: view.request.form.get('billing_address_is_shipping_address', 'True')" id="billing_address_is_shipping_address" onchange="billingAddressIsShippingAddress(this.checked);"/>
+          </div>
             <div class="field subfield-first-name">
               <label>First name</label>
-              <input type="text" name="first_name" required="required" tal:attributes="value python: view.request.form.get('first_name', None)" />
+              <input type="text" id="first_name" name="first_name" disabled="disabled" tal:attributes="value python: view.request.form.get('first_name', None)" />
             </div>
             <div class="field subfield-last-name">
               <label>Last name</label>
-              <input type="text" name="last_name" required="required" tal:attributes="value python: view.request.form.get('last_name', None)" />
+              <input type="text" id="last_name" name="last_name" disabled="disabled" tal:attributes="value python: view.request.form.get('last_name', None)" />
             </div>
             <div class="field subfield-address">
               <label>Address</label>
-              <input type="text" name="address" required="required" tal:attributes="value python: view.request.form.get('address', None)" />
+              <input type="text" id="address" name="address" disabled="disabled" tal:attributes="value python: view.request.form.get('address', None)" />
             </div>
             <div class="field subfield-city">
               <label>City</label>
-              <input type="text" name="city" required="required" tal:attributes="value python: view.request.form.get('city', None)" />
+              <input type="text" id="city" name="city" disabled="disabled" tal:attributes="value python: view.request.form.get('city', None)" />
             </div>
             <div class="field subfield-state">
               <label>State</label>
-              <input type="text" name="state" required="required" tal:attributes="value python: view.request.form.get('state', None)"/>
+              <input type="text" id="state" name="state" disabled="disabled" tal:attributes="value python: view.request.form.get('state', None)"/>
             </div>
             <div class="field subfield-zip">
               <label>Postal code</label>
-              <input type="text" name="zip" required="required" tal:attributes="value python: view.request.form.get('zip', None)" />
+              <input type="text" id="zip" name="zip" disabled="disabled" tal:attributes="value python: view.request.form.get('zip', None)" />
             </div>
             <div class="field subfield-country"
                  tal:define="value request/country|string:United States">
               <label>Country</label>
-              <select name="country" required="required" class="pat-select2">
+              <select id="country" name="country" disabled="disabled" class="pat-select2">
                 <option tal:repeat="country view/countries"
                         tal:content="country"
                         tal:attributes="value country; selected python:'selected' if country == value else None">United States</option>
