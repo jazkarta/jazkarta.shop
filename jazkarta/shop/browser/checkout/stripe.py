@@ -40,12 +40,21 @@ class CheckoutFormStripe(CheckoutFormBase):
 
         userid = get_current_userid()
         contact_info = PersistentMapping()
-        for f in ('first_name', 'last_name', 'email', 'phone', 'address',
-                  'city', 'state', 'zip', 'country'):
-            if f in self.request.form: # for digital products only email address is currently required in /checkout
-                contact_info[f] = self.request.form[f]
+        for field in ('first_name', 'last_name', 'email', 'phone', 'address', 'city', 'state', 'zip', 'country'):
+            if field in self.request.form: # for digital products only email address is currently required in /checkout
+                if self.request.form.get('billing_address_is_shipping_address') == 'on' and field not in ('email', 'phone'):
+                    # Use shipping data inplace of form data if the 'billing_address_is_shipping_address'
+                    # checkbox is checked.
+                    if field == 'zip':
+                        contact_info[field] = self.cart.ship_to['postal_code']
+                    elif field == 'address':
+                        contact_info[field] = self.cart.ship_to['street']
+                    else:
+                        contact_info[field] = self.cart.ship_to[field]
+                else:
+                    contact_info[field] = self.request.form[field]
             else:
-                contact_info[f] = None
+                contact_info[field] = None
 
         if not amount and 'nocharge' in self.request.form:
             method = 'Free download'
@@ -165,3 +174,23 @@ class CheckoutFormStripe(CheckoutFormBase):
         self.old_cart = self.cart.clone()
 
         self.send_receipt_email()
+
+    def prepopulate_billing_info(self):
+        form = self.request.form
+        for form_field in (
+            'first_name',
+            'last_name',
+            'address',
+            'city',
+            'state',
+            'zip',
+            'country'
+        ):
+            address_field = form_field
+            if form_field == 'address':
+                address_field = 'street'
+            elif form_field == 'zip':
+                address_field = 'postal_code'
+
+            if form_field not in form and address_field in self.cart.ship_to:
+                form[form_field] = self.cart.ship_to[address_field]
