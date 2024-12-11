@@ -256,7 +256,7 @@ SHIPPING_COUNTRIES = (
     ("Uganda", "UG"),
     ("Ukraine", "UA"),
     ("United Arab Emirates", "AE"),
-    ("United Kingdom (Great Britain and Northern Ireland)", "GB"),
+    ("United Kingdom of Great Britain and Northern Ireland", "GB"),
     ("Uruguay", "UY"),
     ("Uzbekistan", "UZ"),
     ("Vanuatu", "VU"),
