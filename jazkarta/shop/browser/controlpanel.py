@@ -17,7 +17,10 @@ from plone.app.registry.browser.controlpanel import ControlPanelFormWrapper
 from plone.batching import Batch
 from plone.z3cform import layout
 from Products.Five import BrowserView
-from Products.ZCatalog.Lazy import Lazy
+try:
+    from Products.ZCatalog.Lazy import Lazy
+except ImportError:
+    from ZTUtils.Lazy import Lazy
 from zope.component.hooks import getSite
 from zope.interface import implementer
 from z3c.form import form
