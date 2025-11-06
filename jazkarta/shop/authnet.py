@@ -21,6 +21,16 @@ class AuthorizeDotNetDebugFilter(logging.Filter):
         else:
             return 0
 
+# Patch pyxb date class; https://github.com/pabigot/pyxb/issues/12
+from pyxb.binding.datatypes import date as pyxb_date
+orig_new = pyxb_date.__new__
+def date_new(cls, *args, **kw):
+    if len(args) == 8:
+        if args[3] == 12 and all(not bool(x) for x in args[-4:]):
+            args = args[:3]
+    return orig_new(cls, *args, **kw)
+pyxb_date.__new__ = date_new
+
 
 logger = logging.getLogger(__name__)
 authnet_logger = logging.getLogger(constants.defaultLoggerName)
