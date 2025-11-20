@@ -21,14 +21,20 @@ class AuthorizeDotNetDebugFilter(logging.Filter):
         else:
             return 0
 
+
 # Patch pyxb date class; https://github.com/pabigot/pyxb/issues/12
 from pyxb.binding.datatypes import date as pyxb_date
+
 orig_new = pyxb_date.__new__
+
+
 def date_new(cls, *args, **kw):
     if len(args) == 8:
         if args[3] == 12 and all(not bool(x) for x in args[-4:]):
             args = args[:3]
     return orig_new(cls, *args, **kw)
+
+
 pyxb_date.__new__ = date_new
 
 
@@ -57,21 +63,21 @@ def enhanced_authnet_logging():
 def _getMerchantAuth():
     merchantAuth = apicontractsv1.merchantAuthenticationType()
     if config.IN_PRODUCTION:
-        merchantAuth.name = get_setting('authorizenet_api_login_id_production')
+        merchantAuth.name = get_setting("authorizenet_api_login_id_production")
         merchantAuth.transactionKey = get_setting(
-            'authorizenet_transaction_key_production')
+            "authorizenet_transaction_key_production"
+        )
     else:
-        merchantAuth.name = get_setting('authorizenet_api_login_id_dev')
-        merchantAuth.transactionKey = get_setting(
-            'authorizenet_transaction_key_dev')
+        merchantAuth.name = get_setting("authorizenet_api_login_id_dev")
+        merchantAuth.transactionKey = get_setting("authorizenet_transaction_key_dev")
     return merchantAuth
 
 
 def _getPayment(opaque_data):
     # Create the payment object for a payment nonce
     opaqueData = apicontractsv1.opaqueDataType()
-    opaqueData.dataDescriptor = opaque_data['dataDescriptor']
-    opaqueData.dataValue = opaque_data['dataValue']
+    opaqueData.dataDescriptor = opaque_data["dataDescriptor"]
+    opaqueData.dataValue = opaque_data["dataValue"]
 
     # Add the payment data to a paymentType object
     payment = apicontractsv1.paymentType()
@@ -93,8 +99,8 @@ def _getLineItems(cart):
 
 
 def createTransactionRequest(
-        cart, refId, opaque_data, contact_info,
-        transactionType='authCaptureTransaction'):
+    cart, refId, opaque_data, contact_info, transactionType="authCaptureTransaction"
+):
 
     # Get Authorize.net API credentials
     merchantAuth = _getMerchantAuth()
@@ -109,19 +115,20 @@ def createTransactionRequest(
     # Set the customer's Bill To address
     customerAddress = apicontractsv1.customerAddressType()
     customerAddress.firstName = contact_info.get(
-        'first_name', contact_info.get('name_on_card', ''))
-    customerAddress.lastName = contact_info.get('last_name', '')
-    customerAddress.address = contact_info['address']
-    customerAddress.city = contact_info['city']
-    customerAddress.state = contact_info['state']
-    customerAddress.zip = contact_info['zip']
-    customerAddress.country = contact_info['country']
-    customerAddress.phoneNumber = contact_info['phone']
+        "first_name", contact_info.get("name_on_card", "")
+    )
+    customerAddress.lastName = contact_info.get("last_name", "")
+    customerAddress.address = contact_info["address"]
+    customerAddress.city = contact_info["city"]
+    customerAddress.state = contact_info["state"]
+    customerAddress.zip = contact_info["zip"]
+    customerAddress.country = contact_info["country"]
+    customerAddress.phoneNumber = contact_info["phone"]
 
     # Set the customer's identifying information
     customerData = apicontractsv1.customerDataType()
     customerData.type = "individual"
-    customerData.email = contact_info['email']
+    customerData.email = contact_info["email"]
 
     # @@@ shipping
 
@@ -155,23 +162,21 @@ def createTransactionRequest(
         controller.execute()
         response = controller.getresponse()
 
-    logger.info(
-        'createTransactionController response: {}'.format(response.__repr__())
-    )
-    defaultMsg = 'Your card could not be processed.'
+    logger.info("createTransactionController response: {}".format(response.__repr__()))
+    defaultMsg = "Your card could not be processed."
     if controller._httpResponse:
-        logger.info('Authorize.net response: {}'.format(controller._httpResponse))
-    if response.messages.resultCode == 'Ok':
+        logger.info("Authorize.net response: {}".format(controller._httpResponse))
+    if response.messages.resultCode == "Ok":
         if response.transactionResponse.responseCode != 1:  # Approved
             raise PaymentProcessingException(defaultMsg)
         return response
     else:
         raise PaymentProcessingException(
-            response.messages.message[0].text or defaultMsg)
+            response.messages.message[0].text or defaultMsg
+        )
 
 
-def ARBCreateSubscriptionRequest(
-        cart, refId, opaque_data, contact_info, months):
+def ARBCreateSubscriptionRequest(cart, refId, opaque_data, contact_info, months):
 
     # Get Authorize.net API credentials
     merchantAuth = _getMerchantAuth()
@@ -193,20 +198,20 @@ def ARBCreateSubscriptionRequest(
 
     # Setting billing information
     billto = apicontractsv1.nameAndAddressType()
-    billto.firstName = contact_info['first_name']
-    billto.lastName = contact_info['last_name']
-    billto.address = contact_info['address']
-    billto.city = contact_info['city']
-    billto.state = contact_info['state']
-    billto.zip = contact_info['zip']
-    billto.country = contact_info['country']
-    billto.phoneNumber = contact_info['phone']
+    billto.firstName = contact_info["first_name"]
+    billto.lastName = contact_info["last_name"]
+    billto.address = contact_info["address"]
+    billto.city = contact_info["city"]
+    billto.state = contact_info["state"]
+    billto.zip = contact_info["zip"]
+    billto.country = contact_info["country"]
+    billto.phoneNumber = contact_info["phone"]
 
     # Set the customer's identifying information
     customerData = apicontractsv1.customerType()
     customerData.type = "individual"
-    customerData.email = contact_info['email']
-    customerData.phoneNumber = contact_info['phone']
+    customerData.email = contact_info["email"]
+    customerData.phoneNumber = contact_info["phone"]
 
     # Setting subscription details
     subscription = apicontractsv1.ARBSubscriptionType()
@@ -230,9 +235,9 @@ def ARBCreateSubscriptionRequest(
         response = controller.getresponse()
 
     logger.info(
-        'ARBCreateSubscriptionController response: {}'.format(response.__repr__())
+        "ARBCreateSubscriptionController response: {}".format(response.__repr__())
     )
-    if response.messages.resultCode == 'Ok':
+    if response.messages.resultCode == "Ok":
         return response
     else:
-        raise PaymentProcessingException(response.messages.message[0].text)
+        raise PaymentProcessingException(response.messages.message[0]["text"])

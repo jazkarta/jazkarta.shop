@@ -8,6 +8,7 @@ Unreleased
   This fixes free products not being added to the cart
 - Don't rely on only the request value to bypass stripe charges.
 - Add item-added js trigger hook when click detected on '.jaz-shop-add' button
+- Fix parsing of error message from Authorize.net recurring subscription responses.
 
 2.0.5 (2022-05-04)
 -----------------
