@@ -103,6 +103,7 @@ class UpdateCartView(CartViewMixin, BrowserView, P5Mixin):
                 cart_id: 'Not enough items in stock.',
             }
 
+        self.cart.calculate_taxes()
         self.validate_cart()
 
     def __call__(self):
