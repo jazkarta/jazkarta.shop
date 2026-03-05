@@ -347,8 +347,14 @@ class ISettings(model.Schema):
         required=False,
     )
 
-    usps_userid = schema.TextLine(
-        title=u'USPS WebTools API User Id',
+    usps_consumer_key = schema.TextLine(
+        title=u'USPS API Consumer Key',
+        description=u"Required if USPS shipping option is being used.",
+        required=False,
+    )
+
+    usps_consumer_secret = schema.TextLine(
+        title=u'USPS API Consumer Secret',
         description=u"Required if USPS shipping option is being used.",
         required=False,
     )

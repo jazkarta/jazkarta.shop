@@ -151,4 +151,13 @@
       import_steps="plone.app.registry"
       />
 
+  <genericsetup:upgradeDepends
+      profile="jazkarta.shop:default"
+      source="13"
+      destination="14"
+      title="Replace USPS userid with OAuth2 consumer key and secret"
+      description=""
+      import_steps="plone.app.registry"
+      />
+
 </configure>
