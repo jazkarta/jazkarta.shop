@@ -1,104 +1,84 @@
+from datetime import datetime
+from datetime import timedelta
 from decimal import Decimal
-from lxml import etree
-import re
+import threading
+
 import requests
+
+from .config import SHIPPING_COUNTRIES
 from .utils import get_setting
 
-ENDPOINT = 'http://production.shippingapis.com/ShippingAPI.dll'
-DOMESTIC_REQUEST = """<RateV4Request USERID="%(userid)s">
-  <Revision>2</Revision>
-  <Package ID="0">
-    <Service>%(service)s</Service>
-    <ZipOrigination>%(origin_zip)s</ZipOrigination>
-    <ZipDestination>%(destination_zip)s</ZipDestination>
-    <Pounds>%(pounds)s</Pounds>
-    <Ounces>%(ounces)s</Ounces>
-    <Container></Container>
-    <Size>REGULAR</Size>
-  </Package>
-</RateV4Request>
-"""
-INTL_REQUEST = """<IntlRateV2Request USERID="%(userid)s">
-  <Revision>2</Revision>
-  <Package ID="0">
-    <Pounds>%(pounds)s</Pounds>
-    <Ounces>%(ounces)s</Ounces>
-    <MailType>Package</MailType>
-    <ValueOfContents></ValueOfContents>
-    <Country>%(country)s</Country>
-    <Container></Container>
-    <Size>REGULAR</Size>
-    <Width></Width>
-    <Length></Length>
-    <Height></Height>
-    <Girth></Girth>
-    <OriginZip>%(origin_zip)s</OriginZip>
-  </Package>
-</IntlRateV2Request>
-"""
-
-WHITESPACE_RE = re.compile(r'\s+')
+ENDPOINT = "https://apis.usps.com"
+USPS_COUNTRY_MAP = dict(SHIPPING_COUNTRIES)
+USPS_TOKEN = {}
+token_update_lock = threading.Lock()
 
 
-def call_usps_api(api, request, params):
-    params = params.copy()
-    params.update({
-        'userid': get_setting('usps_userid'),
-        'origin_zip': get_setting('ship_from_zip'),
-    })
-    request = (request % params).replace('\n', '')
-    request = WHITESPACE_RE.sub(' ', request)
-    res = requests.get(ENDPOINT, params={
-        'API': api,
-        'XML': request,
-        })
-    tree = etree.fromstring(res.content)
-    error = None
-    if tree.tag == 'Error':
-        error = tree
-    else:
-        error = tree.find('.//Error')
-    if error is not None:
-        raise Exception('USPS Error: %s' % error.find('Description').text)
-    return tree
-
-
-def expand_weight(weight):
-    pounds = int(weight)
-    ounces = (weight - int(weight)) * 16
-    return pounds, ounces
-
-
-def calculate_domestic_usps_rate(weight, service_type, destination_zip):
-    pounds, ounces = expand_weight(weight)
-    usps_services = {'USPS Priority Mail' : 'PRIORITY',
-                     'USPS Media Mail' : 'MEDIA'}
-    params = {
-        'destination_zip': destination_zip,
-        'pounds': pounds,
-        'ounces': ounces,
-        'service': usps_services[service_type],
-    }
-    res = call_usps_api('RateV4', DOMESTIC_REQUEST, params)
-    rate = res.find('.//Postage/Rate').text
-    return Decimal(rate)
-
-
-def calculate_international_usps_rate(weight, country):
-    pounds, ounces = expand_weight(weight)
-    params = {
-        'country': country,
-        'pounds': pounds,
-        'ounces': ounces,
-    }
-    res = call_usps_api('IntlRateV2', INTL_REQUEST, params)
-    # get the rate for Priority Mail International
-    rate = res.find('.//Service[@ID="2"]').find('Postage').text
-    return Decimal(rate)
+def get_usps_access_token():
+    """Get USPS OAuth access token.
+    Cache it in a global variable until it expires.
+    """
+    token = USPS_TOKEN
+    with token_update_lock:
+        if not token or token["expires_at"] < datetime.now():
+            response = requests.post(
+                f"{ENDPOINT}/oauth2/v3/token",
+                json={
+                    "grant_type": "client_credentials",
+                    "client_id": get_setting('usps_consumer_key'),
+                    "client_secret": get_setting('usps_consumer_secret'),
+                },
+            )
+            response.raise_for_status()
+            token.update(response.json())
+            token["expires_at"] = (
+                datetime.fromtimestamp(int(token["issued_at"]) / 1000) +
+                timedelta(seconds=int(token["expires_in"]) - 60)
+            )
+    return token["access_token"]
 
 
 def calculate_usps_rate(weight, service_type, country, zip):
-    if country == 'United States':
-        return calculate_domestic_usps_rate(weight, service_type, zip)
+    access_token = get_usps_access_token()
+    origin_zip = get_setting('ship_from_zip')
+    options = {
+        "priceType": "RETAIL",
+        "processingCategory": "NONSTANDARD",
+        "rateIndicator": "SP",  # single piece (not flat rate box or envelope)
+        "destinationEntryFacilityType": "NONE",
+        "originZIPCode": origin_zip,
+        "weight": weight,
+        "length": 1,
+        "width": 1,
+        "height": 1,
+    }
+    # We can't calculate rates without a destination zip code. Returning None
+    # will skip this shipping method
+    if not zip:
+        return None
+    if country == "United States":
+        endpoint = f"{ENDPOINT}/prices/v3/base-rates/search"
+        options["destinationZIPCode"] = zip
+        if service_type == "USPS Media Mail":
+            options["mailClass"] = "MEDIA_MAIL"
+        else:
+            options["mailClass"] = "PRIORITY_MAIL"
     else:
-        return calculate_international_usps_rate(weight, country)
+        endpoint = f"{ENDPOINT}/international-prices/v3/base-rates/search"
+        options["destinationCountryCode"] = USPS_COUNTRY_MAP[country]
+        options["foreignPostalCode"] = zip
+        options["mailClass"] = "PRIORITY_MAIL_INTERNATIONAL"
+    response = requests.post(
+        endpoint,
+        json=options,
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+    try:
+        response.raise_for_status()
+    except Exception as err:
+        try:
+            message = response.json()["response"]["errors"][0]["message"]
+        except Exception:
+            message = str(err)
+        raise Exception(f"USPS error: {message}")
+    return Decimal(response.json()["totalBasePrice"])
