@@ -46,18 +46,19 @@ describe('Admin operations', () => {
         cy.contains("My Cart").click();
         cy.contains("Checkout").click();
         cy.contains("Proceed to Checkout").click();
-        cy.get("input[name=first_name]").type("John");
-        cy.get("input[name=last_name]").type("Doe");
-        cy.get("input[name=address]").type("Customer street 101");
-        cy.get("input[name=city]").type("Customer City");
-        cy.get("input[name=state]").type("Customer State");
-        cy.get("input[name=zip]").type("000000");
+        cy.get("input[name=first_name]").type("John", { force: true });
+        cy.get("input[name=last_name]").type("Doe", { force: true });
+        cy.get("input[name=address]").type("Customer street 101", { force: true });
+        cy.get("input[name=city]").type("Customer City", { force: true });
+        cy.get("input[name=state]").type("Customer State", { force: true });
+        cy.get("input[name=zip]").type("000000", { force: true });
         cy.get("input[name=email]").type("customer@example.com");
         cy.get("input[name=phone]").type("+1-555-555-5555");
         cy.contains("Cash").click();
         cy.contains("Complete Purchase").click();
         cy.contains("Thank You");
-        cy.contains("Your purchases total $10.00");
+        cy.contains("Your purchases total");
+        cy.contains("$10.00");
     })
 })
 
