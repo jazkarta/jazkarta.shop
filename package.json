@@ -1,6 +1,6 @@
 {
   "devDependencies": {
-    "cypress": "^9.5.3",
+    "cypress": "^14.0.0",
     "cypress-plone": "^1.0.0"
   },
   "scripts": {

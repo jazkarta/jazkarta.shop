@@ -7,3 +7,6 @@
 bin/
 develop-eggs/
 parts/
+node_modules/
+build/
+dist/
